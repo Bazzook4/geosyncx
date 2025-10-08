@@ -1,6 +1,6 @@
 {
   "name": "timezone-comparator",
-  "homepage": "https://github.com/Bazzook4/geosyncx.git",
+  "homepage": "https://www.geosyncx.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,17 +9,21 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "rm -rf dist && vite build && touch dist/.nojekyll && echo www.geosyncx.com > dist/CNAME && cp dist/index.html dist/404.html",
+    "deploy": "gh-pages -d dist -b gh-pages"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.12",
+    "@vvo/tzdb": "^6.183.0",
+    "chrono-node": "^2.8.4",
+    "libphonenumber-js": "^1.12.15",
     "luxon": "^3.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "tailwindcss": "^4.0.12"
+    "tailwindcss": "^4.0.12",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

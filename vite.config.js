@@ -1,9 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+// /vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
-// https://vite.dev/config/
 export default defineConfig({
+<<<<<<< HEAD
   plugins: [
     react(),
     tailwindcss(),
@@ -13,3 +14,9 @@ export default defineConfig({
   // (Optional alternative if you want relative paths)
   // base: './',
 })
+=======
+  plugins: [react(), tailwindcss()],
+  // custom domain root
+  base: '/',
+});
+>>>>>>> d01065a (Refresh UI, smart to-do updates, and live weather icons)
