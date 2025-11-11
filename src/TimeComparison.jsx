@@ -2,7 +2,118 @@
 import { useState, useEffect, useMemo } from "react";
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
-import { MapPinIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { MapPinIcon, TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
+
+// Country calling codes mapping
+const countryCallingCodes = {
+  "+1": ["United States", "Canada"],
+  "+7": ["Russia", "Kazakhstan"],
+  "+20": ["Egypt"],
+  "+27": ["South Africa"],
+  "+30": ["Greece"],
+  "+31": ["Netherlands"],
+  "+32": ["Belgium"],
+  "+33": ["France"],
+  "+34": ["Spain"],
+  "+36": ["Hungary"],
+  "+39": ["Italy"],
+  "+40": ["Romania"],
+  "+41": ["Switzerland"],
+  "+43": ["Austria"],
+  "+44": ["United Kingdom"],
+  "+45": ["Denmark"],
+  "+46": ["Sweden"],
+  "+47": ["Norway"],
+  "+48": ["Poland"],
+  "+49": ["Germany"],
+  "+51": ["Peru"],
+  "+52": ["Mexico"],
+  "+53": ["Cuba"],
+  "+54": ["Argentina"],
+  "+55": ["Brazil"],
+  "+56": ["Chile"],
+  "+57": ["Colombia"],
+  "+58": ["Venezuela"],
+  "+60": ["Malaysia"],
+  "+61": ["Australia"],
+  "+62": ["Indonesia"],
+  "+63": ["Philippines"],
+  "+64": ["New Zealand"],
+  "+65": ["Singapore"],
+  "+66": ["Thailand"],
+  "+81": ["Japan"],
+  "+82": ["South Korea"],
+  "+84": ["Vietnam"],
+  "+86": ["China"],
+  "+90": ["Turkey"],
+  "+91": ["India"],
+  "+92": ["Pakistan"],
+  "+93": ["Afghanistan"],
+  "+94": ["Sri Lanka"],
+  "+95": ["Myanmar"],
+  "+98": ["Iran"],
+  "+212": ["Morocco"],
+  "+213": ["Algeria"],
+  "+216": ["Tunisia"],
+  "+218": ["Libya"],
+  "+220": ["Gambia"],
+  "+234": ["Nigeria"],
+  "+249": ["Sudan"],
+  "+250": ["Rwanda"],
+  "+251": ["Ethiopia"],
+  "+254": ["Kenya"],
+  "+255": ["Tanzania"],
+  "+256": ["Uganda"],
+  "+260": ["Zambia"],
+  "+263": ["Zimbabwe"],
+  "+264": ["Namibia"],
+  "+265": ["Malawi"],
+  "+351": ["Portugal"],
+  "+352": ["Luxembourg"],
+  "+353": ["Ireland"],
+  "+354": ["Iceland"],
+  "+358": ["Finland"],
+  "+370": ["Lithuania"],
+  "+371": ["Latvia"],
+  "+372": ["Estonia"],
+  "+373": ["Moldova"],
+  "+374": ["Armenia"],
+  "+375": ["Belarus"],
+  "+380": ["Ukraine"],
+  "+381": ["Serbia"],
+  "+385": ["Croatia"],
+  "+386": ["Slovenia"],
+  "+387": ["Bosnia and Herzegovina"],
+  "+389": ["North Macedonia"],
+  "+420": ["Czech Republic"],
+  "+421": ["Slovakia"],
+  "+852": ["Hong Kong"],
+  "+853": ["Macau"],
+  "+880": ["Bangladesh"],
+  "+886": ["Taiwan"],
+  "+960": ["Maldives"],
+  "+961": ["Lebanon"],
+  "+962": ["Jordan"],
+  "+963": ["Syria"],
+  "+964": ["Iraq"],
+  "+965": ["Kuwait"],
+  "+966": ["Saudi Arabia"],
+  "+967": ["Yemen"],
+  "+968": ["Oman"],
+  "+971": ["United Arab Emirates"],
+  "+972": ["Israel"],
+  "+973": ["Bahrain"],
+  "+974": ["Qatar"],
+  "+975": ["Bhutan"],
+  "+976": ["Mongolia"],
+  "+977": ["Nepal"],
+  "+992": ["Tajikistan"],
+  "+993": ["Turkmenistan"],
+  "+994": ["Azerbaijan"],
+  "+995": ["Georgia"],
+  "+996": ["Kyrgyzstan"],
+  "+998": ["Uzbekistan"],
+};
 
 function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
@@ -34,13 +145,15 @@ export default function TimeComparison({
     return DateTime.now().setZone(zone).toISODate();
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [phoneCode, setPhoneCode] = useState("");
+  const [phoneCodeMatches, setPhoneCodeMatches] = useState([]);
   const [filteredTimezones, setFilteredTimezones] = useState([]);
   const [weatherByZone, setWeatherByZone] = useState({});
   const [weatherRefreshTick, setWeatherRefreshTick] = useState(0);
 
   // Small calendar fields
   const [title, setTitle] = useState("Meeting");
-  const [durationMin, setDurationMin] = useState(60);
+  const [durationMin, setDurationMin] = useState(30);
   const [location, setLocation] = useState("Google Meet");
   const [details, setDetails] = useState("Planned via GeoSyncX");
 
@@ -81,22 +194,61 @@ export default function TimeComparison({
     return () => clearInterval(interval);
   }, [selectedZones, primaryZone]);
 
-  // Search filter
+  // Phone code lookup
   useEffect(() => {
-    if (!searchQuery) {
+    if (!phoneCode) {
+      setPhoneCodeMatches([]);
+      return;
+    }
+    const normalized = phoneCode.startsWith("+") ? phoneCode : `+${phoneCode}`;
+    const countries = countryCallingCodes[normalized];
+    if (countries) {
+      const matches = timezoneData.filter((tz) =>
+        countries.some((country) =>
+          tz.country.toLowerCase().includes(country.toLowerCase())
+        )
+      );
+      setPhoneCodeMatches(matches);
+    } else {
+      setPhoneCodeMatches([]);
+    }
+  }, [phoneCode]);
+
+  // Search filter - combines text search and phone code results
+  useEffect(() => {
+    if (!searchQuery && phoneCodeMatches.length === 0) {
       setFilteredTimezones([]);
       return;
     }
-    const q = searchQuery.toLowerCase();
-    const filtered = timezoneData.filter(
-      (tz) =>
-        tz.city.toLowerCase().includes(q) ||
-        tz.country.toLowerCase().includes(q) ||
-        tz.value.toLowerCase().includes(q) ||
-        tz.gmt.toLowerCase().includes(q)
-    );
-    setFilteredTimezones(filtered.slice(0, 200));
-  }, [searchQuery]);
+
+    let results = [];
+
+    // Add phone code matches first
+    if (phoneCodeMatches.length > 0) {
+      results = [...phoneCodeMatches];
+    }
+
+    // Add text search results
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const textMatches = timezoneData.filter(
+        (tz) =>
+          tz.city.toLowerCase().includes(q) ||
+          tz.country.toLowerCase().includes(q) ||
+          tz.value.toLowerCase().includes(q) ||
+          tz.gmt.toLowerCase().includes(q)
+      );
+
+      // Merge without duplicates
+      textMatches.forEach((tm) => {
+        if (!results.find((r) => r.value === tm.value)) {
+          results.push(tm);
+        }
+      });
+    }
+
+    setFilteredTimezones(results.slice(0, 200));
+  }, [searchQuery, phoneCodeMatches]);
 
   // Convert “selectedTime” (HH:mm) from primary -> target zone
   const convertTime = (zone) => {
@@ -261,15 +413,38 @@ export default function TimeComparison({
         <label className="block mb-2 text-xs font-semibold uppercase tracking-wide opacity-80">
           Add a Timezone
         </label>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by city, country, IANA (e.g., Asia/Kolkata) or GMT..."
-          className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
-        />
-        {searchQuery && (
+        <div className="grid md:grid-cols-2 gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <PhoneIcon className="w-4 h-4 opacity-70" />
+              <label className="text-xs opacity-70">Search by Phone Code</label>
+            </div>
+            <input
+              type="text"
+              value={phoneCode}
+              onChange={(e) => setPhoneCode(e.target.value)}
+              placeholder="e.g., +91, +44, +1..."
+              className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
+            />
+          </div>
+          <div>
+            <label className="text-xs opacity-70 mb-1 block">Search by Location</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="City, country, IANA, or GMT..."
+              className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
+            />
+          </div>
+        </div>
+        {(searchQuery || phoneCode) && (
           <div className="mt-2 max-h-56 overflow-y-auto rounded-xl border border-white/10">
+            {phoneCode && phoneCodeMatches.length > 0 && (
+              <div className="p-2 bg-emerald-500/20 text-xs font-semibold sticky top-0 backdrop-blur-sm">
+                Found {phoneCodeMatches.length} timezone(s) for {phoneCode}
+              </div>
+            )}
             {filteredTimezones.map((tz) => (
               <div
                 key={tz.value}
@@ -277,6 +452,7 @@ export default function TimeComparison({
                 onClick={() => {
                   addZone(tz.value);
                   setSearchQuery("");
+                  setPhoneCode("");
                 }}
               >
                 {tz.city}, {tz.country} ({tz.gmt}) —{" "}
@@ -284,7 +460,9 @@ export default function TimeComparison({
               </div>
             ))}
             {filteredTimezones.length === 0 && (
-              <div className="p-2 opacity-70">No matches</div>
+              <div className="p-2 opacity-70">
+                {phoneCode ? `No timezones found for phone code ${phoneCode}` : "No matches"}
+              </div>
             )}
           </div>
         )}
@@ -431,7 +609,7 @@ export default function TimeComparison({
               className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
               placeholder="Duration (min)"
               value={durationMin}
-              onChange={(e) => setDurationMin(parseInt(e.target.value || "60", 10))}
+              onChange={(e) => setDurationMin(parseInt(e.target.value || "30", 10))}
             />
             <input
               className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}

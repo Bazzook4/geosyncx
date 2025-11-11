@@ -1,10 +1,10 @@
 // /src/App.jsx
 import { useMemo, useEffect, useState } from "react";
 import TimeComparison from "./TimeComparison.jsx";
-import TelephoneCodeLookup from "./TelephoneCodeLookup.jsx";
 import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import TodoSmart from "./TodoSmart.jsx";
-import { countryCodeToPrimaryTimezone } from "./timezones.js";
+import QuickLinks from "./QuickLinks.jsx";
+import FormatterStudio from "./FormatterStudio.jsx";
 
 const FALLBACK_QUOTES = [
   { text: "Small steps every day build momentum.", author: "Unknown" },
@@ -21,8 +21,9 @@ const FALLBACK_QUOTES = [
 ];
 
 const TABS = [
-  { id: "tasks", label: "Smart To-Do" },
   { id: "timezones", label: "Timezones" },
+  { id: "tasks", label: "Smart To-Do" },
+  { id: "formatter", label: "Formatter" },
 ];
 
 function shuffleQuotes(list) {
@@ -34,16 +35,9 @@ function shuffleQuotes(list) {
   return arr;
 }
 
-export default function App() {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true"
-  );
-  useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
+export default function App({ darkMode }) {
 
-  const [activeTab, setActiveTab] = useState("tasks");
+  const [activeTab, setActiveTab] = useState("timezones");
 
   const [quotes, setQuotes] = useState(() => shuffleQuotes(FALLBACK_QUOTES));
   const [quotePointer, setQuotePointer] = useState(0);
@@ -129,43 +123,7 @@ export default function App() {
     return primaryZone ? [primaryZone, ...unique] : unique;
   }, [primaryZone, selectedZones]);
 
-  const handleCountrySelect = (country) => {
-    if (!country) return;
-    const iso = country.iso?.toUpperCase();
-    if (!iso) return;
-    const match = countryCodeToPrimaryTimezone[iso];
-    if (!match) {
-      alert(`No timezone data found for ${country.country}.`);
-      return;
-    }
-    const alreadyTracked =
-      primaryZone === match.value || selectedZones.includes(match.value);
-    if (alreadyTracked) {
-      if (
-        primaryZone !== match.value &&
-        window.confirm(
-          `${match.city} (${match.gmt}) is already tracked. Set it as your primary timezone?`
-        )
-      ) {
-        setPrimaryZone(match.value);
-      } else if (primaryZone === match.value) {
-        alert(`${match.city} is already your primary timezone.`);
-      }
-      return;
-    }
-    if (
-      window.confirm(
-        `Add ${match.city} (${match.gmt}) to your timezone list for quick comparison?`
-      )
-    ) {
-      setSelectedZones((prev) => [...prev, match.value]);
-    }
-  };
-
   const quote = quotes[quotePointer] || FALLBACK_QUOTES[0];
-  const backgroundClass = darkMode
-    ? "bg-slate-950 text-slate-100"
-    : "bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 text-slate-900";
   const toolbarCard = darkMode
     ? "bg-white/10 border border-white/10 text-white"
     : "bg-white/70 border border-white/60 text-slate-900";
@@ -175,49 +133,25 @@ export default function App() {
   const tabInactive = darkMode
     ? "text-white/80 hover:text-white"
     : "text-slate-600 hover:text-slate-900";
-  const themeToggleClass = darkMode
-    ? "bg-white/20 text-white hover:bg-white/30"
-    : "bg-slate-900 text-white hover:bg-slate-800";
 
   return (
-    <div className={`min-h-screen w-full transition-colors ${backgroundClass}`}>
-      <div className="px-4 py-6 md:px-8 md:py-10 space-y-6 md:space-y-8">
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-xl shadow-lg ${toolbarCard}`}
-          >
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] opacity-80">
-              Daily Spark
+    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-xl shadow-lg ${toolbarCard}`}
+        >
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] opacity-80">
+            Daily Spark
+          </span>
+          <div className="flex flex-col">
+            <span className="text-sm md:text-base font-medium leading-snug">
+              "{quote.text}"
             </span>
-            <div className="flex flex-col">
-              <span className="text-sm md:text-base font-medium leading-snug">
-                “{quote.text}”
-              </span>
-            </div>
           </div>
+        </div>
+      </header>
 
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`px-3 py-2 rounded-xl transition-transform active:scale-95 shadow-lg ${themeToggleClass}`}
-              title="Toggle theme"
-            >
-              {darkMode ? "🌞" : "🌙"}
-            </button>
-            <button
-              onClick={() =>
-                (window.location.href =
-                  "mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback")
-              }
-              className="px-3 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg"
-              title="Send feedback"
-            >
-              📩
-            </button>
-          </div>
-        </header>
-
-        <div className="flex items-center justify-start">
+      <div className="flex items-center justify-start">
           <div
             className={`flex gap-2 p-1 rounded-full backdrop-blur-xl shadow-lg ${tabShell}`}
           >
@@ -242,10 +176,7 @@ export default function App() {
           <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-6">
             <TodoSmart darkMode={darkMode} />
             <div className="flex flex-col gap-4">
-              <TelephoneCodeLookup
-                darkMode={darkMode}
-                onCountrySelect={handleCountrySelect}
-              />
+              <QuickLinks darkMode={darkMode} />
             </div>
           </div>
         )}
@@ -262,7 +193,12 @@ export default function App() {
             <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} />
           </div>
         )}
-      </div>
+
+      {activeTab === "formatter" && (
+        <div className="space-y-4 xl:space-y-6">
+          <FormatterStudio darkMode={darkMode} />
+        </div>
+      )}
     </div>
   );
 }

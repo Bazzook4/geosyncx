@@ -49,16 +49,16 @@ export default function BestMeetingFinder({ zones = [], darkMode }) {
   useEffect(() => {
     if (!hasEnoughZones) return;
 
-    setExpandedCards(new Set()); // reset open state on zones change
+          setExpandedCards(new Set()); // reset open state on zones change
 
     setPrefs((prev) => {
       const next = { ...prev };
       let changed = false;
 
       // Add defaults for new
-      for (const z of validZones) {
-        if (!next[z]) {
-          next[z] = { start: "09:00", end: "18:00" };
+          for (const z of validZones) {
+            if (!next[z]) {
+              next[z] = { start: "11:00", end: "19:00" };
           changed = true;
         }
       }
@@ -140,7 +140,9 @@ export default function BestMeetingFinder({ zones = [], darkMode }) {
     if (!src) return;
     setPrefs((prev) => {
       const next = { ...prev };
-      for (const z of validZones) next[z] = { ...src };
+      for (const z of validZones) {
+        next[z] = { ...src };
+      }
       return next;
     });
   };
@@ -196,7 +198,7 @@ export default function BestMeetingFinder({ zones = [], darkMode }) {
               <tbody>
                 {validZones.map((z) => {
                   const city = labelByZone.get(z) || z.split("/").pop()?.replace(/_/g, " ") || z;
-                  const p = prefs[z] || { start: "09:00", end: "18:00" };
+                  const p = prefs[z] || { start: "11:00", end: "19:00" };
                   return (
                     <tr key={z} className={`${rowHoverClass} transition`}>
                       <td className="p-2 font-medium">{city}</td>
