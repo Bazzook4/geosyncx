@@ -259,24 +259,6 @@ export default function TimeComparison({
     return primaryZone ? [primaryZone, ...unique] : unique;
   }, [selectedZones, primaryZone]);
 
-  useEffect(() => {
-    setWeatherByZone((prev) => {
-      const next = {};
-      sortedTimezones.forEach((zone) => {
-        if (prev[zone]) next[zone] = prev[zone];
-      });
-      const prevKeys = Object.keys(prev);
-      const nextKeys = Object.keys(next);
-      if (
-        prevKeys.length === nextKeys.length &&
-        prevKeys.every((key) => nextKeys.includes(key))
-      ) {
-        return prev;
-      }
-      return next;
-    });
-  }, [sortedTimezones]);
-
   const formatTimeWithAMPM = (time) => {
     if (!time || time === "-") return { time: "-", ampm: "" };
     const [timePart, ampm] = time.split(" ");
