@@ -2,7 +2,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
-import { MapPinIcon, TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 
 // Country calling codes mapping
 const countryCallingCodes = {
@@ -467,8 +469,8 @@ export default function TimeComparison({
           </div>
         )}
 
-        {/* Primary date/time */}
-        <div className="grid md:grid-cols-3 gap-3 mt-4">
+        {/* Primary date */}
+        <div className="grid md:grid-cols-2 gap-3 mt-4">
           <div>
             <label className="block mb-1 font-semibold">Primary Date</label>
             <input
@@ -478,17 +480,9 @@ export default function TimeComparison({
               className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
             />
           </div>
-          <div>
-            <label className="block mb-1 font-semibold">Primary Time</label>
-            <input
-              type="time"
-              onChange={(e) => setSelectedTime(e.target.value)}
-              className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
-            />
-          </div>
           <div className="flex items-end">
             <span className="text-sm opacity-75">
-              {primaryZone ? `Primary: ${primaryZone}` : "Set a primary zone"}
+              {primaryZone ? `Primary Timezone: ${primaryZone}` : "Click ⭐ to set a primary timezone"}
             </span>
           </div>
         </div>
@@ -500,7 +494,17 @@ export default function TimeComparison({
               <tr className={tableHeaderClass}>
                 <th className="p-2 text-left md:w-1/2 w-[40%]">City</th>
                 <th className="p-2 text-left md:w-1/4 w-[30%]">Current</th>
-                <th className="p-2 text-left md:w-1/4 w-[30%]">Converted</th>
+                <th className="p-2 text-left md:w-1/4 w-[30%]">
+                  <div className="flex flex-col gap-1">
+                    <span>Converted</span>
+                    <input
+                      type="time"
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      placeholder="Set time"
+                      className={`p-2 rounded-lg shadow-inner transition text-sm ${inputClass}`}
+                    />
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -521,12 +525,16 @@ export default function TimeComparison({
                           onClick={() => setAsPrimary(tz)}
                           className={`p-1 rounded-lg ${
                             tz === primaryZone
-                              ? "text-emerald-400 hover:text-emerald-300"
-                              : "text-sky-400 hover:text-sky-300"
-                          } transition-transform transform hover:scale-110 active:scale-95`}
+                              ? "text-yellow-400 hover:text-yellow-300"
+                              : "text-gray-400 hover:text-yellow-400"
+                          } transition-all transform hover:scale-110 active:scale-95`}
                           title={tz === primaryZone ? "Primary Timezone" : "Set as Primary Timezone"}
                         >
-                          <MapPinIcon className="w-5 h-5" />
+                          {tz === primaryZone ? (
+                            <StarIconSolid className="w-5 h-5" />
+                          ) : (
+                            <StarIconOutline className="w-5 h-5" />
+                          )}
                         </button>
                         <button
                           onClick={() =>
@@ -539,7 +547,14 @@ export default function TimeComparison({
                         </button>
                       </div>
                       <div>
-                        <p className="font-bold">{timezone?.city || tz}</p>
+                        <p className="font-bold">
+                          {timezone?.city || tz}
+                          {tz === primaryZone && (
+                            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400">
+                              Primary
+                            </span>
+                          )}
+                        </p>
                         <p
                           className={`text-sm ${
                             darkMode ? "text-white/60" : "text-gray-500"
