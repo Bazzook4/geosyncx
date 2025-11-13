@@ -471,14 +471,23 @@ export default function TimeComparison({
           </div>
         )}
 
-        {/* Primary date */}
-        <div className="grid md:grid-cols-2 gap-3 mt-4">
+        {/* Primary date and time */}
+        <div className="grid md:grid-cols-3 gap-3 mt-4">
           <div>
             <label className="block mb-1 font-semibold">Primary Date</label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
+              className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-semibold">Set Time</label>
+            <input
+              type="time"
+              onChange={(e) => setSelectedTime(e.target.value)}
+              placeholder="Set time"
               className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
             />
           </div>
@@ -494,19 +503,9 @@ export default function TimeComparison({
           <table className="w-full border-collapse">
             <thead>
               <tr className={tableHeaderClass}>
-                <th className="p-2 text-left md:w-1/2 w-[40%]">City</th>
-                <th className="p-2 text-left md:w-1/4 w-[30%]">Current</th>
-                <th className="p-2 text-left md:w-1/4 w-[30%]">
-                  <div className="flex flex-col gap-1">
-                    <span>Converted</span>
-                    <input
-                      type="time"
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      placeholder="Set time"
-                      className={`p-2 rounded-lg shadow-inner transition text-sm ${inputClass}`}
-                    />
-                  </div>
-                </th>
+                <th className="p-3 text-left md:w-1/2 w-[40%] rounded-tl-xl">City</th>
+                <th className="p-3 text-left md:w-1/4 w-[30%]">Current</th>
+                <th className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">At This Time</th>
               </tr>
             </thead>
             <tbody>
