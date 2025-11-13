@@ -5,6 +5,7 @@ import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import TodoSmart from "./TodoSmart.jsx";
 import QuickLinks from "./QuickLinks.jsx";
 import FormatterStudio from "./FormatterStudio.jsx";
+import { normalizeTimezoneName } from "./timezones.js";
 
 const FALLBACK_QUOTES = [
   { text: "Small steps every day build momentum.", author: "Unknown" },
@@ -93,20 +94,19 @@ export default function App({ darkMode }) {
   }, [quotes, quotePointer]);
 
   const [primaryZone, setPrimaryZone] = useState(() => {
-    return (
-      localStorage.getItem("primaryZone") ||
-      Intl.DateTimeFormat().resolvedOptions().timeZone ||
-      "UTC"
-    );
+    const stored = localStorage.getItem("primaryZone");
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const tz = stored || detected || "UTC";
+    return normalizeTimezoneName(tz);
   });
 
   const [selectedZones, setSelectedZones] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("selectedZones") || "[]");
       if (!Array.isArray(saved)) return [];
-      const filtered = saved.filter(
-        (zone) => typeof zone === "string" && zone.trim().length > 0
-      );
+      const filtered = saved
+        .filter((zone) => typeof zone === "string" && zone.trim().length > 0)
+        .map(normalizeTimezoneName);
       return Array.from(new Set(filtered));
     } catch {
       return [];

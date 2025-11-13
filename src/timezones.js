@@ -2,6 +2,15 @@
 import { getTimeZones } from '@vvo/tzdb';
 const timeZones = getTimeZones();
 
+/** Normalize legacy timezone names to modern IANA names */
+export function normalizeTimezoneName(tz) {
+  // Map legacy timezone names to modern equivalents
+  const legacyMap = {
+    'Asia/Calcutta': 'Asia/Kolkata',
+  };
+  return legacyMap[tz] || tz;
+}
+
 /** Convert minutes offset to "GMT+H[:MM]" */
 function toGmtString(minutes) {
   const sign = minutes >= 0 ? '+' : '-';
