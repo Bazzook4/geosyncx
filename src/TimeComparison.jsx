@@ -165,7 +165,9 @@ export default function TimeComparison({
   const inputClass = darkMode
     ? "bg-white/5 text-white placeholder:text-white/50"
     : "bg-white/60 text-gray-900 placeholder:text-gray-500";
-  const tableHeaderClass = darkMode ? "bg-white/5" : "bg-white/70";
+  const tableHeaderClass = darkMode
+    ? "bg-gradient-to-b from-white/10 to-white/5 border-b border-white/20"
+    : "bg-gradient-to-b from-white/90 to-white/70 border-b border-white/40";
   const rowHoverClass = darkMode ? "hover:bg-white/10" : "hover:bg-white/80";
   const chipClass = darkMode ? "bg-white/10 text-white" : "bg-white/80 text-gray-900";
 
