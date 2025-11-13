@@ -472,7 +472,7 @@ export default function TimeComparison({
         )}
 
         {/* Primary date and time */}
-        <div className="grid md:grid-cols-3 gap-3 mt-4">
+        <div className="grid md:grid-cols-2 gap-3 mt-4">
           <div>
             <label className="block mb-1 font-semibold">Primary Date</label>
             <input
@@ -483,18 +483,19 @@ export default function TimeComparison({
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">Set Time</label>
+            <label className="block mb-1 font-semibold">
+              {primaryZone
+                ? `Your Time at ${
+                    timezoneData.find((tz) => tz.value === primaryZone)?.city || primaryZone.split("/").pop()
+                  }, ${timezoneData.find((tz) => tz.value === primaryZone)?.country || ""}`
+                : "Your Time (Click ⭐ to set primary timezone)"}
+            </label>
             <input
               type="time"
               onChange={(e) => setSelectedTime(e.target.value)}
               placeholder="Set time"
               className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
             />
-          </div>
-          <div className="flex items-end">
-            <span className="text-sm opacity-75">
-              {primaryZone ? `Primary Timezone: ${primaryZone}` : "Click ⭐ to set a primary timezone"}
-            </span>
           </div>
         </div>
 
@@ -505,7 +506,7 @@ export default function TimeComparison({
               <tr className={tableHeaderClass}>
                 <th className="p-3 text-left md:w-1/2 w-[40%] rounded-tl-xl">City</th>
                 <th className="p-3 text-left md:w-1/4 w-[30%]">Current</th>
-                <th className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">At This Time</th>
+                <th className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">Equivalent Time</th>
               </tr>
             </thead>
             <tbody>
@@ -582,7 +583,6 @@ export default function TimeComparison({
                     <td className="p-2 md:w-1/4 w-[30%]">
                       <div className="flex flex-col">
                         <span className="flex items-center gap-1">
-                          {weatherIcon ? <span>{weatherIcon}</span> : null}
                           <span>{convertedTimeFormatted.time}</span>
                         </span>
                         <span className="text-lg">{convertedTimeFormatted.ampm}</span>
