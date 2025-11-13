@@ -121,16 +121,6 @@ function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
 }
 
-const WEATHER_STALE_MS = 5 * 60 * 1000;
-
-function pickWeatherIcon(weathercode, isDay) {
-  if (weathercode === null || weathercode === undefined) return "☁️";
-  if (weathercode <= 1) {
-    return isDay ? "☀️" : "🌙";
-  }
-  return "☁️";
-}
-
 export default function TimeComparison({
   darkMode,
   primaryZone,
@@ -150,8 +140,6 @@ export default function TimeComparison({
   const [phoneCode, setPhoneCode] = useState("");
   const [phoneCodeMatches, setPhoneCodeMatches] = useState([]);
   const [filteredTimezones, setFilteredTimezones] = useState([]);
-  const [weatherByZone, setWeatherByZone] = useState({});
-  const [weatherRefreshTick, setWeatherRefreshTick] = useState(0);
 
   // Small calendar fields
   const [title, setTitle] = useState("Meeting");
@@ -174,13 +162,6 @@ export default function TimeComparison({
   useEffect(() => {
     localStorage.setItem("selectedDate", selectedDate);
   }, [selectedDate]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setWeatherRefreshTick((prev) => prev + 1);
-    }, WEATHER_STALE_MS);
-    return () => clearInterval(interval);
-  }, []);
 
   // Tick current times every second
   useEffect(() => {
@@ -295,57 +276,6 @@ export default function TimeComparison({
       return next;
     });
   }, [sortedTimezones]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchWeatherForZone = async (zone) => {
-      try {
-        const tzInfo = timezoneData.find((item) => item.value === zone);
-        if (!tzInfo) return;
-        const searchTerms = [tzInfo.city, tzInfo.country].filter(Boolean).join(", ");
-        if (!searchTerms) return;
-
-        const geoRes = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-            searchTerms
-          )}&count=1&language=en&format=json`
-        );
-        if (!geoRes.ok) throw new Error(`Geocoding ${geoRes.status}`);
-        const geoJson = await geoRes.json();
-        const location = geoJson?.results?.[0];
-        if (!location) return;
-
-        const { latitude, longitude } = location;
-        const weatherRes = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
-        );
-        if (!weatherRes.ok) throw new Error(`Weather ${weatherRes.status}`);
-        const weatherJson = await weatherRes.json();
-        const current = weatherJson?.current_weather;
-        if (!current) return;
-
-        const icon = pickWeatherIcon(current.weathercode, current.is_day);
-        if (cancelled) return;
-        setWeatherByZone((prev) => ({
-          ...prev,
-          [zone]: { icon, fetchedAt: Date.now() },
-        }));
-      } catch (error) {
-        console.warn(`Weather lookup failed for ${zone}`, error);
-      }
-    };
-
-    sortedTimezones.forEach((zone) => {
-      const entry = weatherByZone[zone];
-      if (entry && Date.now() - entry.fetchedAt < WEATHER_STALE_MS) return;
-      fetchWeatherForZone(zone);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sortedTimezones, weatherByZone, weatherRefreshTick]);
 
   const formatTimeWithAMPM = (time) => {
     if (!time || time === "-") return { time: "-", ampm: "" };
@@ -514,7 +444,6 @@ export default function TimeComparison({
                 const timezone = timezoneData.find((zone) => zone.value === tz);
                 const currentTimeFormatted = formatTimeWithAMPM(currentTime[tz]);
                 const convertedTimeFormatted = formatTimeWithAMPM(convertTime(tz));
-                const weatherIcon = weatherByZone[tz]?.icon;
 
                 return (
                   <tr
@@ -552,7 +481,7 @@ export default function TimeComparison({
                         <p className="font-bold">
                           {timezone?.city || tz}
                           {tz === primaryZone && (
-                            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400">
+                            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 hidden md:inline">
                               Primary
                             </span>
                           )}
@@ -574,7 +503,6 @@ export default function TimeComparison({
                     <td className="p-2 md:w-1/4 w-[30%]">
                       <div className="flex flex-col">
                         <span className="flex items-center gap-1">
-                          {weatherIcon ? <span>{weatherIcon}</span> : null}
                           <span>{currentTimeFormatted.time}</span>
                         </span>
                         <span className="text-lg">{currentTimeFormatted.ampm}</span>
