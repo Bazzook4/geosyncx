@@ -1,0 +1,9 @@
+# robots.txt for GeoSyncX
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.geosyncx.com/sitemap.xml
+
+# Crawl-delay for courtesy
+Crawl-delay: 1
