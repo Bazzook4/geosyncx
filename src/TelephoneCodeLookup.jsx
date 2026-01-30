@@ -31,7 +31,7 @@ export default function TelephoneCodeLookup({ darkMode, onCountrySelect }) {
       .map((iso) => ({
         iso,
         flag: isoToFlag(iso),
-        code: `+${getCountryCodeForRegionCode(iso)}`,
+        code: `+${String(getCountryCodeForRegionCode(iso))}`,
         country: displayNames.of(iso) || iso,
       }))
       .sort((a, b) => a.country.localeCompare(b.country));

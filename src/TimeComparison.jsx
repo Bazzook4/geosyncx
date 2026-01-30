@@ -5,117 +5,52 @@ import { timezoneData } from "./timezones.js";
 import { TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
+import {
+  getSupportedRegionCodes,
+  getCountryCodeForRegionCode,
+} from "awesome-phonenumber";
 
-// Country calling codes mapping
-const countryCallingCodes = {
-  "+1": ["United States", "Canada"],
-  "+7": ["Russia", "Kazakhstan"],
-  "+20": ["Egypt"],
-  "+27": ["South Africa"],
-  "+30": ["Greece"],
-  "+31": ["Netherlands"],
-  "+32": ["Belgium"],
-  "+33": ["France"],
-  "+34": ["Spain"],
-  "+36": ["Hungary"],
-  "+39": ["Italy"],
-  "+40": ["Romania"],
-  "+41": ["Switzerland"],
-  "+43": ["Austria"],
-  "+44": ["United Kingdom"],
-  "+45": ["Denmark"],
-  "+46": ["Sweden"],
-  "+47": ["Norway"],
-  "+48": ["Poland"],
-  "+49": ["Germany"],
-  "+51": ["Peru"],
-  "+52": ["Mexico"],
-  "+53": ["Cuba"],
-  "+54": ["Argentina"],
-  "+55": ["Brazil"],
-  "+56": ["Chile"],
-  "+57": ["Colombia"],
-  "+58": ["Venezuela"],
-  "+60": ["Malaysia"],
-  "+61": ["Australia"],
-  "+62": ["Indonesia"],
-  "+63": ["Philippines"],
-  "+64": ["New Zealand"],
-  "+65": ["Singapore"],
-  "+66": ["Thailand"],
-  "+81": ["Japan"],
-  "+82": ["South Korea"],
-  "+84": ["Vietnam"],
-  "+86": ["China"],
-  "+90": ["Turkey"],
-  "+91": ["India"],
-  "+92": ["Pakistan"],
-  "+93": ["Afghanistan"],
-  "+94": ["Sri Lanka"],
-  "+95": ["Myanmar"],
-  "+98": ["Iran"],
-  "+212": ["Morocco"],
-  "+213": ["Algeria"],
-  "+216": ["Tunisia"],
-  "+218": ["Libya"],
-  "+220": ["Gambia"],
-  "+234": ["Nigeria"],
-  "+249": ["Sudan"],
-  "+250": ["Rwanda"],
-  "+251": ["Ethiopia"],
-  "+254": ["Kenya"],
-  "+255": ["Tanzania"],
-  "+256": ["Uganda"],
-  "+260": ["Zambia"],
-  "+263": ["Zimbabwe"],
-  "+264": ["Namibia"],
-  "+265": ["Malawi"],
-  "+351": ["Portugal"],
-  "+352": ["Luxembourg"],
-  "+353": ["Ireland"],
-  "+354": ["Iceland"],
-  "+358": ["Finland"],
-  "+370": ["Lithuania"],
-  "+371": ["Latvia"],
-  "+372": ["Estonia"],
-  "+373": ["Moldova"],
-  "+374": ["Armenia"],
-  "+375": ["Belarus"],
-  "+380": ["Ukraine"],
-  "+381": ["Serbia"],
-  "+385": ["Croatia"],
-  "+386": ["Slovenia"],
-  "+387": ["Bosnia and Herzegovina"],
-  "+389": ["North Macedonia"],
-  "+420": ["Czech Republic"],
-  "+421": ["Slovakia"],
-  "+852": ["Hong Kong"],
-  "+853": ["Macau"],
-  "+880": ["Bangladesh"],
-  "+886": ["Taiwan"],
-  "+960": ["Maldives"],
-  "+961": ["Lebanon"],
-  "+962": ["Jordan"],
-  "+963": ["Syria"],
-  "+964": ["Iraq"],
-  "+965": ["Kuwait"],
-  "+966": ["Saudi Arabia"],
-  "+967": ["Yemen"],
-  "+968": ["Oman"],
-  "+971": ["United Arab Emirates"],
-  "+972": ["Israel"],
-  "+973": ["Bahrain"],
-  "+974": ["Qatar"],
-  "+975": ["Bhutan"],
-  "+976": ["Mongolia"],
-  "+977": ["Nepal"],
-  "+992": ["Tajikistan"],
-  "+993": ["Turkmenistan"],
-  "+994": ["Azerbaijan"],
-  "+995": ["Georgia"],
-  "+996": ["Kyrgyzstan"],
-  "+998": ["Uzbekistan"],
-};
+// Build country calling codes mapping dynamically from awesome-phonenumber
+const displayNames = new Intl.DisplayNames(["en"], { type: "region" });
+const countryCallingCodes = (() => {
+  const map = {};
+  getSupportedRegionCodes().forEach((iso) => {
+    const code = `+${getCountryCodeForRegionCode(iso)}`;
+    const countryName = displayNames.of(iso) || iso;
+    if (!map[code]) {
+      map[code] = [];
+    }
+    map[code].push(countryName);
+  });
+  return map;
+})();
+
+// Reverse mapping: country name -> phone code
+const countryToPhoneCode = (() => {
+  const map = {};
+  getSupportedRegionCodes().forEach((iso) => {
+    const code = `+${getCountryCodeForRegionCode(iso)}`;
+    const countryName = displayNames.of(iso) || iso;
+    // Store with lowercase key for easier matching
+    map[countryName.toLowerCase()] = code;
+  });
+  return map;
+})();
+
+// Helper to get phone code for a country name
+function getPhoneCodeForCountry(countryName) {
+  if (!countryName) return null;
+  const lower = countryName.toLowerCase();
+  // Try exact match first
+  if (countryToPhoneCode[lower]) return countryToPhoneCode[lower];
+  // Try partial match
+  for (const [key, code] of Object.entries(countryToPhoneCode)) {
+    if (lower.includes(key) || key.includes(lower)) {
+      return code;
+    }
+  }
+  return null;
+}
 
 function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
@@ -131,8 +66,7 @@ export default function TimeComparison({
   const [currentTime, setCurrentTime] = useState({});
   const [selectedTime, setSelectedTime] = useState(""); // HH:mm
   const [selectedDate, setSelectedDate] = useState(() => {
-    const stored = localStorage.getItem("selectedDate");
-    if (stored) return stored;
+    // Always default to today's date
     const zone = primaryZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
     return DateTime.now().setZone(zone).toISODate();
   });
@@ -159,9 +93,10 @@ export default function TimeComparison({
   const rowHoverClass = darkMode ? "hover:bg-white/10" : "hover:bg-white/80";
   const chipClass = darkMode ? "bg-white/10 text-white" : "bg-white/80 text-gray-900";
 
+  // Clear old cached date (one-time cleanup)
   useEffect(() => {
-    localStorage.setItem("selectedDate", selectedDate);
-  }, [selectedDate]);
+    localStorage.removeItem("selectedDate");
+  }, []);
 
   // Tick current times every second
   useEffect(() => {
@@ -179,17 +114,56 @@ export default function TimeComparison({
     return () => clearInterval(interval);
   }, [selectedZones, primaryZone]);
 
-  // Phone code lookup
+  // Phone code lookup - smart matching for partial codes and full numbers
   useEffect(() => {
     if (!phoneCode) {
       setPhoneCodeMatches([]);
       return;
     }
-    const normalized = phoneCode.startsWith("+") ? phoneCode : `+${phoneCode}`;
-    const countries = countryCallingCodes[normalized];
-    if (countries) {
+
+    // Clean input: remove spaces, dashes, parentheses
+    const digits = phoneCode.replace(/[\s\-\(\)]/g, "");
+    const normalized = digits.startsWith("+") ? digits : `+${digits}`;
+    const numericOnly = digits.replace(/\D/g, "");
+
+    let matchedCountries = [];
+
+    // 1. Try exact match first
+    if (countryCallingCodes[normalized]) {
+      matchedCountries = [...countryCallingCodes[normalized]];
+    }
+
+    // 2. If no exact match, try partial/prefix matching
+    if (matchedCountries.length === 0 && numericOnly.length > 0) {
+      // For short inputs (1-4 digits), find all codes that START with this prefix
+      if (numericOnly.length <= 4) {
+        Object.entries(countryCallingCodes).forEach(([code, countries]) => {
+          const codeDigits = code.replace(/\D/g, "");
+          if (codeDigits.startsWith(numericOnly) || numericOnly.startsWith(codeDigits)) {
+            countries.forEach((c) => {
+              if (!matchedCountries.includes(c)) {
+                matchedCountries.push(c);
+              }
+            });
+          }
+        });
+      }
+
+      // 3. For longer inputs (full phone numbers), try matching 1-4 digit prefixes
+      if (numericOnly.length > 4) {
+        for (let len = 4; len >= 1; len--) {
+          const prefix = `+${numericOnly.slice(0, len)}`;
+          if (countryCallingCodes[prefix]) {
+            matchedCountries = [...countryCallingCodes[prefix]];
+            break;
+          }
+        }
+      }
+    }
+
+    if (matchedCountries.length > 0) {
       const matches = timezoneData.filter((tz) =>
-        countries.some((country) =>
+        matchedCountries.some((country) =>
           tz.country.toLowerCase().includes(country.toLowerCase())
         )
       );
@@ -361,20 +335,30 @@ export default function TimeComparison({
                 Found {phoneCodeMatches.length} timezone(s) for {phoneCode}
               </div>
             )}
-            {filteredTimezones.map((tz) => (
-              <div
-                key={tz.value}
-                className={`p-2 cursor-pointer ${rowHoverClass} transition`}
-                onClick={() => {
-                  addZone(tz.value);
-                  setSearchQuery("");
-                  setPhoneCode("");
-                }}
-              >
-                {tz.city}, {tz.country} ({tz.gmt}) —{" "}
-                <span className="text-xs opacity-70">{tz.value}</span>
-              </div>
-            ))}
+            {filteredTimezones.map((tz) => {
+              const phoneCodeForTz = getPhoneCodeForCountry(tz.country);
+              return (
+                <div
+                  key={tz.value}
+                  className={`p-2 cursor-pointer ${rowHoverClass} transition flex items-center justify-between gap-2`}
+                  onClick={() => {
+                    addZone(tz.value);
+                    setSearchQuery("");
+                    setPhoneCode("");
+                  }}
+                >
+                  <span>
+                    {tz.city}, {tz.country} ({tz.gmt}) —{" "}
+                    <span className="text-xs opacity-70">{tz.value}</span>
+                  </span>
+                  {phoneCodeForTz && (
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${darkMode ? "bg-white/10" : "bg-gray-200"}`}>
+                      {phoneCodeForTz}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
             {filteredTimezones.length === 0 && (
               <div className="p-2 opacity-70">
                 {phoneCode ? `No timezones found for phone code ${phoneCode}` : "No matches"}
