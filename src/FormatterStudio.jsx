@@ -36,6 +36,67 @@ function prettifyXml(input) {
     tokens.push({ type: "text", value: current.trim() });
   }
 
+  // Format tag with attributes on separate lines if too many attributes
+  function formatTag(tag, indentLevel) {
+    const baseIndent = "  ".repeat(indentLevel);
+    const attrIndent = "  ".repeat(indentLevel + 1);
+
+    // Match tag name and attributes
+    const selfClosing = tag.endsWith("/>");
+    const tagEnd = selfClosing ? "/>" : ">";
+    const tagContent = tag.slice(1, selfClosing ? -2 : -1).trim();
+
+    // Split into tag name and attributes
+    const firstSpace = tagContent.indexOf(" ");
+    if (firstSpace === -1) {
+      // No attributes
+      return baseIndent + tag;
+    }
+
+    const tagName = tagContent.slice(0, firstSpace);
+    const attrString = tagContent.slice(firstSpace + 1).trim();
+
+    // Parse attributes (handle quoted values with spaces)
+    const attrs = [];
+    let attrCurrent = "";
+    let inQuote = false;
+    let quoteChar = "";
+
+    for (let i = 0; i < attrString.length; i++) {
+      const char = attrString[i];
+      if ((char === '"' || char === "'") && !inQuote) {
+        inQuote = true;
+        quoteChar = char;
+        attrCurrent += char;
+      } else if (char === quoteChar && inQuote) {
+        inQuote = false;
+        attrCurrent += char;
+      } else if (char === " " && !inQuote && attrCurrent.trim()) {
+        attrs.push(attrCurrent.trim());
+        attrCurrent = "";
+      } else {
+        attrCurrent += char;
+      }
+    }
+    if (attrCurrent.trim()) {
+      attrs.push(attrCurrent.trim());
+    }
+
+    // If 3 or fewer attributes, keep on one line
+    if (attrs.length <= 3) {
+      return baseIndent + tag;
+    }
+
+    // Multiple attributes: format each on its own line
+    const lines = [`${baseIndent}<${tagName}`];
+    attrs.forEach((attr, i) => {
+      const isLast = i === attrs.length - 1;
+      lines.push(`${attrIndent}${attr}${isLast ? tagEnd : ""}`);
+    });
+
+    return lines.join("\n");
+  }
+
   // Format with proper indentation
   let indent = 0;
   const lines = [];
@@ -57,11 +118,11 @@ function prettifyXml(input) {
     }
     // Self-closing tag <.../> or <?...?> or <!...>
     else if (tag.endsWith("/>") || tag.startsWith("<?") || tag.startsWith("<!")) {
-      lines.push("  ".repeat(indent) + tag);
+      lines.push(formatTag(tag, indent));
     }
     // Opening tag <...>
     else {
-      lines.push("  ".repeat(indent) + tag);
+      lines.push(formatTag(tag, indent));
       indent += 1;
     }
   }
