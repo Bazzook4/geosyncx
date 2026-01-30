@@ -7,23 +7,66 @@ function prettifyJson(input) {
 }
 
 function prettifyXml(input) {
-  const compact = input.replace(/>\s+</g, "><").replace(/></g, ">\n<");
-  const lines = compact
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  // Remove existing whitespace between tags
+  let xml = input.replace(/>\s+</g, "><").trim();
 
-  let indent = 0;
-  return lines
-    .map((line) => {
-      if (line.match(/^<\/.+>/)) indent = Math.max(indent - 1, 0);
-      const padded = `${"  ".repeat(indent)}${line}`;
-      if (line.match(/^<[^!?][^>]*[^/]>.*$/) && !line.includes("</")) {
-        indent += 1;
+  // Split into tokens (tags and text content)
+  const tokens = [];
+  let current = "";
+  let inTag = false;
+
+  for (let i = 0; i < xml.length; i++) {
+    const char = xml[i];
+    if (char === "<") {
+      if (current.trim()) {
+        tokens.push({ type: "text", value: current.trim() });
       }
-      return padded;
-    })
-    .join("\n");
+      current = "<";
+      inTag = true;
+    } else if (char === ">" && inTag) {
+      current += ">";
+      tokens.push({ type: "tag", value: current });
+      current = "";
+      inTag = false;
+    } else {
+      current += char;
+    }
+  }
+  if (current.trim()) {
+    tokens.push({ type: "text", value: current.trim() });
+  }
+
+  // Format with proper indentation
+  let indent = 0;
+  const lines = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+
+    if (token.type === "text") {
+      lines.push("  ".repeat(indent) + token.value);
+      continue;
+    }
+
+    const tag = token.value;
+
+    // Closing tag </...>
+    if (tag.startsWith("</")) {
+      indent = Math.max(0, indent - 1);
+      lines.push("  ".repeat(indent) + tag);
+    }
+    // Self-closing tag <.../> or <?...?> or <!...>
+    else if (tag.endsWith("/>") || tag.startsWith("<?") || tag.startsWith("<!")) {
+      lines.push("  ".repeat(indent) + tag);
+    }
+    // Opening tag <...>
+    else {
+      lines.push("  ".repeat(indent) + tag);
+      indent += 1;
+    }
+  }
+
+  return lines.join("\n");
 }
 
 function prettifySoap(input) {
