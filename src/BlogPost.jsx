@@ -1,6 +1,8 @@
 // /src/BlogPost.jsx
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useEffect } from "react";
+import SEO from "./SEO";
+import { getBlogPostSEO } from "./seo-config";
 import TimezoneComparisonPost from "./blog-posts/TimezoneComparisonPost";
 import PhoneCodePost from "./blog-posts/PhoneCodePost";
 import PrimaryTimezonePost from "./blog-posts/PrimaryTimezonePost";
@@ -22,6 +24,7 @@ const BLOG_POST_COMPONENTS = {
 export default function BlogPost({ darkMode }) {
   const { postId } = useParams();
   const PostComponent = BLOG_POST_COMPONENTS[postId];
+  const seoData = getBlogPostSEO(postId);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -36,7 +39,9 @@ export default function BlogPost({ darkMode }) {
     : "bg-white/70 text-gray-900 border border-white/60 shadow-xl";
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <>
+      {seoData && <SEO {...seoData} />}
+      <div className="w-full max-w-4xl mx-auto">
       <div
         className={`p-6 md:p-10 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${cardBase}`}
       >
@@ -86,5 +91,6 @@ export default function BlogPost({ darkMode }) {
         </div>
       </div>
     </div>
+    </>
   );
 }

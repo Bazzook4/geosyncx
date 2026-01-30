@@ -1,5 +1,7 @@
 // /src/Blog.jsx
 import { Link } from "react-router-dom";
+import SEO from "./SEO";
+import { BLOG_INDEX_SEO } from "./seo-config";
 
 const BLOG_POSTS = [
   {
@@ -74,7 +76,9 @@ export default function Blog({ darkMode }) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <>
+      <SEO {...BLOG_INDEX_SEO} />
+      <div className="w-full max-w-6xl mx-auto">
       <div
         className={`p-6 md:p-8 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${cardBase}`}
       >
@@ -137,5 +141,6 @@ export default function Blog({ darkMode }) {
         </div>
       </div>
     </div>
+    </>
   );
 }

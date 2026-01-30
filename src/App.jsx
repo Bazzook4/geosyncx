@@ -1,5 +1,7 @@
 // /src/App.jsx
 import { useMemo, useEffect, useState } from "react";
+import SEO from "./SEO";
+import { DEFAULT_SEO } from "./seo-config";
 import TimeComparison from "./TimeComparison.jsx";
 import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import TodoSmart from "./TodoSmart.jsx";
@@ -135,7 +137,9 @@ export default function App({ darkMode }) {
     : "text-slate-600 hover:text-slate-900";
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
+    <>
+      <SEO {...DEFAULT_SEO} />
+      <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div
           className={`flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-xl shadow-lg ${toolbarCard}`}
@@ -200,5 +204,6 @@ export default function App({ darkMode }) {
         </div>
       )}
     </div>
+    </>
   );
 }
