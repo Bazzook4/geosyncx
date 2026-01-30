@@ -240,13 +240,13 @@ export default function FormatterStudio({ darkMode }) {
           onChange={(e) => setMode(e.target.value)}
           className={`px-4 py-2 rounded-xl text-sm transition-colors ${
             darkMode
-              ? "bg-white/10 text-white border border-white/20 hover:bg-white/15"
+              ? "bg-slate-800 text-white border border-white/20 hover:bg-slate-700"
               : "bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
           }`}
         >
           <option value="format">Format JSON/XML/SOAP</option>
-          <option value="escape">Escape String</option>
-          <option value="unescape">Unescape String</option>
+          <option value="escape">Add Escape Characters</option>
+          <option value="unescape">Remove Escape Characters</option>
         </select>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -291,38 +291,50 @@ export default function FormatterStudio({ darkMode }) {
       </div>
 
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start">
-        <textarea
-          ref={inputRef}
-          value={raw}
-          onChange={(e) => setRaw(e.target.value)}
-          placeholder={
-            mode === "format"
-              ? "Paste your JSON, XML, or SOAP envelope here…"
-              : mode === "escape"
-              ? "Paste your string to escape special characters (quotes, newlines, etc.)…"
-              : "Paste your escaped string to unescape back to normal text…"
-          }
-          className={`flex-1 w-full resize-none rounded-xl p-4 shadow-inner text-sm leading-relaxed ${inputClass}`}
-          style={{ minHeight: "220px" }}
-        />
-        <div
-          className={`flex-1 w-full rounded-xl p-4 shadow-inner text-sm leading-relaxed ${
-            darkMode ? "bg-slate-950/60 text-white" : "bg-slate-900/5 text-slate-900"
-          }`}
-          style={{ minHeight: "220px" }}
-        >
-          {output ? (
-            <pre
-              className={`whitespace-pre-wrap formatter-output ${
-                detected ? `format-${detected}` : ""
-              }`}
-              dangerouslySetInnerHTML={{ __html: highlighted }}
-            />
-          ) : (
-            <div className="text-xs opacity-60">
-              Formatted output will appear here.
-            </div>
-          )}
+        {/* Input: 30% width */}
+        <div className="lg:w-[30%] flex flex-col">
+          <label className={`text-xs font-semibold uppercase tracking-wide mb-2 ${darkMode ? "text-white/70" : "text-gray-600"}`}>
+            Input
+          </label>
+          <textarea
+            ref={inputRef}
+            value={raw}
+            onChange={(e) => setRaw(e.target.value)}
+            placeholder={
+              mode === "format"
+                ? "Paste your JSON, XML, or SOAP here…"
+                : mode === "escape"
+                ? "Paste text to add escape characters…"
+                : "Paste escaped text to convert back…"
+            }
+            className={`w-full resize-none rounded-xl p-4 shadow-inner text-sm leading-relaxed ${inputClass}`}
+            style={{ minHeight: "220px" }}
+          />
+        </div>
+        {/* Result: 70% width */}
+        <div className="lg:w-[70%] flex flex-col">
+          <label className={`text-xs font-semibold uppercase tracking-wide mb-2 ${darkMode ? "text-white/70" : "text-gray-600"}`}>
+            Result
+          </label>
+          <div
+            className={`w-full rounded-xl p-4 shadow-inner text-sm leading-relaxed ${
+              darkMode ? "bg-slate-950/60 text-white" : "bg-slate-900/5 text-slate-900"
+            }`}
+            style={{ minHeight: "220px" }}
+          >
+            {output ? (
+              <pre
+                className={`whitespace-pre-wrap formatter-output ${
+                  detected ? `format-${detected}` : ""
+                }`}
+                dangerouslySetInnerHTML={{ __html: highlighted }}
+              />
+            ) : (
+              <div className="text-xs opacity-60">
+                Formatted output will appear here.
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

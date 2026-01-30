@@ -4,8 +4,6 @@ import SEO from "./SEO";
 import { DEFAULT_SEO } from "./seo-config";
 import TimeComparison from "./TimeComparison.jsx";
 import BestMeetingFinder from "./BestMeetingFinder.jsx";
-import TodoSmart from "./TodoSmart.jsx";
-import QuickLinks from "./QuickLinks.jsx";
 import FormatterStudio from "./FormatterStudio.jsx";
 import { normalizeTimezoneName } from "./timezones.js";
 
@@ -24,9 +22,8 @@ const FALLBACK_QUOTES = [
 ];
 
 const TABS = [
-  { id: "timezones", label: "Timezones" },
-  { id: "tasks", label: "Smart To-Do" },
-  { id: "formatter", label: "Formatter" },
+  { id: "timezones", label: "Timezones", desc: "Compare times across cities. Search by phone code or location to find timezones." },
+  { id: "formatter", label: "Formatter", desc: "Clean up messy JSON, XML, or SOAP. Add or remove escape characters from text." },
 ];
 
 function shuffleQuotes(list) {
@@ -155,35 +152,31 @@ export default function App({ darkMode }) {
         </div>
       </header>
 
-      <div className="flex items-center justify-start">
-          <div
-            className={`flex gap-2 p-1 rounded-full backdrop-blur-xl shadow-lg ${tabShell}`}
-          >
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 active:scale-95 ${
-                    isActive ? "bg-sky-500 text-white shadow-lg" : tabInactive
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {activeTab === "tasks" && (
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:gap-6">
-            <TodoSmart darkMode={darkMode} />
-            <div className="flex flex-col gap-4">
-              <QuickLinks darkMode={darkMode} />
+      <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-start">
+            <div
+              className={`flex gap-2 p-1 rounded-full backdrop-blur-xl shadow-lg ${tabShell}`}
+            >
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 active:scale-95 ${
+                      isActive ? "bg-sky-500 text-white shadow-lg" : tabInactive
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        )}
+          <p className={`text-sm ${darkMode ? "text-white/60" : "text-slate-500"}`}>
+            {TABS.find(t => t.id === activeTab)?.desc}
+          </p>
+        </div>
 
         {activeTab === "timezones" && (
           <div className="space-y-4 xl:space-y-6">

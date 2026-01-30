@@ -6,9 +6,11 @@ import Blog from "./Blog.jsx";
 import BlogPost from "./BlogPost.jsx";
 
 export default function AppRouter() {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true"
-  );
+  const [darkMode, setDarkMode] = useState(() => {
+    const stored = localStorage.getItem("darkMode");
+    // Default to dark mode if no preference stored
+    return stored === null ? true : stored === "true";
+  });
   const location = useLocation();
   const isBlogPage = location.pathname.startsWith('/blog');
 
