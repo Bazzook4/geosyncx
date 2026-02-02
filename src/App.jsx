@@ -5,6 +5,7 @@ import { DEFAULT_SEO } from "./seo-config";
 import TimeComparison from "./TimeComparison.jsx";
 import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import FormatterStudio from "./FormatterStudio.jsx";
+import InAppGuide from "./InAppGuide.jsx";
 import { normalizeTimezoneName } from "./timezones.js";
 
 const FALLBACK_QUOTES = [
@@ -22,8 +23,18 @@ const FALLBACK_QUOTES = [
 ];
 
 const TABS = [
-  { id: "timezones", label: "Timezones", desc: "Compare times across cities. Search by phone code or location to find timezones." },
-  { id: "formatter", label: "Formatter", desc: "Clean up messy JSON, XML, or SOAP. Add or remove escape characters from text." },
+  {
+    id: "timezones",
+    label: "Timezones",
+    desc: "Compare times across cities",
+    subDesc: "Search by phone code (+91, +44) or location. Set a primary timezone to convert times instantly.",
+  },
+  {
+    id: "formatter",
+    label: "Formatter",
+    desc: "Clean up messy JSON, XML, or SOAP",
+    subDesc: "Paste your code, click format, and copy the beautified result. Supports escape/unescape too.",
+  },
 ];
 
 function shuffleQuotes(list) {
@@ -152,7 +163,7 @@ export default function App({ darkMode }) {
         </div>
       </header>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
           <div className="flex items-center justify-start">
             <div
               className={`flex gap-2 p-1 rounded-full backdrop-blur-xl shadow-lg ${tabShell}`}
@@ -173,9 +184,18 @@ export default function App({ darkMode }) {
               })}
             </div>
           </div>
-          <p className={`text-sm ${darkMode ? "text-white/60" : "text-slate-500"}`}>
-            {TABS.find(t => t.id === activeTab)?.desc}
-          </p>
+          {/* Tab description */}
+          {(() => {
+            const currentTab = TABS.find(t => t.id === activeTab);
+            return currentTab && (
+              <div className={`pl-1 ${darkMode ? "text-white/80" : "text-slate-700"}`}>
+                <p className="font-medium text-sm">{currentTab.desc}</p>
+                <p className={`text-xs mt-0.5 ${darkMode ? "text-white/50" : "text-slate-500"}`}>
+                  {currentTab.subDesc}
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         {activeTab === "timezones" && (
@@ -196,6 +216,9 @@ export default function App({ darkMode }) {
           <FormatterStudio darkMode={darkMode} />
         </div>
       )}
+
+      {/* In-App Help Guide */}
+      <InAppGuide darkMode={darkMode} activeTab={activeTab} />
     </div>
     </>
   );

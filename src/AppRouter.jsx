@@ -4,6 +4,7 @@ import { Routes, Route, Link, useLocation } from "react-router-dom";
 import App from "./App.jsx";
 import Blog from "./Blog.jsx";
 import BlogPost from "./BlogPost.jsx";
+import TimezoneConverter from "./TimezoneConverter.jsx";
 
 export default function AppRouter() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -76,6 +77,7 @@ export default function AppRouter() {
           <Route path="/" element={<App darkMode={darkMode} />} />
           <Route path="/blog" element={<Blog darkMode={darkMode} />} />
           <Route path="/blog/:postId" element={<BlogPost darkMode={darkMode} />} />
+          <Route path="/time/:route" element={<TimezoneConverter darkMode={darkMode} />} />
         </Routes>
       </div>
     </div>
