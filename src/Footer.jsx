@@ -16,30 +16,40 @@ export default function Footer({ darkMode }) {
     <footer className={`mt-16 border-t ${bgClass} backdrop-blur-sm`}>
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-          {/* Popular Tools */}
+          {/* Tools */}
           <div>
             <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${headingClass}`}>
-              Popular Tools
+              Tools
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
-                  Timezone Converter
+                <Link to="/tools/phone-code-lookup" className={`text-sm transition-colors ${linkClass}`}>
+                  Phone Code Lookup
                 </Link>
               </li>
               <li>
-                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
+                <Link to="/tools/timezone-finder" className={`text-sm transition-colors ${linkClass}`}>
+                  Timezone Finder
+                </Link>
+              </li>
+              <li>
+                <Link to="/tools/timezone-compare" className={`text-sm transition-colors ${linkClass}`}>
+                  Timezone Compare
+                </Link>
+              </li>
+              <li>
+                <Link to="/tools/meeting-scheduler" className={`text-sm transition-colors ${linkClass}`}>
                   Meeting Scheduler
                 </Link>
               </li>
               <li>
-                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
-                  JSON Formatter
+                <Link to="/tools/best-meeting-time" className={`text-sm transition-colors ${linkClass}`}>
+                  Best Meeting Time
                 </Link>
               </li>
               <li>
-                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
-                  Phone Code Lookup
+                <Link to="/dashboard" className={`text-sm transition-colors ${linkClass}`}>
+                  Full Dashboard
                 </Link>
               </li>
             </ul>
@@ -71,6 +81,16 @@ export default function Footer({ darkMode }) {
                   EST to PST
                 </Link>
               </li>
+              <li>
+                <Link to="/time/london-to-ist" className={`text-sm transition-colors ${linkClass}`}>
+                  London to IST
+                </Link>
+              </li>
+              <li>
+                <Link to="/time/pst-to-ist" className={`text-sm transition-colors ${linkClass}`}>
+                  PST to IST
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -97,7 +117,12 @@ export default function Footer({ darkMode }) {
               </li>
               <li>
                 <Link to="/blog/phone-code-timezone-search" className={`text-sm transition-colors ${linkClass}`}>
-                  Phone Code Search
+                  Phone Code Guide
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog" className={`text-sm transition-colors ${linkClass}`}>
+                  All Articles
                 </Link>
               </li>
             </ul>
@@ -110,8 +135,13 @@ export default function Footer({ darkMode }) {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/blog" className={`text-sm transition-colors ${linkClass}`}>
-                  Blog
+                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className={`text-sm transition-colors ${linkClass}`}>
+                  About / Our Story
                 </Link>
               </li>
               <li>
@@ -121,11 +151,6 @@ export default function Footer({ darkMode }) {
                 >
                   Contact Us
                 </a>
-              </li>
-              <li>
-                <Link to="/" className={`text-sm transition-colors ${linkClass}`}>
-                  Home
-                </Link>
               </li>
             </ul>
           </div>
@@ -138,9 +163,9 @@ export default function Footer({ darkMode }) {
               © {new Date().getFullYear()} GeoSyncX. Free timezone tools for global teams.
             </p>
             <div className="flex items-center gap-6">
-              <span className={`text-xs ${textClass}`}>
-                Made with ❤️ for remote teams worldwide
-              </span>
+              <Link to="/about" className={`text-xs hover:text-sky-500 ${textClass}`}>
+                Built by a sales exec, for global teams
+              </Link>
             </div>
           </div>
         </div>
