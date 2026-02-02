@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import Blog from "./Blog.jsx";
 import BlogPost from "./BlogPost.jsx";
 import TimezoneConverter from "./TimezoneConverter.jsx";
+import Footer from "./Footer.jsx";
 
 export default function AppRouter() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -79,6 +80,9 @@ export default function AppRouter() {
           <Route path="/blog/:postId" element={<BlogPost darkMode={darkMode} />} />
           <Route path="/time/:route" element={<TimezoneConverter darkMode={darkMode} />} />
         </Routes>
+
+        {/* Footer */}
+        <Footer darkMode={darkMode} />
       </div>
     </div>
   );
