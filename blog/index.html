@@ -3,87 +3,381 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GeoSyncX Blog - Timezone Tools, Meeting Scheduling & Developer Utilities</title>
-  <meta name="description" content="Learn how to master timezone management, schedule global meetings, format JSON/XML data, and boost your productivity with GeoSyncX tools.">
-  <meta name="keywords" content="timezone tools, meeting scheduler, json formatter, xml formatter, phone code timezone, time conversion">
+  <title>GeoSyncX Blog — Timezone Management & Productivity Tips</title>
+  <meta name="description" content="Learn how to master timezone management, schedule global meetings, and boost your productivity. Free guides and tutorials for remote teams.">
+  <meta name="keywords" content="timezone tips, remote work blog, productivity guides, meeting scheduling tips, timezone management, global team collaboration">
+  <meta name="author" content="GeoSyncX Team">
   <link rel="canonical" href="https://www.geosyncx.com/blog">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png">
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="GeoSyncX Blog - Timezone Tools, Meeting Scheduling & Developer Utilities">
-  <meta property="og:description" content="Learn how to master timezone management, schedule global meetings, and boost productivity.">
+  <meta property="og:title" content="GeoSyncX Blog — Timezone Management & Productivity Tips">
+  <meta property="og:description" content="Learn how to master timezone management, schedule global meetings, and boost your productivity.">
   <meta property="og:url" content="https://www.geosyncx.com/blog">
-  <meta property="og:site_name" content="GeoSyncX">
+  <meta property="og:image" content="https://www.geosyncx.com/android-chrome-512x512.png">
+  <meta name="twitter:card" content="summary_large_image">
 
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 40px 20px; color: #1a1a1a; }
-    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 2rem; }
-    .posts { display: grid; gap: 24px; }
-    .post { border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; transition: box-shadow 0.2s; }
-    .post:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .post h2 { margin: 0 0 8px 0; font-size: 1.3rem; }
-    .post h2 a { color: #1a1a1a; text-decoration: none; }
-    .post h2 a:hover { color: #0066cc; }
-    .post p { margin: 0 0 12px 0; color: #555; }
-    .meta { display: flex; gap: 16px; font-size: 0.85rem; color: #888; }
-    .category { background: #e8f4fc; color: #0066cc; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
-    .back { display: inline-block; margin-bottom: 24px; color: #0066cc; text-decoration: none; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #020617;
+      color: #f1f5f9;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .logo:hover { color: #0ea5e9; }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.1);
+      color: #f1f5f9;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+    .btn-primary {
+      background: #0ea5e9;
+      color: white;
+    }
+
+    .btn-primary:hover { background: #0284c7; }
+
+    /* Main Card */
+    .main-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 32px;
+      backdrop-filter: blur(20px);
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      margin-bottom: 32px;
+    }
+
+    /* Blog Grid */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .blog-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .blog-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .category {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .category-timezone { background: rgba(59,130,246,0.2); color: #93c5fd; }
+    .category-meeting { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+    .category-productivity { background: rgba(139,92,246,0.2); color: #c4b5fd; }
+    .category-developer { background: rgba(249,115,22,0.2); color: #fdba74; }
+    .category-getting-started { background: rgba(14,165,233,0.2); color: #7dd3fc; }
+
+    .read-time {
+      font-size: 0.75rem;
+      opacity: 0.6;
+    }
+
+    .blog-card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .blog-card p {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .blog-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .blog-date {
+      font-size: 0.75rem;
+      opacity: 0.5;
+    }
+
+    .read-more {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #0ea5e9;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-section h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-section a:hover { color: #0ea5e9; }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 640px) {
+      .page-title { font-size: 1.75rem; }
+      .blog-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 16px; }
+    }
   </style>
 </head>
 <body>
-  <a href="https://www.geosyncx.com" class="back">← Back to GeoSyncX</a>
+  <div class="container">
+    <header>
+      <a href="https://www.geosyncx.com" class="logo">GeoSyncX</a>
+      <div class="header-actions">
+        <a href="https://www.geosyncx.com" class="btn btn-primary">Open App</a>
+      </div>
+    </header>
 
-  <h1>GeoSyncX Blog</h1>
-  <p class="subtitle">Learn how to master timezone management, schedule global meetings, and boost your productivity.</p>
+    <main class="main-card">
+      <h1 class="page-title">GeoSyncX Blog</h1>
+      <p class="page-subtitle">Learn how to master timezone management, schedule global meetings, and boost your productivity.</p>
 
-  <div class="posts">
-    <article class="post">
-      <span class="category">Timezone Tools</span>
-      <h2><a href="/blog/timezone-comparison-tool.html">How to Compare Time Zones Easily: A Free Online Timezone Converter</a></h2>
-      <p>Stop calculating time zone differences manually. Discover how to instantly compare multiple time zones with live updates.</p>
-      <div class="meta"><span>8 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+      <div class="blog-grid">
+        <a href="/blog/timezone-comparison-tool.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-timezone">Timezone Tools</span>
+            <span class="read-time">8 min read</span>
+          </div>
+          <h2>How to Compare Time Zones Easily: A Free Online Timezone Converter</h2>
+          <p>Stop calculating time zone differences manually. Discover how to instantly compare multiple time zones with live updates and weather information.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
 
-    <article class="post">
-      <span class="category">Timezone Tools</span>
-      <h2><a href="/blog/phone-code-timezone-search.html">Find Timezone by Phone Country Code: Instant Lookup Tool</a></h2>
-      <p>Got a phone number starting with +91, +44, or +1? Instantly find the timezone and schedule calls at the right time.</p>
-      <div class="meta"><span>7 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+        <a href="/blog/phone-code-timezone-search.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-timezone">Timezone Tools</span>
+            <span class="read-time">7 min read</span>
+          </div>
+          <h2>Find Timezone by Phone Country Code: Instant Lookup Tool</h2>
+          <p>Got a phone number starting with +91, +44, or +1? Instantly find the timezone and schedule calls at the right time.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
 
-    <article class="post">
-      <span class="category">Getting Started</span>
-      <h2><a href="/blog/set-primary-timezone.html">How to Set Your Primary Timezone: Essential Guide for Remote Workers</a></h2>
-      <p>Master timezone management by setting your home timezone as the reference point for all time conversions.</p>
-      <div class="meta"><span>6 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+        <a href="/blog/set-primary-timezone.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-getting-started">Getting Started</span>
+            <span class="read-time">6 min read</span>
+          </div>
+          <h2>How to Set Your Primary Timezone: Essential Guide for Remote Workers</h2>
+          <p>Master timezone management by setting your home timezone as the reference point for all time conversions.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
 
-    <article class="post">
-      <span class="category">Meeting Tools</span>
-      <h2><a href="/blog/schedule-meeting-across-timezones.html">How to Schedule Meetings Across Timezones: Google Calendar Integration</a></h2>
-      <p>Stop manually creating calendar invites. Automatically schedule meetings that show correct local time for every attendee.</p>
-      <div class="meta"><span>9 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+        <a href="/blog/schedule-meeting-across-timezones.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-meeting">Meeting Tools</span>
+            <span class="read-time">9 min read</span>
+          </div>
+          <h2>How to Schedule Meetings Across Timezones: Google Calendar Integration Guide</h2>
+          <p>Stop manually creating calendar invites with timezone notes. Automatically schedule meetings that show correct local time for every attendee.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
 
-    <article class="post">
-      <span class="category">Meeting Tools</span>
-      <h2><a href="/blog/best-meeting-time-finder.html">Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones</a></h2>
-      <p>Stop manually checking if 3 PM works for everyone. Automatically discover meeting times where all participants are available.</p>
-      <div class="meta"><span>10 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+        <a href="/blog/best-meeting-time-finder.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-meeting">Meeting Tools</span>
+            <span class="read-time">10 min read</span>
+          </div>
+          <h2>Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones</h2>
+          <p>Stop manually checking if 3 PM works for everyone. Automatically discover meeting times where all participants are within their working hours.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
 
-    <article class="post">
-      <span class="category">Developer Tools</span>
-      <h2><a href="/blog/json-xml-soap-formatter.html">Free JSON, XML & SOAP Formatter with Syntax Highlighting</a></h2>
-      <p>Instantly beautify minified JSON, XML, and SOAP data. Format, highlight, and copy with one click.</p>
-      <div class="meta"><span>8 min read</span><span>Nov 4, 2025</span></div>
-    </article>
+        <a href="/blog/json-xml-soap-formatter.html" class="blog-card">
+          <div class="blog-meta">
+            <span class="category category-developer">Developer Tools</span>
+            <span class="read-time">8 min read</span>
+          </div>
+          <h2>Free JSON, XML & SOAP Formatter with Syntax Highlighting</h2>
+          <p>Instantly beautify minified JSON, XML, and SOAP data. Format, highlight, and copy with one click - no installation required.</p>
+          <div class="blog-card-footer">
+            <span class="blog-date">2025-11-04</span>
+            <span class="read-more">Read more →</span>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Popular Tools</h3>
+          <ul>
+            <li><a href="https://www.geosyncx.com">Timezone Converter</a></li>
+            <li><a href="https://www.geosyncx.com">Meeting Scheduler</a></li>
+            <li><a href="https://www.geosyncx.com">JSON Formatter</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Time Converters</h3>
+          <ul>
+            <li><a href="/time/ist-to-london.html">IST to London</a></li>
+            <li><a href="/time/ist-to-est.html">IST to EST</a></li>
+            <li><a href="/time/ist-to-pst.html">IST to PST</a></li>
+            <li><a href="/time/est-to-pst.html">EST to PST</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="/blog/timezone-comparison-tool.html">Timezone Guide</a></li>
+            <li><a href="/blog/best-meeting-time-finder.html">Meeting Time Guide</a></li>
+            <li><a href="/blog/phone-code-timezone-search.html">Phone Code Lookup</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="mailto:hello@geosyncx.com">Contact Us</a></li>
+            <li><a href="https://www.geosyncx.com">Home</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 GeoSyncX. Free timezone tools for global teams.</p>
+      </div>
+    </footer>
   </div>
 
   <script>
+    // Redirect to React app (unless viewing static version)
     if (!window.location.search.includes('static=1')) {
-      setTimeout(function() { window.location.href = '/#/blog'; }, 100);
+      window.location.href = 'https://www.geosyncx.com/blog';
     }
   </script>
 </body>

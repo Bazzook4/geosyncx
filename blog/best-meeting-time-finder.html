@@ -6,60 +6,250 @@
   <title>Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones | GeoSyncX</title>
   <meta name="description" content="Stop manually checking if 3 PM works for everyone. Automatically discover meeting times where all participants are within their working hours.">
   <meta name="keywords" content="best meeting time finder, timezone overlap finder, meeting time across timezones, find common meeting time">
+  <meta name="author" content="GeoSyncX Team">
   <link rel="canonical" href="https://www.geosyncx.com/blog/best-meeting-time-finder">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png">
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones">
   <meta property="og:description" content="Automatically discover meeting times where all participants are within their working hours.">
   <meta property="og:url" content="https://www.geosyncx.com/blog/best-meeting-time-finder">
+  <meta property="og:image" content="https://www.geosyncx.com/android-chrome-512x512.png">
+  <meta name="twitter:card" content="summary_large_image">
 
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Article","headline":"Best Meeting Time Finder","description":"Automatically discover meeting times where all participants are within their working hours.","author":{"@type":"Organization","name":"GeoSyncX"},"datePublished":"2025-11-04"}
+  {"@context":"https://schema.org","@type":"Article","headline":"Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones","description":"Automatically discover meeting times where all participants are within their working hours.","author":{"@type":"Organization","name":"GeoSyncX"},"datePublished":"2025-11-04","mainEntityOfPage":"https://www.geosyncx.com/blog/best-meeting-time-finder"}
   </script>
 
-  <style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.8;max-width:800px;margin:0 auto;padding:40px 20px;color:#1a1a1a}h1{font-size:2.5rem;line-height:1.2;margin-bottom:1rem}h2{font-size:1.8rem;margin-top:2.5rem}h3{font-size:1.3rem;margin-top:2rem}p{margin:1rem 0}ul,ol{margin:1rem 0;padding-left:2rem}li{margin:0.5rem 0}a{color:#0066cc}.cta{display:inline-block;background:#0066cc;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;margin:1rem 0}.meta{color:#666;font-size:0.9rem;margin-bottom:2rem}table{border-collapse:collapse;width:100%;margin:1rem 0}th,td{border:1px solid #ddd;padding:8px 12px;text-align:left}th{background:#f4f4f4}</style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #020617; color: #f1f5f9; min-height: 100vh; line-height: 1.8; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+    .logo { font-size: 1.5rem; font-weight: 700; color: #f1f5f9; text-decoration: none; transition: color 0.2s; }
+    .logo:hover { color: #0ea5e9; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+    .btn-ghost { background: rgba(255,255,255,0.1); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.15); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+    .btn-primary { background: #0ea5e9; color: white; }
+    .btn-primary:hover { background: #0284c7; }
+    .article-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 40px; backdrop-filter: blur(20px); }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; margin-bottom: 24px; transition: color 0.2s; }
+    .back-link:hover { color: #f1f5f9; }
+    article h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+    .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-bottom: 32px; font-size: 0.9rem; opacity: 0.7; }
+    .category { background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .lead { font-size: 1.25rem; line-height: 1.8; opacity: 0.9; border-left: 4px solid #0ea5e9; padding-left: 20px; margin: 32px 0; }
+    article h2 { font-size: 1.75rem; font-weight: 700; margin-top: 48px; margin-bottom: 20px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+    article h3 { font-size: 1.25rem; font-weight: 600; margin-top: 32px; margin-bottom: 16px; color: #0ea5e9; }
+    article p { margin-bottom: 20px; opacity: 0.9; }
+    article ul, article ol { margin: 20px 0; padding-left: 24px; }
+    article li { margin-bottom: 12px; opacity: 0.9; }
+    article li::marker { color: #0ea5e9; }
+    article strong { color: #f1f5f9; font-weight: 600; }
+    article a { color: #0ea5e9; text-decoration: underline; text-decoration-color: rgba(14,165,233,0.3); }
+    article a:hover { text-decoration-color: #0ea5e9; }
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.95rem; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { background: rgba(255,255,255,0.05); font-weight: 600; color: #f1f5f9; }
+    tr:hover { background: rgba(255,255,255,0.03); }
+    .feature-box { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.1)); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 24px; margin: 24px 0; }
+    .feature-box h4 { color: #6ee7b7; font-size: 1rem; margin-bottom: 12px; }
+    .cta-box { background: linear-gradient(135deg, rgba(14,165,233,0.15), rgba(16,185,129,0.1)); border: 1px solid rgba(14,165,233,0.3); border-radius: 16px; padding: 32px; text-align: center; margin: 40px 0; }
+    .cta-box h3 { margin-top: 0; margin-bottom: 16px; color: #f1f5f9; }
+    .cta-box p { opacity: 0.8; margin-bottom: 20px; }
+    .cta-box .btn-primary { font-size: 1.1rem; padding: 14px 32px; }
+    .cta-note { font-size: 0.85rem; opacity: 0.6; margin-top: 12px; }
+    .article-footer { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+    footer { margin-top: 60px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 40px; margin-bottom: 40px; }
+    .footer-section h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; margin-bottom: 16px; }
+    .footer-section ul { list-style: none; padding: 0; }
+    .footer-section li { margin-bottom: 10px; }
+    .footer-section a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-section a:hover { color: #0ea5e9; }
+    .footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; opacity: 0.5; }
+    @media (max-width: 640px) { article h1 { font-size: 1.75rem; } article h2 { font-size: 1.4rem; } .article-card { padding: 24px; } header { flex-direction: column; gap: 16px; } }
+  </style>
 </head>
 <body>
-  <article>
-    <h1>Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones</h1>
-    <p class="meta">Published: November 4, 2025 · 10 min read · Category: Meeting Tools</p>
+  <div class="container">
+    <header>
+      <a href="https://www.geosyncx.com" class="logo">GeoSyncX</a>
+      <div>
+        <a href="/blog/index.html" class="btn btn-ghost">Blog</a>
+        <a href="https://www.geosyncx.com" class="btn btn-primary">Open App</a>
+      </div>
+    </header>
 
-    <p><strong>Stop manually checking if 3 PM works for everyone. Automatically discover meeting times where all participants are within their working hours.</strong></p>
+    <main class="article-card">
+      <a href="/blog/index.html" class="back-link">← Back to Blog</a>
 
-    <h2>The Overlap Problem</h2>
-    <p>With team members in San Francisco, London, and Singapore, finding a time when everyone is awake (let alone at work) is nearly impossible. The timezone spread can be 16+ hours!</p>
+      <article>
+        <h1>Best Meeting Time Finder: Find Perfect Overlap Across Multiple Timezones</h1>
 
-    <h2>How Best Meeting Time Finder Works</h2>
-    <ol>
-      <li>Add all participant timezones to GeoSyncX</li>
-      <li>The tool analyzes working hours (9 AM - 6 PM) for each timezone</li>
-      <li>It finds overlapping windows where everyone is available</li>
-      <li>Results are color-coded: green (all available), yellow (some outside hours), red (bad time)</li>
-    </ol>
+        <div class="meta">
+          <span class="category">Meeting Tools</span>
+          <span>10 min read</span>
+          <span>November 4, 2025</span>
+        </div>
 
-    <h2>Example: SF + London + Singapore</h2>
-    <table>
-      <tr><th>Time (SF)</th><th>London</th><th>Singapore</th><th>Status</th></tr>
-      <tr><td>7:00 AM</td><td>3:00 PM</td><td>11:00 PM</td><td>⚠️ Singapore late</td></tr>
-      <tr><td>8:00 AM</td><td>4:00 PM</td><td>12:00 AM</td><td>❌ Singapore midnight</td></tr>
-      <tr><td>6:00 AM</td><td>2:00 PM</td><td>10:00 PM</td><td>⚠️ Early SF, late SG</td></tr>
-    </table>
-    <p>The tool shows you the best compromise times based on your priorities.</p>
+        <p class="lead">Stop manually checking if 3 PM works for everyone. Automatically discover meeting times where all participants are within their working hours.</p>
 
-    <h2>Features</h2>
-    <ul>
-      <li>Customizable working hours per timezone</li>
-      <li>Visual timeline showing overlap</li>
-      <li>Suggestions ranked by quality</li>
-      <li>One-click to schedule selected time</li>
-    </ul>
+        <h2>The Timezone Overlap Problem</h2>
 
-    <h2>When Perfect Overlap Doesn't Exist</h2>
-    <p>Sometimes there's no perfect time. The tool helps you find the "least bad" option and shows exactly who would be inconvenienced.</p>
+        <p>With team members in San Francisco, London, and Singapore, finding a time when everyone is awake (let alone at work) is nearly impossible. The timezone spread can be 16+ hours!</p>
 
-    <a href="https://www.geosyncx.com" class="cta">Find Your Best Meeting Time</a>
-  </article>
+        <p>Have you experienced this?</p>
+        <ul>
+          <li>Spending 30 minutes in a group chat figuring out "what time works for everyone"</li>
+          <li>Accidentally scheduling calls at 3 AM for someone</li>
+          <li>The frustration of "I can't do that time, I'll be asleep"</li>
+          <li>Endless back-and-forth trying to find a compromise</li>
+        </ul>
 
-  <script>if(!window.location.search.includes('static=1')){setTimeout(function(){window.location.href='/#/blog/best-meeting-time-finder'},100)}</script>
+        <h2>How Best Meeting Time Finder Works</h2>
+
+        <ol>
+          <li><strong>Add all participant timezones</strong> to GeoSyncX</li>
+          <li><strong>The tool analyzes working hours</strong> (9 AM - 6 PM) for each timezone</li>
+          <li><strong>It finds overlapping windows</strong> where everyone is available</li>
+          <li><strong>Results are color-coded:</strong> green (all available), yellow (some outside hours), red (bad time)</li>
+        </ol>
+
+        <h2>Example: San Francisco + London + Singapore</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Time (SF)</th>
+              <th>London</th>
+              <th>Singapore</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>6:00 AM</td>
+              <td>2:00 PM</td>
+              <td>10:00 PM</td>
+              <td style="color:#fcd34d;">⚠️ Early SF, late SG</td>
+            </tr>
+            <tr>
+              <td>7:00 AM</td>
+              <td>3:00 PM</td>
+              <td>11:00 PM</td>
+              <td style="color:#fcd34d;">⚠️ Singapore late</td>
+            </tr>
+            <tr>
+              <td>8:00 AM</td>
+              <td>4:00 PM</td>
+              <td>12:00 AM</td>
+              <td style="color:#f87171;">❌ Singapore midnight</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>The tool shows you the best compromise times based on your priorities.</p>
+
+        <div class="feature-box">
+          <h4>Pro Tip: The "Golden Window"</h4>
+          <p>For most US-Europe-Asia combinations, <strong>6-8 AM Pacific / 2-4 PM London / 9-11 PM Singapore</strong> is often the only viable overlap. The tool identifies these windows automatically.</p>
+        </div>
+
+        <h2>Key Features</h2>
+
+        <h3>Visual Timeline</h3>
+        <p>See a color-coded timeline showing when each timezone's business hours overlap. Green bands show "good" times, yellow shows "okay" times, and red shows times to avoid.</p>
+
+        <h3>Customizable Working Hours</h3>
+        <p>Not everyone works 9-5. Set custom working hours for each timezone (e.g., someone who works 7 AM - 3 PM).</p>
+
+        <h3>Ranked Suggestions</h3>
+        <p>The tool ranks meeting times by quality, so you can see which option inconveniences the fewest people.</p>
+
+        <h3>One-Click Scheduling</h3>
+        <p>Found the perfect time? Click to add it to Google Calendar with all timezone information pre-filled.</p>
+
+        <h2>When Perfect Overlap Doesn't Exist</h2>
+
+        <p>Sometimes there's no perfect time - and that's okay. The tool helps you find the "least bad" option by showing:</p>
+        <ul>
+          <li>Exactly who would be inconvenienced</li>
+          <li>By how much (e.g., "30 minutes before working hours" vs "2 AM")</li>
+          <li>Alternative days where overlap might be better</li>
+        </ul>
+
+        <h2>Common Scenarios</h2>
+
+        <h3>US + Europe</h3>
+        <p>Usually easy - late US morning (10 AM - 12 PM ET) overlaps with European afternoon (3-5 PM GMT).</p>
+
+        <h3>US + India</h3>
+        <p>Challenging - US morning means India evening/night. Best overlap is early US morning (8-9 AM ET = 5:30-6:30 PM IST).</p>
+
+        <h3>US + East Asia (Japan, Singapore, Australia)</h3>
+        <p>Most difficult - very early US morning or very late US evening required. Consider async alternatives.</p>
+
+        <div class="cta-box">
+          <h3>Find Your Best Meeting Time</h3>
+          <p>Stop the endless "what time works?" emails. Use GeoSyncX to find the optimal meeting time in seconds.</p>
+          <a href="https://www.geosyncx.com" class="btn btn-primary">Launch Meeting Time Finder</a>
+          <p class="cta-note">No signup required • Works with any number of timezones</p>
+        </div>
+
+        <div class="article-footer">
+          <a href="/blog/index.html" class="btn btn-ghost">← More Blog Posts</a>
+          <a href="https://www.geosyncx.com" class="btn btn-primary">Try GeoSyncX →</a>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Popular Tools</h3>
+          <ul>
+            <li><a href="https://www.geosyncx.com">Timezone Converter</a></li>
+            <li><a href="https://www.geosyncx.com">Meeting Scheduler</a></li>
+            <li><a href="https://www.geosyncx.com">JSON Formatter</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Time Converters</h3>
+          <ul>
+            <li><a href="/time/ist-to-london.html">IST to London</a></li>
+            <li><a href="/time/ist-to-est.html">IST to EST</a></li>
+            <li><a href="/time/ist-to-pst.html">IST to PST</a></li>
+            <li><a href="/time/est-to-pst.html">EST to PST</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="/blog/timezone-comparison-tool.html">Timezone Guide</a></li>
+            <li><a href="/blog/schedule-meeting-across-timezones.html">Google Calendar Guide</a></li>
+            <li><a href="/blog/phone-code-timezone-search.html">Phone Code Lookup</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="mailto:hello@geosyncx.com">Contact Us</a></li>
+            <li><a href="https://www.geosyncx.com">Home</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 GeoSyncX. Free timezone tools for global teams.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    if (!window.location.search.includes('static=1')) {
+      window.location.href = 'https://www.geosyncx.com/blog/best-meeting-time-finder';
+    }
+  </script>
 </body>
 </html>
