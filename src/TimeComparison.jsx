@@ -62,6 +62,7 @@ export default function TimeComparison({
   setPrimaryZone,
   selectedZones,
   setSelectedZones,
+  showCalendar = true,
 }) {
   const [currentTime, setCurrentTime] = useState({});
   const [selectedTime, setSelectedTime] = useState(""); // HH:mm
@@ -78,7 +79,7 @@ export default function TimeComparison({
   // Small calendar fields
   const [title, setTitle] = useState("Meeting");
   const [durationMin, setDurationMin] = useState(30);
-  const [location, setLocation] = useState("Google Meet");
+  const [location, setLocation] = useState("");
   const [details, setDetails] = useState("Planned via GeoSyncX");
 
   const cardBase = darkMode
@@ -496,60 +497,62 @@ export default function TimeComparison({
           </table>
         </div>
 
-        {/* Inline scheduling (inside TimeComparison) */}
-        <div className="mt-6 p-3 rounded-lg border border-dashed border-gray-400/40">
-          <div className="font-semibold mb-2">Schedule this time</div>
-          <div className="grid md:grid-cols-4 gap-3">
-            <input
-              className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <input
-              className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
-              placeholder="Location (e.g., Google Meet)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-            <input
-              type="number"
-              min={15}
-              step={15}
-              className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
-              placeholder="Duration (min)"
-              value={durationMin}
-              onChange={(e) => setDurationMin(parseInt(e.target.value || "30", 10))}
-            />
-            <input
-              className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
-              placeholder="Details"
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-            />
-          </div>
+        {/* Inline scheduling (inside TimeComparison) - only show if showCalendar is true */}
+        {showCalendar && (
+          <div className="mt-6 p-3 rounded-lg border border-dashed border-gray-400/40">
+            <div className="font-semibold mb-2">Schedule this time</div>
+            <div className="grid md:grid-cols-4 gap-3">
+              <input
+                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <input
+                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                placeholder="Location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <input
+                type="number"
+                min={15}
+                step={15}
+                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                placeholder="Duration (min)"
+                value={durationMin}
+                onChange={(e) => setDurationMin(parseInt(e.target.value || "30", 10))}
+              />
+              <input
+                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                placeholder="Details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+              />
+            </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <a
-              href={calendarReady ? gcalUrl : undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`px-4 py-2 rounded-xl transition-transform ${
-                calendarReady
-                  ? "bg-emerald-500 hover:bg-emerald-400 text-white active:scale-95"
-                  : "bg-white/20 text-white/60 cursor-not-allowed"
-              }`}
-              onClick={(e) => {
-                if (!calendarReady) e.preventDefault();
-              }}
-            >
-              Add to Google Calendar
-            </a>
-            <span className="text-xs opacity-70">
-              Times are saved in UTC; Calendar shows them in each attendee’s local timezone. To get a Google Meet link, click “Add Google Meet” in Calendar after opening.
-            </span>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <a
+                href={calendarReady ? gcalUrl : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-4 py-2 rounded-xl transition-transform ${
+                  calendarReady
+                    ? "bg-emerald-500 hover:bg-emerald-400 text-white active:scale-95"
+                    : "bg-white/20 text-white/60 cursor-not-allowed"
+                }`}
+                onClick={(e) => {
+                  if (!calendarReady) e.preventDefault();
+                }}
+              >
+                Add to Google Calendar
+              </a>
+              <span className="text-xs opacity-70">
+                Times are saved in UTC; Calendar shows them in each attendee's local timezone.
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

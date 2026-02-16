@@ -32,7 +32,7 @@ export default function MeetingSchedulerPage({ darkMode }) {
   }, [primaryZone, selectedZones]);
 
   const cardClass = darkMode
-    ? "bg-white/10 border border-white/15 backdrop-blur-xl"
+    ? "bg-white/5 border border-white/10 backdrop-blur-xl"
     : "bg-white/80 border border-white/60 backdrop-blur-xl";
 
   return (
@@ -55,29 +55,36 @@ export default function MeetingSchedulerPage({ darkMode }) {
           </p>
         </div>
 
-        {/* Instructions */}
+        {/* Quick Steps Guide */}
         <div className={`rounded-2xl p-6 ${cardClass}`}>
-          <h2 className={`text-lg font-semibold mb-3 ${darkMode ? "text-white" : "text-slate-900"}`}>
-            How to Schedule a Meeting
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
-              <div className="text-2xl mb-2">1️⃣</div>
-              <p className={`text-sm ${darkMode ? "text-white/80" : "text-slate-700"}`}>
-                <strong>Add participants' timezones</strong> using the search box below
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">1</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Add Timezones</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Search cities or phone codes</p>
+              </div>
             </div>
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
-              <div className="text-2xl mb-2">2️⃣</div>
-              <p className={`text-sm ${darkMode ? "text-white/80" : "text-slate-700"}`}>
-                <strong>Click any time slot</strong> to see what time it is for everyone
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">2</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Set Primary</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Star your timezone</p>
+              </div>
             </div>
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
-              <div className="text-2xl mb-2">3️⃣</div>
-              <p className={`text-sm ${darkMode ? "text-white/80" : "text-slate-700"}`}>
-                <strong>Pick a slot</strong> that works for all participants
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">3</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Pick a Time</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Enter date and time</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">4</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Schedule</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Add to calendar</p>
+              </div>
             </div>
           </div>
         </div>
@@ -136,6 +143,47 @@ export default function MeetingSchedulerPage({ darkMode }) {
                 Don't know where they're from? Look up their phone code
               </p>
             </Link>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className={`rounded-2xl p-6 ${cardClass}`}>
+          <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-slate-900"}`}>
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                How do I schedule a meeting across timezones?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Add all participants' timezones, set your timezone as primary (click the star), then choose a date and time. You'll see what time it is for everyone. Use the scheduling form to add it to Google Calendar.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Will attendees see the meeting in their local time?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Yes! When you add the event to Google Calendar, it's saved in UTC. Each attendee's calendar app automatically converts it to their local timezone.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                How do I find the best time when everyone is available?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Use our "Best Meeting Time" tool! It automatically analyzes all timezones and finds slots where everyone is within working hours.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Can I schedule recurring meetings?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Our tool creates a single event. For recurring meetings, schedule one event first, then set up recurrence directly in Google Calendar after the event is created.
+              </p>
+            </details>
           </div>
         </div>
       </div>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoSyncX — World Time Comparison, Meeting Scheduler & Productivity Tools</title>
+  <meta name="description" content="Free online timezone converter, meeting scheduler, and productivity tools. Compare multiple timezones, find best meeting times, format JSON/XML. Perfect for remote teams.">
+  <meta name="keywords" content="timezone converter, world clock, meeting scheduler, time zone comparison, remote team tools, productivity app, JSON formatter, XML formatter, phone code lookup">
+  <meta name="author" content="GeoSyncX Team">
+  <link rel="canonical" href="https://www.geosyncx.com/">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png">
+  
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="GeoSyncX — Timezone Tools for Global Teams">
+  <meta property="og:description" content="Free timezone converter, meeting scheduler, and productivity tools for remote teams.">
+  <meta property="og:url" content="https://www.geosyncx.com/">
+  <meta property="og:image" content="https://www.geosyncx.com/android-chrome-512x512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GeoSyncX",
+    "description": "Free online timezone converter, meeting scheduler, and productivity tools for remote teams and global collaboration.",
+    "url": "https://www.geosyncx.com/",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Web",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "author": {"@type": "Organization", "name": "GeoSyncX"},
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1247"
+    }
+  }
+  </script>
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: linear-gradient(135deg, #020617 0%, #0f172a 100%); color: #f1f5f9; min-height: 100vh; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    
+    /* Header */
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 60px; }
+    .logo { font-size: 1.8rem; font-weight: 700; color: #f1f5f9; text-decoration: none; }
+    .nav-links { display: flex; gap: 16px; }
+    .btn { display: inline-block; padding: 10px 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+    .btn-ghost { background: rgba(255,255,255,0.1); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.15); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: white; padding: 16px 32px; font-size: 1.1rem; box-shadow: 0 10px 40px rgba(14,165,233,0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 50px rgba(14,165,233,0.4); }
+    
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 60px; }
+    .hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 24px; }
+    .gradient-text { background: linear-gradient(135deg, #0ea5e9, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-lead { font-size: 1.25rem; color: rgba(255,255,255,0.7); max-width: 700px; margin: 0 auto 32px; }
+    .hero-quote { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; }
+    .hero-quote p { font-style: italic; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .hero-quote cite { color: #0ea5e9; font-size: 0.9rem; font-style: normal; }
+    
+    /* Tools Grid */
+    .section-title { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 32px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 60px; }
+    .tool-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s; position: relative; }
+    .tool-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); border-color: rgba(14,165,233,0.5); }
+    .tool-card.featured { background: linear-gradient(135deg, rgba(14,165,233,0.1), rgba(99,102,241,0.1)); border: 2px solid rgba(14,165,233,0.3); }
+    .tool-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .tool-badge { position: absolute; top: 12px; right: 12px; background: #0ea5e9; color: white; font-size: 0.65rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; }
+    .tool-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #f1f5f9; }
+    .tool-card p { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
+    
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; margin: 60px 0; }
+    .feature { text-align: center; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 32px; }
+    .feature-icon { width: 60px; height: 60px; margin: 0 auto 16px; background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.2)); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .feature h3 { font-size: 1.2rem; margin-bottom: 12px; }
+    .feature p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+    
+    /* Popular Links */
+    .popular-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 40px 0; }
+    .popular-link { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; text-align: center; text-decoration: none; color: #f1f5f9; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; }
+    .popular-link:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+    
+    /* CTA */
+    .cta-section { text-align: center; padding: 80px 20px; }
+    
+    /* Footer */
+    footer { margin-top: 80px; padding-top: 60px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 40px; }
+    .footer-section h4 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; margin-bottom: 16px; }
+    .footer-section ul { list-style: none; }
+    .footer-section li { margin-bottom: 10px; }
+    .footer-section a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-section a:hover { color: #0ea5e9; }
+    .footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; opacity: 0.5; }
+    
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .tools-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="/" class="logo">GeoSyncX</a>
+      <div class="nav-links">
+        <a href="/blog/index.html" class="btn btn-ghost">Blog</a>
+        <a href="/about.html" class="btn btn-ghost">About</a>
+      </div>
+    </header>
+    
+    <section class="hero">
+      <h1>
+        Stop Juggling Tabs. <br>
+        <span class="gradient-text">Start Closing Deals.</span>
+      </h1>
+      
+      <p class="hero-lead">
+        Phone number from an unknown country? Meeting across 5 timezones? <strong>We've got you.</strong>
+      </p>
+      
+      <div class="hero-quote">
+        <p>"I got tired of juggling 3-4 tools for something so simple."</p>
+        <cite>— Why I built GeoSyncX</cite>
+      </div>
+    </section>
+    
+    <section>
+      <h2 class="section-title">Pick Your Tool</h2>
+      
+      <div class="tools-grid">
+        <a href="/command-center.html" class="tool-card featured">
+          <span class="tool-badge">ALL-IN-ONE</span>
+          <div class="tool-icon">🚀</div>
+          <h3>Command Center</h3>
+          <p>All timezone tools unified in one powerful dashboard</p>
+        </a>
+        
+        <a href="/tools/phone-code-lookup.html" class="tool-card">
+          <div class="tool-icon">📞</div>
+          <h3>Phone Lookup</h3>
+          <p>Find timezone from phone country code instantly</p>
+        </a>
+        
+        <a href="/tools/timezone-compare.html" class="tool-card">
+          <div class="tool-icon">🌍</div>
+          <h3>Compare Timezones</h3>
+          <p>View multiple world clocks side by side with live updates</p>
+        </a>
+        
+        <a href="/tools/best-meeting-time.html" class="tool-card">
+          <div class="tool-icon">✨</div>
+          <h3>Best Meeting Time</h3>
+          <p>Find optimal times when everyone's awake and available</p>
+        </a>
+        
+        <a href="/tools/timezone-finder.html" class="tool-card">
+          <div class="tool-icon">🔍</div>
+          <h3>Timezone Finder</h3>
+          <p>Search timezones by city, country, or GMT offset</p>
+        </a>
+        
+        <a href="/tools/meeting-scheduler.html" class="tool-card">
+          <div class="tool-icon">📅</div>
+          <h3>Meeting Scheduler</h3>
+          <p>Schedule meetings with Google Calendar integration</p>
+        </a>
+        
+        <a href="/tools/formatter.html" class="tool-card">
+          <div class="tool-icon">🔧</div>
+          <h3>JSON/XML Formatter</h3>
+          <p>Beautify and format JSON, XML, SOAP with syntax highlighting</p>
+        </a>
+      </div>
+    </section>
+    
+    <section>
+      <h2 class="section-title">Why Teams Love GeoSyncX</h2>
+      
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <h3>Zero Friction</h3>
+          <p>No signup required. Just paste and go. Start using instantly without creating an account.</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">🎯</div>
+          <h3>Built for Sales & Remote Teams</h3>
+          <p>Used by 1000+ professionals to schedule international calls and coordinate global meetings.</p>
+        </div>
+        
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <h3>100% Private</h3>
+          <p>All calculations run locally in your browser. Your data never leaves your device.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section>
+      <h2 class="section-title">Popular Timezone Conversions</h2>
+      
+      <div class="popular-links">
+        <a href="/time/ist-to-london.html" class="popular-link">IST → London</a>
+        <a href="/time/ist-to-est.html" class="popular-link">IST → EST</a>
+        <a href="/time/ist-to-pst.html" class="popular-link">IST → PST</a>
+        <a href="/time/est-to-pst.html" class="popular-link">EST → PST</a>
+        <a href="/time/london-to-est.html" class="popular-link">London → EST</a>
+        <a href="/time/gmt-to-ist.html" class="popular-link">GMT → IST</a>
+        <a href="/time/pst-to-ist.html" class="popular-link">PST → IST</a>
+        <a href="/time/london-to-ist.html" class="popular-link">London → IST</a>
+      </div>
+    </section>
+    
+    <section class="cta-section">
+      <a href="https://www.geosyncx.com/command-center" class="btn btn-primary">
+        Launch Command Center →
+      </a>
+    </section>
+    
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-section">
+          <h4>Tools</h4>
+          <ul>
+            <li><a href="/tools/timezone-compare.html">Timezone Converter</a></li>
+            <li><a href="/tools/phone-code-lookup.html">Phone Code Lookup</a></li>
+            <li><a href="/tools/meeting-scheduler.html">Meeting Scheduler</a></li>
+            <li><a href="/tools/best-meeting-time.html">Best Meeting Time</a></li>
+            <li><a href="/tools/formatter.html">JSON Formatter</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Popular Conversions</h4>
+          <ul>
+            <li><a href="/time/ist-to-london.html">IST to London</a></li>
+            <li><a href="/time/ist-to-est.html">IST to EST</a></li>
+            <li><a href="/time/ist-to-pst.html">IST to PST</a></li>
+            <li><a href="/time/est-to-pst.html">EST to PST</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="/blog/index.html">Blog</a></li>
+            <li><a href="/blog/timezone-comparison-tool.html">Timezone Guide</a></li>
+            <li><a href="/blog/best-meeting-time-finder.html">Meeting Tips</a></li>
+            <li><a href="/about.html">About Us</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="mailto:hello@geosyncx.com">Contact Us</a></li>
+            <li><a href="https://www.geosyncx.com">Home</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>© 2025 GeoSyncX. Free timezone tools for global teams.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

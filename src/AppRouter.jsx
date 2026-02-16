@@ -20,6 +20,7 @@ import TimezoneFinderPage from "./pages/TimezoneFinderPage.jsx";
 import TimezoneComparePage from "./pages/TimezoneComparePage.jsx";
 import MeetingSchedulerPage from "./pages/MeetingSchedulerPage.jsx";
 import BestMeetingTimePage from "./pages/BestMeetingTimePage.jsx";
+import FormatterPage from "./pages/FormatterPage.jsx";
 
 // Components
 import Footer from "./Footer.jsx";
@@ -36,17 +37,18 @@ export default function AppRouter() {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
+  // Gradient background for dark mode
   const backgroundClass = darkMode
-    ? "bg-slate-950 text-slate-100"
-    : "bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 text-slate-900";
+    ? "bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100"
+    : "bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900";
 
   const themeToggleClass = darkMode
     ? "bg-white/20 text-white hover:bg-white/30"
     : "bg-slate-900 text-white hover:bg-slate-800";
 
   const navLinkClass = darkMode
-    ? "bg-white/15 text-white hover:bg-white/25"
-    : "bg-white/70 text-slate-700 hover:bg-white border border-slate-200";
+    ? "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
+    : "bg-white/70 text-slate-600 hover:bg-white hover:text-slate-900 border border-slate-200";
 
   const navLinkActiveClass = "bg-sky-500 text-white";
 
@@ -55,20 +57,40 @@ export default function AppRouter() {
       <div className="px-4 py-6 md:px-8 md:py-10 space-y-6 md:space-y-8">
         {/* Header */}
         <header className="flex items-center justify-between max-w-6xl mx-auto">
-          <div className="flex items-center gap-2 md:gap-4 flex-wrap">
-            <Link to="/" className="text-2xl font-bold hover:text-sky-500 transition-colors">
+          <div className="flex items-center gap-3 md:gap-6 flex-wrap">
+            {/* Bigger Logo */}
+            <Link to="/" className="text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight">
               GeoSyncX
             </Link>
 
-            {/* Navigation - Hidden on mobile, shown on md+ */}
+            {/* Navigation - Dashboard FIRST, then tools */}
             <nav className="hidden md:flex items-center gap-2">
+              <Link
+                to="/command-center"
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                  location.pathname === '/command-center'
+                    ? navLinkActiveClass
+                    : 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-400 hover:to-indigo-400 shadow-lg'
+                }`}
+              >
+                Command Center
+              </Link>
+              <div className={`h-6 w-px ${darkMode ? 'bg-white/20' : 'bg-slate-300'}`} />
               <Link
                 to="/tools/phone-code-lookup"
                 className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                   location.pathname === '/tools/phone-code-lookup' ? navLinkActiveClass : navLinkClass
                 }`}
               >
-                Phone
+                Phone Lookup
+              </Link>
+              <Link
+                to="/tools/timezone-finder"
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                  location.pathname === '/tools/timezone-finder' ? navLinkActiveClass : navLinkClass
+                }`}
+              >
+                Finder
               </Link>
               <Link
                 to="/tools/timezone-compare"
@@ -87,32 +109,31 @@ export default function AppRouter() {
                 Best Time
               </Link>
               <Link
-                to="/dashboard"
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                  location.pathname === '/dashboard' ? navLinkActiveClass : 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/30'
+                to="/tools/meeting-scheduler"
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                  location.pathname === '/tools/meeting-scheduler' ? navLinkActiveClass : navLinkClass
                 }`}
               >
-                Dashboard
+                Scheduler
+              </Link>
+              <Link
+                to="/tools/formatter"
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                  location.pathname === '/tools/formatter' ? navLinkActiveClass : navLinkClass
+                }`}
+              >
+                Formatter
               </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Mobile: Show Command Center button */}
             <Link
-              to="/blog"
-              className={`px-3 py-2 rounded-xl transition-transform active:scale-95 ${navLinkClass}`}
-              title="Blog"
+              to="/command-center"
+              className="md:hidden px-3 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-sm font-semibold"
             >
-              <span className="hidden md:inline">Blog</span>
-              <span className="md:hidden">📚</span>
-            </Link>
-            <Link
-              to="/about"
-              className={`px-3 py-2 rounded-xl transition-transform active:scale-95 ${navLinkClass}`}
-              title="About"
-            >
-              <span className="hidden md:inline">About</span>
-              <span className="md:hidden">ℹ️</span>
+              Go
             </Link>
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -126,7 +147,7 @@ export default function AppRouter() {
                 (window.location.href =
                   "mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback")
               }
-              className="px-3 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg"
+              className="hidden md:block px-3 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg"
               title="Send feedback"
             >
               📩
@@ -139,7 +160,9 @@ export default function AppRouter() {
           {/* Home */}
           <Route path="/" element={<HomePage darkMode={darkMode} />} />
 
-          {/* Dashboard (Original Full App) */}
+          {/* Command Center (renamed from Dashboard) */}
+          <Route path="/command-center" element={<App darkMode={darkMode} />} />
+          {/* Keep /dashboard as alias for backwards compatibility */}
           <Route path="/dashboard" element={<App darkMode={darkMode} />} />
 
           {/* About */}
@@ -151,6 +174,7 @@ export default function AppRouter() {
           <Route path="/tools/timezone-compare" element={<TimezoneComparePage darkMode={darkMode} />} />
           <Route path="/tools/meeting-scheduler" element={<MeetingSchedulerPage darkMode={darkMode} />} />
           <Route path="/tools/best-meeting-time" element={<BestMeetingTimePage darkMode={darkMode} />} />
+          <Route path="/tools/formatter" element={<FormatterPage darkMode={darkMode} />} />
 
           {/* Blog */}
           <Route path="/blog" element={<Blog darkMode={darkMode} />} />

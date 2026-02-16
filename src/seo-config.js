@@ -55,17 +55,6 @@ export const BLOG_SEO_DATA = {
     readTime: "10 min read",
     image: "https://www.geosyncx.com/android-chrome-512x512.png",
   },
-  "smart-todo-list": {
-    title: "Smart To-Do List: Simple Task Management with One-Click Sharing",
-    description: "Track your tasks, check them off, and share as formatted bullets - all without leaving your productivity hub. Free smart todo list app.",
-    keywords: "smart todo list, task management, productivity app, to-do list online, task tracker, simple todo app, shareable task list",
-    author: "GeoSyncX Team",
-    datePublished: "2025-11-04",
-    dateModified: "2025-11-04",
-    category: "Productivity",
-    readTime: "7 min read",
-    image: "https://www.geosyncx.com/android-chrome-512x512.png",
-  },
   "json-xml-soap-formatter": {
     title: "Free JSON, XML & SOAP Formatter with Syntax Highlighting",
     description: "Instantly beautify minified JSON, XML, and SOAP data. Format, highlight, and copy with one click - no installation required. Free online formatter tool.",

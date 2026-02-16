@@ -57,7 +57,7 @@ export default function TimezoneFinderPage({ darkMode }) {
   }, [query, allTimezones]);
 
   const cardClass = darkMode
-    ? "bg-white/10 border border-white/15 backdrop-blur-xl"
+    ? "bg-white/5 border border-white/10 backdrop-blur-xl"
     : "bg-white/80 border border-white/60 backdrop-blur-xl";
 
   const inputClass = darkMode
@@ -82,6 +82,33 @@ export default function TimezoneFinderPage({ darkMode }) {
           <p className={`text-lg ${darkMode ? "text-white/70" : "text-slate-600"}`}>
             Search by city, country, or GMT offset
           </p>
+        </div>
+
+        {/* Quick Steps */}
+        <div className={`rounded-2xl p-6 ${cardClass}`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">1</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Search</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>City, country, or GMT</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">2</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Browse Results</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>See matching timezones</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">3</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>See Local Time</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Live clock updates</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Search */}
@@ -159,6 +186,47 @@ export default function TimezoneFinderPage({ darkMode }) {
                 Identify country from phone number
               </p>
             </Link>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className={`rounded-2xl p-6 ${cardClass}`}>
+          <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-slate-900"}`}>
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                How do I search for a timezone?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                You can search by city name (e.g., "Tokyo"), country (e.g., "India"), timezone abbreviation (e.g., "PST"), or GMT offset (e.g., "GMT+5:30").
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                What is the difference between GMT and UTC?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                GMT (Greenwich Mean Time) and UTC (Coordinated Universal Time) are essentially the same for practical purposes. UTC is the modern standard used in computing and aviation, while GMT is the traditional term.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Do the times account for Daylight Saving Time?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Yes! Our timezone finder automatically accounts for DST. The displayed times reflect the current offset including any active daylight saving adjustments.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Why do some countries have multiple timezones?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Large countries like the USA, Russia, and Australia span multiple timezone regions. When you search for such countries, we show all applicable timezones with their major cities.
+              </p>
+            </details>
           </div>
         </div>
       </div>

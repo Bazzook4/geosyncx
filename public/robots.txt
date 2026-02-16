@@ -1,9 +1,13 @@
-# robots.txt for GeoSyncX
 User-agent: *
 Allow: /
+Allow: /blog/
+Allow: /time/
 
-# Sitemap location
 Sitemap: https://www.geosyncx.com/sitemap.xml
 
-# Crawl-delay for courtesy
-Crawl-delay: 1
+# Disallow build artifacts and node modules
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /build/
+Disallow: /*.json$
+Disallow: /*.map$

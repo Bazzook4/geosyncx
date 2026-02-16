@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function PhoneCodeLookupPage({ darkMode }) {
   const cardClass = darkMode
-    ? "bg-white/10 border border-white/15 backdrop-blur-xl"
+    ? "bg-white/5 border border-white/10 backdrop-blur-xl"
     : "bg-white/80 border border-white/60 backdrop-blur-xl";
 
   const handleCountrySelect = (country) => {
@@ -32,6 +32,33 @@ export default function PhoneCodeLookupPage({ darkMode }) {
           <p className={`text-lg ${darkMode ? "text-white/70" : "text-slate-600"}`}>
             Paste any phone number and instantly identify the country
           </p>
+        </div>
+
+        {/* Quick Steps */}
+        <div className={`rounded-2xl p-6 ${cardClass}`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">1</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Paste Number</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Any format works</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">2</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>See Country</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Instantly identified</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">3</div>
+              <div>
+                <p className={`font-medium ${darkMode ? "text-white" : "text-slate-900"}`}>Get Timezone</p>
+                <p className={`text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>Know their local time</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Tool */}
@@ -84,6 +111,47 @@ export default function PhoneCodeLookupPage({ darkMode }) {
                 Schedule calls across timezones
               </p>
             </Link>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className={`rounded-2xl p-6 ${cardClass}`}>
+          <h2 className={`text-xl font-semibold mb-6 ${darkMode ? "text-white" : "text-slate-900"}`}>
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                How do I find a country from a phone number?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Simply paste the phone number (with or without the + sign) into the search box. Our tool automatically identifies the country code and shows you the matching country, its timezone, and current local time.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                What phone number formats are supported?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                We support all international formats: +1 555 123 4567, +44 20 7946 0958, +91-9876543210, and more. Spaces, dashes, and parentheses are automatically handled.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Can I look up just the country code without the full number?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Yes! You can enter just the country code like +44, +1, or +91 to see which countries use that code and their timezones.
+              </p>
+            </details>
+            <details className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
+              <summary className={`font-medium cursor-pointer ${darkMode ? "text-white" : "text-slate-900"}`}>
+                Why do some country codes match multiple countries?
+              </summary>
+              <p className={`mt-3 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Some country codes are shared. For example, +1 is used by the USA, Canada, and several Caribbean nations. We show all matching countries so you can identify the correct one.
+              </p>
+            </details>
           </div>
         </div>
       </div>

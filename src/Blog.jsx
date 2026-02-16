@@ -45,14 +45,6 @@ const BLOG_POSTS = [
     date: "2025-11-04",
   },
   {
-    id: "smart-todo-list",
-    title: "Smart To-Do List: Simple Task Management with One-Click Sharing",
-    description: "Track your tasks, check them off, and share as formatted bullets - all without leaving your productivity hub.",
-    category: "Productivity",
-    readTime: "7 min read",
-    date: "2025-11-04",
-  },
-  {
     id: "json-xml-soap-formatter",
     title: "Free JSON, XML & SOAP Formatter with Syntax Highlighting",
     description: "Instantly beautify minified JSON, XML, and SOAP data. Format, highlight, and copy with one click - no installation required.",
