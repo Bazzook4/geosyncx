@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phone Code Timezone Lookup - Find Timezone by Country Code | GeoSyncX</title>
+  <meta name="description" content="Enter any phone country code (+91, +44, +1) and instantly find the corresponding timezone. Perfect for international calls, scheduling, and remote team coordination.">
+  <meta name="keywords" content="phone code timezone, country code lookup, timezone by phone number, international calling times, phone country code search, find timezone by country code, dial code timezone">
+  <meta name="author" content="GeoSyncX Team">
+  <link rel="canonical" href="https://www.geosyncx.com/tools/phone-code-lookup">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Phone Code Timezone Lookup - Find Timezone by Country Code">
+  <meta property="og:description" content="Enter any phone country code and instantly find the corresponding timezone. Free tool for international coordination.">
+  <meta property="og:url" content="https://www.geosyncx.com/tools/phone-code-lookup">
+  <meta property="og:image" content="https://www.geosyncx.com/android-chrome-512x512.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Phone Code Timezone Lookup Tool",
+    "description": "Find timezone by phone country code instantly. Free online tool for international calling and scheduling.",
+    "url": "https://www.geosyncx.com/tools/phone-code-lookup",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Web",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "author": {"@type": "Organization", "name": "GeoSyncX"}
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #020617;
+      color: #f1f5f9;
+      min-height: 100vh;
+      line-height: 1.8;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .logo:hover { color: #0ea5e9; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #0ea5e9;
+      color: white;
+      font-size: 1.1rem;
+      padding: 16px 32px;
+    }
+
+    .btn-primary:hover { background: #0284c7; transform: scale(1.02); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.1);
+      color: #f1f5f9;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+    .article-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .category {
+      background: rgba(59,130,246,0.2);
+      color: #93c5fd;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .lead {
+      font-size: 1.25rem;
+      line-height: 1.8;
+      opacity: 0.9;
+      border-left: 4px solid #0ea5e9;
+      padding-left: 20px;
+      margin: 32px 0;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 48px;
+      margin-bottom: 20px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      color: #0ea5e9;
+    }
+
+    p {
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    ul, ol {
+      margin: 20px 0;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 12px;
+      opacity: 0.9;
+    }
+
+    li::marker {
+      color: #0ea5e9;
+    }
+
+    strong {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .feature-box {
+      background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(14,165,233,0.1));
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+
+    .feature-box h4 {
+      color: #6ee7b7;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, rgba(14,165,233,0.15), rgba(16,185,129,0.1));
+      border: 1px solid rgba(14,165,233,0.3);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin: 48px 0;
+    }
+
+    .cta-box h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #f1f5f9;
+    }
+
+    .cta-box p {
+      opacity: 0.8;
+      margin-bottom: 24px;
+    }
+
+    .cta-note {
+      font-size: 0.85rem;
+      opacity: 0.6;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    th {
+      background: rgba(255,255,255,0.05);
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-section h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-section li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-section a:hover { color: #0ea5e9; }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 1.75rem; }
+      h2 { font-size: 1.4rem; }
+      .article-card { padding: 24px; }
+      header { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://www.geosyncx.com" class="logo">GeoSyncX</a>
+      <div>
+        <a href="/blog/index.html" class="btn btn-ghost">Blog</a>
+        <a href="https://www.geosyncx.com" class="btn btn-ghost">Home</a>
+      </div>
+    </header>
+
+    <main class="article-card">
+      <article>
+        <h1>Phone Code Timezone Lookup Tool</h1>
+        <span class="category">Timezone Tools</span>
+
+        <p class="lead">Enter any phone country code (+91, +44, +1) and instantly discover the corresponding timezone. Perfect for scheduling international calls and coordinating with remote teams.</p>
+
+        <div class="cta-box">
+          <h3>🚀 Launch Interactive Tool</h3>
+          <p>Use our free phone code lookup tool with real-time timezone information and current local times.</p>
+          <a href="https://www.geosyncx.com/tools/phone-code-lookup" class="btn btn-primary">Open Phone Code Lookup Tool →</a>
+          <p class="cta-note">No signup required • Works on all devices • Instant results</p>
+        </div>
+
+        <h2>What is Phone Code Timezone Lookup?</h2>
+
+        <p>When you see an international phone number like <strong>+91 98765 43210</strong> or <strong>+44 20 7946 0958</strong>, wouldn't it be helpful to instantly know what timezone that person is in? That's exactly what this tool does.</p>
+
+        <p>Simply enter the country dial code (the part after the +), and you'll immediately see:</p>
+        <ul>
+          <li>The country associated with that phone code</li>
+          <li>All timezones used in that country</li>
+          <li>Current local time in each timezone</li>
+          <li>GMT/UTC offset for each timezone</li>
+        </ul>
+
+        <h2>Common Phone Codes & Timezones</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Phone Code</th>
+              <th>Country</th>
+              <th>Primary Timezone</th>
+              <th>GMT Offset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>+1</td>
+              <td>United States/Canada</td>
+              <td>Multiple (EST, PST, etc.)</td>
+              <td>GMT-5 to GMT-8</td>
+            </tr>
+            <tr>
+              <td>+44</td>
+              <td>United Kingdom</td>
+              <td>GMT/BST</td>
+              <td>GMT+0/+1</td>
+            </tr>
+            <tr>
+              <td>+91</td>
+              <td>India</td>
+              <td>IST</td>
+              <td>GMT+5:30</td>
+            </tr>
+            <tr>
+              <td>+86</td>
+              <td>China</td>
+              <td>CST</td>
+              <td>GMT+8</td>
+            </tr>
+            <tr>
+              <td>+81</td>
+              <td>Japan</td>
+              <td>JST</td>
+              <td>GMT+9</td>
+            </tr>
+            <tr>
+              <td>+61</td>
+              <td>Australia</td>
+              <td>Multiple (AEST, AWST, etc.)</td>
+              <td>GMT+8 to GMT+11</td>
+            </tr>
+            <tr>
+              <td>+49</td>
+              <td>Germany</td>
+              <td>CET/CEST</td>
+              <td>GMT+1/+2</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Who Uses This Tool?</h2>
+
+        <h3>1. Sales & Business Development Teams</h3>
+        <p>Before cold calling an international prospect, check their timezone to avoid calling at 3 AM their time. Increase your answer rates by calling during business hours.</p>
+
+        <h3>2. Customer Support Teams</h3>
+        <p>When you see a support ticket with a phone number, instantly know what timezone the customer is in to set proper response time expectations.</p>
+
+        <h3>3. Remote Team Managers</h3>
+        <p>Hiring someone from a new country? Enter their phone code to understand their working hours and plan meeting schedules accordingly.</p>
+
+        <h3>4. Recruiters & HR</h3>
+        <p>Scheduling interviews across borders? Check the candidate's timezone before sending calendar invites to avoid awkward time mishaps.</p>
+
+        <div class="feature-box">
+          <h4>💡 Pro Tip</h4>
+          <p>Some countries like the United States (+1) and Australia (+61) span multiple timezones. Our tool shows <strong>all timezones</strong> used in that country so you can pick the right one for your contact's specific location.</p>
+        </div>
+
+        <h2>Key Features</h2>
+
+        <ul>
+          <li><strong>Instant Lookup:</strong> Type a phone code, get timezone results in milliseconds</li>
+          <li><strong>Live Time Display:</strong> See current local time in each timezone</li>
+          <li><strong>Multiple Timezones:</strong> For countries with multiple zones, see all of them</li>
+          <li><strong>GMT Offset Info:</strong> Understand the time difference from your location</li>
+          <li><strong>Mobile-Friendly:</strong> Use it on any device, anywhere</li>
+          <li><strong>No Registration:</strong> Start using immediately, no account needed</li>
+        </ul>
+
+        <h2>How to Use</h2>
+
+        <ol>
+          <li>Click the "Launch Tool" button above</li>
+          <li>Enter a phone country code (e.g., +91, +44, +1)</li>
+          <li>Instantly see all timezones for that country</li>
+          <li>View current local time in each timezone</li>
+          <li>Use this info to schedule calls at appropriate times</li>
+        </ol>
+
+        <h2>Why Timezone Matters for International Calls</h2>
+
+        <p>Calling someone at the wrong time can:</p>
+        <ul>
+          <li>Result in no answer (they're asleep or outside work hours)</li>
+          <li>Create a negative first impression</li>
+          <li>Reduce your connection rate by 50-70%</li>
+          <li>Waste your time and theirs</li>
+        </ul>
+
+        <p>Using our phone code timezone lookup ensures you <strong>always call at the right time</strong>, increasing your success rate and showing respect for the recipient's schedule.</p>
+
+        <div class="cta-box">
+          <h3>Ready to Look Up Phone Code Timezones?</h3>
+          <p>Start using our free tool now and never call someone at the wrong time again.</p>
+          <a href="https://www.geosyncx.com/tools/phone-code-lookup" class="btn btn-primary">Launch Phone Code Lookup →</a>
+        </div>
+
+      </article>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Popular Tools</h3>
+          <ul>
+            <li><a href="https://www.geosyncx.com/tools/timezone-compare">Timezone Converter</a></li>
+            <li><a href="https://www.geosyncx.com/tools/meeting-scheduler">Meeting Scheduler</a></li>
+            <li><a href="https://www.geosyncx.com/tools/formatter">JSON Formatter</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Time Converters</h3>
+          <ul>
+            <li><a href="/time/ist-to-london.html">IST to London</a></li>
+            <li><a href="/time/ist-to-est.html">IST to EST</a></li>
+            <li><a href="/time/ist-to-pst.html">IST to PST</a></li>
+            <li><a href="/time/est-to-pst.html">EST to PST</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="/blog/phone-code-timezone-search.html">Phone Code Guide</a></li>
+            <li><a href="/blog/best-meeting-time-finder.html">Meeting Time Guide</a></li>
+            <li><a href="/blog/index.html">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="mailto:hello@geosyncx.com">Contact Us</a></li>
+            <li><a href="https://www.geosyncx.com">Home</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 GeoSyncX. Free timezone tools for global teams.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
