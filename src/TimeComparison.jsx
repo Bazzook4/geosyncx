@@ -65,6 +65,7 @@ export default function TimeComparison({
   showCalendar = true,
 }) {
   const [currentTime, setCurrentTime] = useState({});
+  const [currentDate, setCurrentDate] = useState({});
   const [selectedTime, setSelectedTime] = useState(""); // HH:mm
   const [selectedDate, setSelectedDate] = useState(() => {
     // Always default to today's date
@@ -103,12 +104,16 @@ export default function TimeComparison({
   useEffect(() => {
     const updateTimes = () => {
       const newTimes = {};
+      const newDates = {};
       const zones = new Set(selectedZones);
       if (primaryZone) zones.add(primaryZone);
       zones.forEach((tz) => {
-        newTimes[tz] = DateTime.now().setZone(tz).toFormat("hh:mm a");
+        const dt = DateTime.now().setZone(tz);
+        newTimes[tz] = dt.toFormat("hh:mm a");
+        newDates[tz] = dt.toFormat("dd MMM");
       });
       setCurrentTime(newTimes);
+      setCurrentDate(newDates);
     };
     updateTimes();
     const interval = setInterval(updateTimes, 1000);
@@ -210,9 +215,10 @@ export default function TimeComparison({
     setFilteredTimezones(results.slice(0, 200));
   }, [searchQuery, phoneCodeMatches]);
 
-  // Convert “selectedTime” (HH:mm) from primary -> target zone
+  // Convert "selectedTime" (HH:mm) from primary -> target zone
+  // Returns { time, ampm, date, dayDiff } or null
   const convertTime = (zone) => {
-    if (!selectedTime || !primaryZone || !selectedDate) return "-";
+    if (!selectedTime || !primaryZone || !selectedDate) return null;
     const [H, M] = selectedTime.split(":").map(Number);
     const base = DateTime.fromObject(
       {
@@ -224,8 +230,11 @@ export default function TimeComparison({
       },
       { zone: primaryZone }
     );
-    if (!base.isValid) return "-";
-    return base.setZone(zone).toFormat("hh:mm a");
+    if (!base.isValid) return null;
+    const converted = base.setZone(zone);
+    const dayDiff = converted.startOf("day").diff(base.startOf("day"), "days").days;
+    const [timePart, ampm] = converted.toFormat("hh:mm a").split(" ");
+    return { time: timePart, ampm, date: converted.toFormat("dd MMM"), dayDiff };
   };
 
   // Table order: primary first, then others
@@ -283,7 +292,7 @@ export default function TimeComparison({
     const startUtc = startPrimary.toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
     const endUtc = endPrimary.toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
     const who = sortedTimezones.join(", ");
-    const fullDetails = `${details}\n\nPrimary TZ: ${primaryZone}\nParticipants: ${who}\n\n(Click “Add Google Meet” in Calendar to attach a Meet link.)`;
+    const fullDetails = `${details}\n\nPrimary TZ: ${primaryZone}\nParticipants: ${who}\n\n(Click "Add Google Meet" in Calendar to attach a Meet link.)`;
     return (
       `https://calendar.google.com/calendar/render?action=TEMPLATE` +
       `&text=${encode(title)}` +
@@ -410,7 +419,7 @@ export default function TimeComparison({
               {sortedTimezones.map((tz) => {
                 const timezone = timezoneData.find((zone) => zone.value === tz);
                 const currentTimeFormatted = formatTimeWithAMPM(currentTime[tz]);
-                const convertedTimeFormatted = formatTimeWithAMPM(convertTime(tz));
+                const converted = convertTime(tz);
 
                 return (
                   <tr
@@ -473,14 +482,37 @@ export default function TimeComparison({
                           <span>{currentTimeFormatted.time}</span>
                         </span>
                         <span className="text-lg">{currentTimeFormatted.ampm}</span>
+                        {currentDate[tz] && (
+                          <span className={`text-xs mt-0.5 ${darkMode ? "text-white/50" : "text-gray-400"}`}>
+                            {currentDate[tz]}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="p-2 md:w-1/4 w-[30%]">
                       <div className="flex flex-col">
-                        <span className="flex items-center gap-1">
-                          <span>{convertedTimeFormatted.time}</span>
-                        </span>
-                        <span className="text-lg">{convertedTimeFormatted.ampm}</span>
+                        {converted ? (
+                          <>
+                            <span className="flex items-center gap-1">
+                              <span>{converted.time}</span>
+                            </span>
+                            <span className="text-lg">{converted.ampm}</span>
+                            <span className={`text-xs mt-0.5 ${darkMode ? "text-white/50" : "text-gray-400"}`}>
+                              {converted.date}
+                              {converted.dayDiff !== 0 && (
+                                <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-semibold ${
+                                  converted.dayDiff > 0
+                                    ? "bg-sky-500/20 text-sky-400"
+                                    : "bg-rose-500/20 text-rose-400"
+                                }`}>
+                                  {converted.dayDiff > 0 ? `+${converted.dayDiff}d` : `${converted.dayDiff}d`}
+                                </span>
+                              )}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="opacity-50">-</span>
+                        )}
                       </div>
                     </td>
                   </tr>
