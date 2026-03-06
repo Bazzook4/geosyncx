@@ -1,5 +1,5 @@
 // /src/FormatterStudio.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 function prettifyJson(input) {
   const parsed = JSON.parse(input);
@@ -41,22 +41,18 @@ function prettifyXml(input) {
     const baseIndent = "  ".repeat(indentLevel);
     const attrIndent = "  ".repeat(indentLevel + 1);
 
-    // Match tag name and attributes
     const selfClosing = tag.endsWith("/>");
     const tagEnd = selfClosing ? "/>" : ">";
     const tagContent = tag.slice(1, selfClosing ? -2 : -1).trim();
 
-    // Split into tag name and attributes
     const firstSpace = tagContent.indexOf(" ");
     if (firstSpace === -1) {
-      // No attributes
       return baseIndent + tag;
     }
 
     const tagName = tagContent.slice(0, firstSpace);
     const attrString = tagContent.slice(firstSpace + 1).trim();
 
-    // Parse attributes (handle quoted values with spaces)
     const attrs = [];
     let attrCurrent = "";
     let inQuote = false;
@@ -82,12 +78,10 @@ function prettifyXml(input) {
       attrs.push(attrCurrent.trim());
     }
 
-    // If 3 or fewer attributes, keep on one line
     if (attrs.length <= 3) {
       return baseIndent + tag;
     }
 
-    // Multiple attributes: format each on its own line
     const lines = [`${baseIndent}<${tagName}`];
     attrs.forEach((attr, i) => {
       const isLast = i === attrs.length - 1;
@@ -97,7 +91,6 @@ function prettifyXml(input) {
     return lines.join("\n");
   }
 
-  // Format with proper indentation
   let indent = 0;
   const lines = [];
 
@@ -111,17 +104,12 @@ function prettifyXml(input) {
 
     const tag = token.value;
 
-    // Closing tag </...>
     if (tag.startsWith("</")) {
       indent = Math.max(0, indent - 1);
       lines.push("  ".repeat(indent) + tag);
-    }
-    // Self-closing tag <.../> or <?...?> or <!...>
-    else if (tag.endsWith("/>") || tag.startsWith("<?") || tag.startsWith("<!")) {
+    } else if (tag.endsWith("/>") || tag.startsWith("<?") || tag.startsWith("<!")) {
       lines.push(formatTag(tag, indent));
-    }
-    // Opening tag <...>
-    else {
+    } else {
       lines.push(formatTag(tag, indent));
       indent += 1;
     }
@@ -136,24 +124,24 @@ function prettifySoap(input) {
 
 function escapeString(input) {
   return input
-    .replace(/\\/g, '\\\\')     // Backslash
-    .replace(/"/g, '\\"')        // Double quote
-    .replace(/\n/g, '\\n')       // Newline
-    .replace(/\r/g, '\\r')       // Carriage return
-    .replace(/\t/g, '\\t')       // Tab
-    .replace(/\b/g, '\\b')       // Backspace
-    .replace(/\f/g, '\\f');      // Form feed
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/\b/g, '\\b')
+    .replace(/\f/g, '\\f');
 }
 
 function unescapeString(input) {
   return input
-    .replace(/\\n/g, '\n')       // Newline
-    .replace(/\\r/g, '\r')       // Carriage return
-    .replace(/\\t/g, '\t')       // Tab
-    .replace(/\\b/g, '\b')       // Backspace
-    .replace(/\\f/g, '\f')       // Form feed
-    .replace(/\\"/g, '"')        // Double quote
-    .replace(/\\\\/g, '\\');     // Backslash (must be last)
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\b/g, '\b')
+    .replace(/\\f/g, '\f')
+    .replace(/\\"/g, '"')
+    .replace(/\\\\/g, '\\');
 }
 
 function detectFormat(input) {
@@ -219,6 +207,188 @@ function highlightXml(xmlString) {
     .replace(/(&lt;!--.*?--&gt;)/g, `<span class="token-comment">$1</span>`);
 }
 
+// Determine which lines are foldable (opening tags) and their matching close line
+function buildFoldMap(lines, format) {
+  if (format !== "xml" && format !== "soap" && format !== "json") return {};
+
+  const foldMap = {}; // lineIndex -> { end: lineIndex, depth }
+  const stack = []; // stack of { lineIndex, tag }
+
+  if (format === "json") {
+    // For JSON, fold on lines ending with { or [
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trimEnd();
+      if (trimmed.endsWith("{") || trimmed.endsWith("[")) {
+        stack.push({ lineIndex: i });
+      } else if (trimmed === "}" || trimmed === "}," || trimmed === "]" || trimmed === "],") {
+        const opener = stack.pop();
+        if (opener && opener.lineIndex !== i) {
+          foldMap[opener.lineIndex] = i;
+        }
+      }
+    }
+  } else {
+    // XML/SOAP: fold on opening tags
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      // Opening tag (not self-closing, not closing, not processing instruction)
+      if (
+        line.startsWith("<") &&
+        !line.startsWith("</") &&
+        !line.startsWith("<?") &&
+        !line.startsWith("<!") &&
+        !line.endsWith("/>")
+      ) {
+        const tagMatch = line.match(/^<([^\s>/]+)/);
+        if (tagMatch) {
+          stack.push({ lineIndex: i, tag: tagMatch[1] });
+        }
+      } else if (line.startsWith("</")) {
+        const tagMatch = line.match(/^<\/([^\s>]+)/);
+        if (tagMatch) {
+          // Find matching opener
+          for (let s = stack.length - 1; s >= 0; s--) {
+            if (stack[s].tag === tagMatch[1]) {
+              const opener = stack.splice(s, 1)[0];
+              if (opener.lineIndex !== i) {
+                foldMap[opener.lineIndex] = i;
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return foldMap;
+}
+
+// CodeViewer: line numbers + folding
+function CodeViewer({ highlighted, output, format, darkMode }) {
+  const [collapsed, setCollapsed] = useState({});
+
+  const lines = useMemo(() => output.split("\n"), [output]);
+  const highlightedLines = useMemo(() => highlighted.split("\n"), [highlighted]);
+  const foldMap = useMemo(() => buildFoldMap(lines, format), [lines, format]);
+
+  // Reset collapsed state when output changes
+  useEffect(() => { setCollapsed({}); }, [output]);
+
+  const toggleFold = useCallback((lineIdx) => {
+    setCollapsed(prev => ({ ...prev, [lineIdx]: !prev[lineIdx] }));
+  }, []);
+
+  // Build set of hidden lines
+  const hiddenLines = useMemo(() => {
+    const hidden = new Set();
+    Object.entries(collapsed).forEach(([startStr, isCollapsed]) => {
+      if (!isCollapsed) return;
+      const start = Number(startStr);
+      const end = foldMap[start];
+      if (end == null) return;
+      for (let i = start + 1; i <= end; i++) hidden.add(i);
+    });
+    return hidden;
+  }, [collapsed, foldMap]);
+
+  const lineNumWidth = String(lines.length).length;
+
+  const gutterBg = darkMode ? "#0f172a" : "#f1f5f9";
+  const gutterColor = darkMode ? "rgba(255,255,255,0.3)" : "#94a3b8";
+  const codeBg = darkMode ? "rgba(2,6,23,0.6)" : "rgba(15,23,42,0.04)";
+
+  return (
+    <div
+      style={{
+        fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+        fontSize: "0.8rem",
+        lineHeight: "1.6",
+        borderRadius: "12px",
+        overflow: "hidden",
+        minHeight: "220px",
+        maxHeight: "600px",
+        overflowY: "auto",
+        display: "flex",
+        background: codeBg,
+      }}
+    >
+      {/* Gutter: line numbers + fold arrows */}
+      <div
+        style={{
+          background: gutterBg,
+          color: gutterColor,
+          userSelect: "none",
+          flexShrink: 0,
+          paddingTop: "16px",
+          paddingBottom: "16px",
+        }}
+      >
+        {lines.map((_, i) => {
+          if (hiddenLines.has(i)) return null;
+          const isFoldable = foldMap[i] != null;
+          const isCollapsed = collapsed[i];
+          return (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: "12px",
+                paddingRight: "8px",
+                height: "1.6em",
+                gap: "4px",
+                cursor: isFoldable ? "pointer" : "default",
+              }}
+              onClick={isFoldable ? () => toggleFold(i) : undefined}
+            >
+              <span style={{ minWidth: `${lineNumWidth}ch`, textAlign: "right", fontSize: "0.75rem" }}>
+                {i + 1}
+              </span>
+              <span style={{ width: "14px", textAlign: "center", fontSize: "0.65rem", color: darkMode ? "#38bdf8" : "#0284c7" }}>
+                {isFoldable ? (isCollapsed ? "▶" : "▼") : ""}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Code content */}
+      <div style={{ flex: 1, overflowX: "auto", padding: "16px 16px 16px 12px" }}>
+        <pre style={{ margin: 0, whiteSpace: "pre" }}>
+          {lines.map((line, i) => {
+            if (hiddenLines.has(i)) return null;
+            const isCollapsed = collapsed[i];
+            const endLine = foldMap[i];
+            return (
+              <div key={i} style={{ display: "block", minHeight: "1.6em" }}>
+                <span dangerouslySetInnerHTML={{ __html: highlightedLines[i] ?? escapeHtml(line) }} />
+                {isCollapsed && endLine != null && (
+                  <span
+                    onClick={() => toggleFold(i)}
+                    style={{
+                      cursor: "pointer",
+                      marginLeft: "6px",
+                      padding: "0 6px",
+                      borderRadius: "4px",
+                      fontSize: "0.7rem",
+                      background: darkMode ? "rgba(56,189,248,0.15)" : "rgba(2,132,199,0.1)",
+                      color: darkMode ? "#38bdf8" : "#0284c7",
+                      border: `1px solid ${darkMode ? "rgba(56,189,248,0.3)" : "rgba(2,132,199,0.2)"}`,
+                    }}
+                  >
+                    ··· {endLine - i} lines
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
 export default function FormatterStudio({ darkMode }) {
   const [raw, setRaw] = useState("");
   const [output, setOutput] = useState("");
@@ -260,7 +430,6 @@ export default function FormatterStudio({ darkMode }) {
     }
 
     try {
-      // Handle String Escape/Unescape modes
       if (mode === "escape") {
         const escaped = escapeString(value);
         setOutput(escaped);
@@ -279,7 +448,6 @@ export default function FormatterStudio({ darkMode }) {
         return;
       }
 
-      // Handle Format mode
       const format = detectFormat(value) || "text";
       setDetected(format);
 
@@ -291,8 +459,7 @@ export default function FormatterStudio({ darkMode }) {
       setOutput(formatted);
 
       if (format === "json") setHighlighted(highlightJson(formatted));
-      else if (format === "xml" || format === "soap")
-        setHighlighted(highlightXml(formatted));
+      else if (format === "xml" || format === "soap") setHighlighted(highlightXml(formatted));
       else setHighlighted(escapeHtml(formatted));
 
       setError("");
@@ -412,30 +579,29 @@ export default function FormatterStudio({ darkMode }) {
             style={{ minHeight: "220px" }}
           />
         </div>
+
         {/* Result: 70% width */}
         <div className="lg:w-[70%] flex flex-col">
           <label className={`text-xs font-semibold uppercase tracking-wide mb-2 ${darkMode ? "text-white/70" : "text-gray-600"}`}>
             Result
           </label>
-          <div
-            className={`w-full rounded-xl p-4 shadow-inner text-sm leading-relaxed ${
-              darkMode ? "bg-slate-950/60 text-white" : "bg-slate-900/5 text-slate-900"
-            }`}
-            style={{ minHeight: "220px" }}
-          >
-            {output ? (
-              <pre
-                className={`whitespace-pre-wrap formatter-output ${
-                  detected ? `format-${detected}` : ""
-                }`}
-                dangerouslySetInnerHTML={{ __html: highlighted }}
-              />
-            ) : (
-              <div className="text-xs opacity-60">
-                Formatted output will appear here.
-              </div>
-            )}
-          </div>
+          {output ? (
+            <CodeViewer
+              highlighted={highlighted}
+              output={output}
+              format={detected}
+              darkMode={darkMode}
+            />
+          ) : (
+            <div
+              className={`w-full rounded-xl p-4 shadow-inner text-sm ${
+                darkMode ? "bg-slate-950/60 text-white" : "bg-slate-900/5 text-slate-900"
+              }`}
+              style={{ minHeight: "220px" }}
+            >
+              <div className="text-xs opacity-60">Formatted output will appear here.</div>
+            </div>
+          )}
         </div>
       </div>
 
