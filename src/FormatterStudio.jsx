@@ -227,7 +227,6 @@ export default function FormatterStudio({ darkMode }) {
   const [detected, setDetected] = useState(null);
   const [mode, setMode] = useState("format"); // "format", "escape", "unescape"
   const inputRef = useRef(null);
-  const topRef = useRef(null);
 
   const panelClass = useMemo(
     () =>
@@ -245,7 +244,9 @@ export default function FormatterStudio({ darkMode }) {
     if (!inputRef.current) return;
     const el = inputRef.current;
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    const maxHeight = 600;
+    el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
+    el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
   }, [raw]);
 
   const handleFormat = () => {
@@ -316,7 +317,6 @@ export default function FormatterStudio({ darkMode }) {
 
   return (
     <div
-      ref={topRef}
       className={`p-6 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${panelClass}`}
     >
       <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -355,10 +355,7 @@ export default function FormatterStudio({ darkMode }) {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => {
-              handleFormat();
-              topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
+            onClick={handleFormat}
             className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
           >
             <span className="text-xl">✨</span>
