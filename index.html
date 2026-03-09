@@ -32,6 +32,20 @@
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>
+
+    <!-- GitHub Pages SPA redirect: restore path encoded by 404.html -->
+    <script>
+      (function() {
+        var redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          var url = new URL(redirect);
+          if (url.pathname !== window.location.pathname) {
+            window.history.replaceState(null, null, url.pathname + url.search + url.hash);
+          }
+        }
+      })();
+    </script>
   </head>
   <body class="antialiased">
     <div id="root"></div>

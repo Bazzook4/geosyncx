@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "rm -rf dist && vite build && touch dist/.nojekyll && echo www.geosyncx.com > dist/CNAME && cp dist/index.html dist/404.html",
+    "predeploy": "rm -rf dist && vite build && touch dist/.nojekyll && echo www.geosyncx.com > dist/CNAME",
     "deploy": "gh-pages -d dist -b gh-pages"
   },
   "dependencies": {
