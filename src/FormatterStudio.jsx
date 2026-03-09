@@ -144,8 +144,13 @@ function unescapeString(input) {
     .replace(/\\\\/g, '\\');
 }
 
+// Strip common log prefixes like [2026-03-09 09:40:46] or 2026-03-09T09:40:46 before the payload
+function stripLogPrefix(input) {
+  return input.replace(/^\[?[\d\-T: .]+\]?\s*/, "").trim();
+}
+
 function detectFormat(input) {
-  const trimmed = input.trim();
+  const trimmed = stripLogPrefix(input.trim());
   if (!trimmed) return null;
 
   try {
@@ -355,7 +360,7 @@ function CodeViewer({ highlighted, output, format, darkMode }) {
 
       {/* Code content */}
       <div style={{ flex: 1, overflowX: "auto", padding: "16px 16px 16px 12px" }}>
-        <pre style={{ margin: 0, whiteSpace: "pre" }}>
+        <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
           {lines.map((line, i) => {
             if (hiddenLines.has(i)) return null;
             const isCollapsed = collapsed[i];
@@ -448,13 +453,14 @@ export default function FormatterStudio({ darkMode }) {
         return;
       }
 
+      const stripped = stripLogPrefix(value);
       const format = detectFormat(value) || "text";
       setDetected(format);
 
-      let formatted = value;
-      if (format === "json") formatted = prettifyJson(value);
-      else if (format === "xml") formatted = prettifyXml(value);
-      else if (format === "soap") formatted = prettifySoap(value);
+      let formatted = stripped;
+      if (format === "json") formatted = prettifyJson(stripped);
+      else if (format === "xml") formatted = prettifyXml(stripped);
+      else if (format === "soap") formatted = prettifySoap(stripped);
 
       setOutput(formatted);
 
