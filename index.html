@@ -33,7 +33,9 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>
 
-    <!-- GitHub Pages SPA redirect: restore path encoded by 404.html -->
+  </head>
+  <body class="antialiased">
+    <!-- GitHub Pages SPA redirect: restore path saved by 404.html before React mounts -->
     <script>
       (function() {
         var redirect = sessionStorage.getItem('redirect');
@@ -46,8 +48,6 @@
         }
       })();
     </script>
-  </head>
-  <body class="antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
