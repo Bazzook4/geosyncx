@@ -144,9 +144,13 @@ function unescapeString(input) {
     .replace(/\\\\/g, '\\');
 }
 
-// Strip common log prefixes like [2026-03-09 09:40:46] or 2026-03-09T09:40:46 before the payload
+// Strip common log prefixes like [2026-03-09 09:40:46] before the payload
+// Only strips if the remainder starts with { [ or <
 function stripLogPrefix(input) {
-  return input.replace(/^\[?[\d\-T: .]+\]?\s*/, "").trim();
+  const stripped = input.replace(/^\[[\d\-T: .]+\]\s*/, "").trim();
+  // Only use stripped version if it looks like a valid payload start
+  if (/^[{[<]/.test(stripped)) return stripped;
+  return input.trim();
 }
 
 function detectFormat(input) {
