@@ -3,7 +3,28 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 function prettifyJson(input) {
   const parsed = JSON.parse(input);
-  return JSON.stringify(parsed, null, 2);
+  // Recursively expand any string values that are themselves JSON
+  function expandNestedJson(value) {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if ((trimmed.startsWith("{") || trimmed.startsWith("[")) && trimmed.length > 10) {
+        try {
+          return expandNestedJson(JSON.parse(trimmed));
+        } catch {
+          // not JSON, leave as-is
+        }
+      }
+      return value;
+    }
+    if (Array.isArray(value)) return value.map(expandNestedJson);
+    if (value !== null && typeof value === "object") {
+      const result = {};
+      for (const k of Object.keys(value)) result[k] = expandNestedJson(value[k]);
+      return result;
+    }
+    return value;
+  }
+  return JSON.stringify(expandNestedJson(parsed), null, 2);
 }
 
 function prettifyXml(input) {
