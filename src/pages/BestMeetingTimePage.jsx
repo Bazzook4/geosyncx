@@ -100,70 +100,63 @@ export default function BestMeetingTimePage({ darkMode }) {
         url="https://www.geosyncx.com/tools/best-meeting-time"
       />
 
-      <div className="w-full max-w-7xl mx-auto space-y-8">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
         {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <h1 className={`text-3xl md:text-4xl font-bold ${headingClass}`}>
-            Best Meeting Time Finder
-          </h1>
-          <p className={`text-lg ${textClass}`}>
-            Find when everyone is within working hours
-          </p>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className={`text-2xl md:text-3xl font-bold ${headingClass}`}>
+              Best Meeting Time Finder
+            </h1>
+            <p className={`text-sm mt-1 ${textClass}`}>
+              Find when everyone is within working hours
+            </p>
+          </div>
           <button
             onClick={handleShare}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium transition-all active:scale-95"
           >
-            {copied ? "✓ Link copied!" : "🔗 Share this setup"}
+            {copied ? "✓ Copied!" : "🔗 Share"}
           </button>
         </div>
 
-        {/* Quick Steps */}
-        <div className={`rounded-2xl p-6 ${cardClass}`}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">1</div>
-              <div>
-                <p className={`font-medium ${headingClass}`}>Add Timezones</p>
-                <p className={`text-sm ${textClass}`}>Search cities or phone codes</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">2</div>
-              <div>
-                <p className={`font-medium ${headingClass}`}>View Results</p>
-                <p className={`text-sm ${textClass}`}>See color-coded time slots</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-white flex items-center justify-center font-bold">3</div>
-              <div>
-                <p className={`font-medium ${headingClass}`}>Pick Green</p>
-                <p className={`text-sm ${textClass}`}>Everyone's awake!</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Add Timezones */}
-        <div className={`rounded-2xl p-6 ${cardClass}`}>
-          <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
-            Add Participant Timezones
-          </h2>
-          <TimeComparison
-            darkMode={darkMode}
-            primaryZone={primaryZone}
-            setPrimaryZone={setPrimaryZone}
-            selectedZones={selectedZones}
-            setSelectedZones={setSelectedZones}
-            showCalendar={false}
-          />
-        </div>
-
-        {/* Best Times Result */}
+        {/* Add Timezones — collapsible once zones are set */}
         {sortedTimezones.length >= 2 ? (
+          <details className={`rounded-2xl ${cardClass}`}>
+            <summary className={`p-4 cursor-pointer font-semibold text-sm select-none ${headingClass}`}>
+              ✏️ Edit Timezones ({sortedTimezones.length} added)
+            </summary>
+            <div className="px-6 pb-6">
+              <TimeComparison
+                darkMode={darkMode}
+                primaryZone={primaryZone}
+                setPrimaryZone={setPrimaryZone}
+                selectedZones={selectedZones}
+                setSelectedZones={setSelectedZones}
+                showCalendar={false}
+              />
+            </div>
+          </details>
+        ) : (
           <div className={`rounded-2xl p-6 ${cardClass}`}>
             <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
-              Best Meeting Times
+              Add Participant Timezones
+            </h2>
+            <TimeComparison
+              darkMode={darkMode}
+              primaryZone={primaryZone}
+              setPrimaryZone={setPrimaryZone}
+              selectedZones={selectedZones}
+              setSelectedZones={setSelectedZones}
+              showCalendar={false}
+            />
+          </div>
+        )}
+
+        {/* Best Times Result — PRIMARY FOCUS */}
+        {sortedTimezones.length >= 2 ? (
+          <div className={`rounded-2xl p-6 ${cardClass} ring-2 ring-emerald-500/30`}>
+            <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
+              ✅ Best Meeting Times
             </h2>
             <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} prefs={prefs} setPrefs={setPrefs} />
           </div>
