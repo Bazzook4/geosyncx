@@ -41,15 +41,33 @@ export default function BestMeetingTimePage({ darkMode }) {
     }
   });
 
-  // Sync to localStorage and URL whenever zones change
+  // Working hours prefs (lifted from BestMeetingFinder so we can encode in URL)
+  const [prefs, setPrefs] = useState(() => {
+    // Try URL first
+    const params = new URLSearchParams(location.search);
+    const hoursParam = params.get("hours");
+    if (hoursParam) {
+      try { return JSON.parse(decodeURIComponent(hoursParam)); } catch {}
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem("bmf_prefs") || "{}");
+      return saved && typeof saved === "object" ? saved : {};
+    } catch { return {}; }
+  });
+
+  // Sync to localStorage and URL whenever zones or prefs change
   useEffect(() => {
     localStorage.setItem("primaryZone", primaryZone);
     localStorage.setItem("selectedZones", JSON.stringify(selectedZones));
+    localStorage.setItem("bmf_prefs", JSON.stringify(prefs));
     const allZones = [primaryZone, ...selectedZones.filter(z => z && z !== primaryZone)];
     const params = new URLSearchParams();
     params.set("zones", allZones.map(encodeURIComponent).join(","));
+    // Only include hours in URL if any are non-default
+    const hasCustomHours = Object.values(prefs).some(p => p.start !== "11:00" || p.end !== "19:00");
+    if (hasCustomHours) params.set("hours", encodeURIComponent(JSON.stringify(prefs)));
     navigate({ search: params.toString() }, { replace: true });
-  }, [primaryZone, selectedZones]);
+  }, [primaryZone, selectedZones, prefs]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -147,7 +165,7 @@ export default function BestMeetingTimePage({ darkMode }) {
             <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
               Best Meeting Times
             </h2>
-            <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} />
+            <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} prefs={prefs} setPrefs={setPrefs} />
           </div>
         ) : (
           <div className={`rounded-2xl p-8 text-center ${cardClass}`}>

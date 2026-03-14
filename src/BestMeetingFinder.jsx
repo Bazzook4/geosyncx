@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
 
-export default function BestMeetingFinder({ zones = [], darkMode }) {
+export default function BestMeetingFinder({ zones = [], darkMode, prefs: prefsProp, setPrefs: setPrefsProp }) {
   // Normalize & guard
   const validZones = useMemo(
     () => (Array.isArray(zones) ? zones.filter(Boolean) : []),
@@ -21,15 +21,15 @@ export default function BestMeetingFinder({ zones = [], darkMode }) {
     return m;
   }, []);
 
-  // Per-zone working hours: { [zone]: { start:"09:00", end:"18:00" } }
-  const [prefs, setPrefs] = useState(() => {
+  // Per-zone working hours: use props if provided (for URL sharing), else own state
+  const [localPrefs, setLocalPrefs] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("bmf_prefs") || "{}");
       return saved && typeof saved === "object" ? saved : {};
-    } catch {
-      return {};
-    }
+    } catch { return {}; }
   });
+  const prefs = prefsProp !== undefined ? prefsProp : localPrefs;
+  const setPrefs = setPrefsProp !== undefined ? setPrefsProp : setLocalPrefs;
 
   // Track which result cards are expanded
   const [expandedCards, setExpandedCards] = useState(new Set());
@@ -73,10 +73,12 @@ export default function BestMeetingFinder({ zones = [], darkMode }) {
     });
   }, [zonesKey, hasEnoughZones, validZones]);
 
-  // Persist prefs to localStorage
+  // Persist prefs to localStorage only when managing own state (no props)
   useEffect(() => {
-    localStorage.setItem("bmf_prefs", JSON.stringify(prefs));
-  }, [prefs]);
+    if (setPrefsProp === undefined) {
+      localStorage.setItem("bmf_prefs", JSON.stringify(prefs));
+    }
+  }, [prefs, setPrefsProp]);
 
   // Check if local time is within [start, end) (supports overnight windows)
   function isWithinRange(localDT, startHHMM, endHHMM) {
