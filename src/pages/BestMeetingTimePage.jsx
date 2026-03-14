@@ -119,7 +119,27 @@ export default function BestMeetingTimePage({ darkMode }) {
           </button>
         </div>
 
-        {/* Add Timezones — collapsible once zones are set */}
+        {/* Best Times Result — PRIMARY FOCUS, always first */}
+        {sortedTimezones.length >= 2 ? (
+          <div className={`rounded-2xl p-6 ${cardClass} ring-2 ring-emerald-500/30`}>
+            <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
+              ✅ Best Meeting Times
+            </h2>
+            <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} prefs={prefs} setPrefs={setPrefs} />
+          </div>
+        ) : (
+          <div className={`rounded-2xl p-8 text-center ${cardClass}`}>
+            <div className="text-5xl mb-4">🌍</div>
+            <p className={`text-lg font-medium ${headingClass}`}>
+              Add at least 2 timezones to find overlapping hours
+            </p>
+            <p className={`text-sm mt-2 ${textClass}`}>
+              Try searching for cities like "London", "New York" or phone codes like "+91"
+            </p>
+          </div>
+        )}
+
+        {/* Add/Edit Timezones — collapsible once zones are set */}
         {sortedTimezones.length >= 2 ? (
           <details className={`rounded-2xl ${cardClass}`}>
             <summary className={`p-4 cursor-pointer font-semibold text-sm select-none ${headingClass}`}>
@@ -149,26 +169,6 @@ export default function BestMeetingTimePage({ darkMode }) {
               setSelectedZones={setSelectedZones}
               showCalendar={false}
             />
-          </div>
-        )}
-
-        {/* Best Times Result — PRIMARY FOCUS */}
-        {sortedTimezones.length >= 2 ? (
-          <div className={`rounded-2xl p-6 ${cardClass} ring-2 ring-emerald-500/30`}>
-            <h2 className={`text-lg font-semibold mb-4 ${headingClass}`}>
-              ✅ Best Meeting Times
-            </h2>
-            <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} prefs={prefs} setPrefs={setPrefs} />
-          </div>
-        ) : (
-          <div className={`rounded-2xl p-8 text-center ${cardClass}`}>
-            <div className="text-5xl mb-4">🌍</div>
-            <p className={`text-lg font-medium ${headingClass}`}>
-              Add at least 2 timezones to find overlapping hours
-            </p>
-            <p className={`text-sm mt-2 ${textClass}`}>
-              Try searching for cities like "London", "New York" or phone codes like "+91"
-            </p>
           </div>
         )}
 
