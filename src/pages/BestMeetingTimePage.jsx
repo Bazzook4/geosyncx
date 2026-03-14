@@ -142,8 +142,9 @@ export default function BestMeetingTimePage({ darkMode }) {
         {/* Add/Edit Timezones — collapsible once zones are set */}
         {sortedTimezones.length >= 2 ? (
           <details className={`rounded-2xl ${cardClass}`}>
-            <summary className={`p-4 cursor-pointer font-semibold text-sm select-none ${headingClass}`}>
-              ✏️ Edit Timezones ({sortedTimezones.length} added)
+            <summary className={`p-4 cursor-pointer select-none flex items-center gap-2 ${headingClass}`}>
+              <span className="text-sm font-semibold">+ Add / Edit Timezones</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${darkMode ? "bg-white/10 text-white/60" : "bg-slate-100 text-slate-500"}`}>{sortedTimezones.length} added</span>
             </summary>
             <div className="px-6 pb-6">
               <TimeComparison
