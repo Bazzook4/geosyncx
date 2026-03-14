@@ -1,13 +1,26 @@
 // /src/pages/BestMeetingTimePage.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import SEO from "../SEO";
 import BestMeetingFinder from "../BestMeetingFinder";
 import TimeComparison from "../TimeComparison";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { normalizeTimezoneName } from "../timezones.js";
 
 export default function BestMeetingTimePage({ darkMode }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+
+  // Parse zones from URL params if present
+  const urlZones = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const zonesParam = params.get("zones");
+    if (!zonesParam) return null;
+    return zonesParam.split(",").map(z => normalizeTimezoneName(decodeURIComponent(z))).filter(Boolean);
+  }, [location.search]);
+
   const [primaryZone, setPrimaryZone] = useState(() => {
+    if (urlZones && urlZones.length > 0) return urlZones[0];
     const stored = localStorage.getItem("primaryZone");
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const tz = stored || detected || "UTC";
@@ -15,6 +28,7 @@ export default function BestMeetingTimePage({ darkMode }) {
   });
 
   const [selectedZones, setSelectedZones] = useState(() => {
+    if (urlZones && urlZones.length > 1) return urlZones.slice(1);
     try {
       const saved = JSON.parse(localStorage.getItem("selectedZones") || "[]");
       if (!Array.isArray(saved)) return [];
@@ -27,10 +41,25 @@ export default function BestMeetingTimePage({ darkMode }) {
     }
   });
 
+  // Sync to localStorage and URL whenever zones change
   useEffect(() => {
     localStorage.setItem("primaryZone", primaryZone);
     localStorage.setItem("selectedZones", JSON.stringify(selectedZones));
+    const allZones = [primaryZone, ...selectedZones.filter(z => z && z !== primaryZone)];
+    const params = new URLSearchParams();
+    params.set("zones", allZones.map(encodeURIComponent).join(","));
+    navigate({ search: params.toString() }, { replace: true });
   }, [primaryZone, selectedZones]);
+
+  const handleShare = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      alert(window.location.href);
+    }
+  }, []);
 
   const sortedTimezones = useMemo(() => {
     const unique = selectedZones.filter((z) => z && z !== primaryZone);
@@ -62,6 +91,12 @@ export default function BestMeetingTimePage({ darkMode }) {
           <p className={`text-lg ${textClass}`}>
             Find when everyone is within working hours
           </p>
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium transition-all active:scale-95"
+          >
+            {copied ? "✓ Link copied!" : "🔗 Share this setup"}
+          </button>
         </div>
 
         {/* Quick Steps */}
