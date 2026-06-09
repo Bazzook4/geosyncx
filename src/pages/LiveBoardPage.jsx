@@ -43,7 +43,7 @@ function ClockRow({ tz, label, isPrimary, darkMode, now, onRemove, isAnchor, onS
   const dt = now.setZone(tz);
   const hour = dt.hour;
   const status = getWorkStatus(hour);
-  const isWhatIf = !!anchorInput && !isAnchor; // this row is showing translated time
+  const isWhatIf = !!anchorInput && !isAnchor;
   const timeStr = dt.toFormat("h:mm a");
   const dateStr = dt.toFormat("EEE, MMM d");
   const offsetStr = dt.toFormat("ZZZZZ");
@@ -63,82 +63,87 @@ function ClockRow({ tz, label, isPrimary, darkMode, now, onRemove, isAnchor, onS
   const textClass = darkMode ? "text-white/60" : "text-slate-500";
   const headingClass = darkMode ? "text-white" : "text-slate-900";
   const inputClass = darkMode
-    ? "bg-white/10 border border-indigo-400/40 text-white placeholder-white/30 focus:border-indigo-400 focus:bg-white/15"
-    : "bg-white border border-indigo-300 text-slate-900 placeholder-slate-400 focus:border-indigo-400";
+    ? "bg-white/10 border border-indigo-400/60 text-white placeholder-white/30 focus:border-indigo-300 focus:bg-white/15"
+    : "bg-white border border-indigo-300 text-slate-900 placeholder-slate-400 focus:border-indigo-500";
 
   return (
-    <div className={`rounded-xl px-5 py-4 flex items-center gap-4 transition-all ${rowClass}`}>
+    <div className={`rounded-xl px-4 py-3 flex items-center gap-3 transition-all ${rowClass}`}>
       {/* Pin indicator */}
       <div
-        className="w-1.5 h-12 rounded-full flex-shrink-0"
+        className="w-1 h-10 rounded-full flex-shrink-0"
         style={{
-          background: isPrimary ? "#38bdf8" : isAnchor ? "#818cf8" : "transparent",
-          border: isPrimary || isAnchor ? "none" : "1px solid rgba(255,255,255,0.1)",
+          background: isPrimary ? "#38bdf8" : isAnchor ? "#818cf8" : "rgba(255,255,255,0.08)",
         }}
       />
 
-      {/* Label */}
-      <div className="w-36 flex-shrink-0">
-        <div className={`font-semibold text-sm ${headingClass}`}>{label}</div>
+      {/* Col 1 — City label */}
+      <div className="w-32 flex-shrink-0">
+        <div className={`font-semibold text-sm leading-tight ${headingClass}`}>{label}</div>
         <div className={`text-xs ${textClass}`}>{offsetStr}</div>
-        {isPrimary && <div className="text-[10px] text-sky-400 font-semibold mt-0.5">YOUR TIME</div>}
-        {isAnchor && <div className="text-[10px] text-indigo-400 font-semibold mt-0.5">THEIR TIME</div>}
+        {isPrimary && <div className="text-[10px] text-sky-400 font-bold mt-0.5 tracking-wide">YOUR TIME</div>}
       </div>
 
-      {/* Time display or input */}
-      <div className="flex-1 min-w-0">
-        {isAnchor ? (
+      {/* Col 2 — Live time */}
+      <div className="w-28 flex-shrink-0">
+        <div className={`text-xl font-mono font-bold tabular-nums leading-tight ${isWhatIf ? "text-indigo-400" : headingClass}`}>
+          {timeStr}
+        </div>
+        <div className={`text-xs ${textClass}`}>{dateStr}</div>
+      </div>
+
+      {/* Col 3 — Convert button or input (KEY HIGHLIGHT) */}
+      <div className="w-44 flex-shrink-0">
+        {isPrimary ? (
+          <div className={`text-xs ${textClass} italic`}>pinned reference</div>
+        ) : isAnchor ? (
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={anchorInput}
               onChange={(e) => onAnchorInputChange(e.target.value)}
               placeholder="e.g. 3:00 PM"
-              className={`w-32 px-3 py-1.5 rounded-lg text-sm font-mono outline-none transition-colors ${inputClass}`}
+              className={`w-28 px-3 py-1.5 rounded-lg text-sm font-mono outline-none transition-all ${inputClass}`}
               autoFocus
             />
             <button
               onClick={onAnchorClear}
-              className={`text-xs px-2 py-1 rounded-lg transition-colors ${darkMode ? "text-indigo-400 hover:text-white hover:bg-white/10" : "text-indigo-500 hover:text-slate-700 hover:bg-slate-100"}`}
+              title="Back to live"
+              className={`text-xs px-2 py-1.5 rounded-lg font-medium transition-colors ${darkMode ? "bg-white/10 text-white/60 hover:text-white hover:bg-white/20" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
             >
               Live
             </button>
           </div>
         ) : (
-          <div
-            className={`cursor-pointer group ${!isPrimary ? "hover:opacity-80" : ""}`}
-            onClick={!isPrimary ? onSetAnchor : undefined}
-            title={!isPrimary ? "Click to convert from this timezone" : undefined}
+          <button
+            onClick={onSetAnchor}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+              darkMode
+                ? "bg-indigo-500/15 border-indigo-400/30 text-indigo-300 hover:bg-indigo-500/30 hover:border-indigo-400/60 hover:text-indigo-200"
+                : "bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100 hover:border-indigo-400"
+            }`}
           >
-            <div className={`text-2xl font-mono font-bold tabular-nums ${headingClass} ${isWhatIf ? "text-indigo-400" : ""}`}>
-              {timeStr}
-            </div>
-            <div className={`text-xs ${textClass}`}>
-              {dateStr}
-              {!isPrimary && !isWhatIf && (
-                <span className={`ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${darkMode ? "text-indigo-400" : "text-indigo-500"}`}>
-                  click to convert →
-                </span>
-              )}
-            </div>
-          </div>
+            <span>⇄</span>
+            <span>Convert time</span>
+          </button>
         )}
       </div>
 
-      {/* Status badge */}
-      <div className={`px-3 py-1 rounded-full text-xs font-semibold border flex-shrink-0 ${status.color}`}>
+      {/* Col 4 — Status badge */}
+      <div className={`px-2.5 py-1 rounded-full text-xs font-semibold border flex-shrink-0 ${status.color}`}>
         {status.label}
       </div>
 
-      {/* Remove */}
-      {!isPrimary && (
-        <button
-          onClick={onRemove}
-          className={`ml-1 text-xs px-2 py-1 rounded-lg transition-colors flex-shrink-0 ${darkMode ? "text-white/30 hover:text-red-400 hover:bg-red-500/10" : "text-slate-300 hover:text-red-500 hover:bg-red-50"}`}
-        >
-          ✕
-        </button>
-      )}
+      {/* Col 5 — Remove */}
+      <div className="w-6 flex-shrink-0 flex justify-center">
+        {!isPrimary && (
+          <button
+            onClick={onRemove}
+            className={`text-xs transition-colors ${darkMode ? "text-white/20 hover:text-red-400" : "text-slate-300 hover:text-red-500"}`}
+          >
+            ✕
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -332,7 +337,7 @@ export default function LiveBoardPage({ darkMode }) {
         {/* How to use hint */}
         {rows.length > 0 && !anchor && (
           <p className={`text-xs text-center ${textClass}`}>
-            Click any city's time to enter "what-if" mode — type their time and all rows update instantly
+            Hit <span className={`font-semibold ${darkMode ? "text-indigo-300" : "text-indigo-600"}`}>⇄ Convert time</span> on any row — type their local time and all rows update instantly
           </p>
         )}
 
