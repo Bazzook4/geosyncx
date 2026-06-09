@@ -21,6 +21,7 @@ import TimezoneComparePage from "./pages/TimezoneComparePage.jsx";
 import MeetingSchedulerPage from "./pages/MeetingSchedulerPage.jsx";
 import BestMeetingTimePage from "./pages/BestMeetingTimePage.jsx";
 import FormatterPage from "./pages/FormatterPage.jsx";
+import LiveBoardPage from "./pages/LiveBoardPage.jsx";
 
 // Components
 import Footer from "./Footer.jsx";
@@ -175,6 +176,7 @@ export default function AppRouter() {
           <Route path="/tools/meeting-scheduler" element={<MeetingSchedulerPage darkMode={darkMode} />} />
           <Route path="/tools/best-meeting-time" element={<BestMeetingTimePage darkMode={darkMode} />} />
           <Route path="/tools/formatter" element={<FormatterPage darkMode={darkMode} />} />
+          <Route path="/tools/live-board" element={<LiveBoardPage darkMode={darkMode} />} />
 
           {/* Blog */}
           <Route path="/blog" element={<Blog darkMode={darkMode} />} />
