@@ -83,35 +83,24 @@ export default function HomePage({ darkMode }) {
       <SEO {...DEFAULT_SEO} />
 
       <div className="w-full max-w-6xl mx-auto space-y-8">
-        {/* Compact Hero Section */}
-        <div className="text-center space-y-4 pt-4">
-          <h1 className={`text-3xl md:text-5xl font-bold leading-tight ${headingClass}`}>
-            Stop Juggling Tabs.{" "}
+        {/* Hero */}
+        <div className="text-center space-y-3 pt-4">
+          <h1 className={`text-4xl md:text-6xl font-bold leading-tight ${headingClass}`}>
+            Geo
             <span className="bg-gradient-to-r from-sky-400 to-indigo-500 bg-clip-text text-transparent">
-              Start Closing Deals.
+              Sync
             </span>
+            X
           </h1>
-
-          <p className={`text-lg max-w-2xl mx-auto ${textClass}`}>
-            Phone number from an unknown country? Meeting across 5 timezones?{" "}
-            <strong className={headingClass}>We've got you.</strong>
+          <p className={`text-lg max-w-xl mx-auto ${textClass}`}>
+            Timezone tools for global teams — phone lookup, meeting finder, compare, and more.
           </p>
-
-          {/* Story Quote - more compact */}
-          <div className={`max-w-xl mx-auto rounded-xl p-4 ${darkMode ? "bg-white/5" : "bg-slate-50"}`}>
-            <p className={`text-sm italic ${textClass}`}>
-              "I got tired of juggling 3-4 tools for something so simple."
-            </p>
-            <p className={`text-xs mt-2 font-medium ${darkMode ? "text-sky-400" : "text-sky-600"}`}>
-              — Why I built GeoSyncX
-            </p>
-          </div>
         </div>
 
-        {/* Tools Grid - Right after hero */}
+        {/* Tools Grid */}
         <div>
           <h2 className={`text-xl font-bold mb-4 text-center ${headingClass}`}>
-            Pick Your Tool
+            Tools
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {TOOLS.map((tool) => (
@@ -138,36 +127,6 @@ export default function HomePage({ darkMode }) {
                 <p className={`text-xs mt-1 ${textClass}`}>{tool.description}</p>
               </Link>
             ))}
-          </div>
-        </div>
-
-        {/* Why GeoSyncX - Compact */}
-        <div className={`rounded-xl p-6 ${cardClass}`}>
-          <h2 className={`text-lg font-bold mb-4 text-center ${headingClass}`}>
-            Why Teams Love This
-          </h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-xl">
-                ⚡
-              </div>
-              <h3 className={`font-semibold text-sm mb-1 ${headingClass}`}>Zero Friction</h3>
-              <p className={`text-xs ${textClass}`}>No signup. Paste & go.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 flex items-center justify-center text-xl">
-                🎯
-              </div>
-              <h3 className={`font-semibold text-sm mb-1 ${headingClass}`}>Built for Sales</h3>
-              <p className={`text-xs ${textClass}`}>1000+ calls scheduled.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-xl">
-                🔒
-              </div>
-              <h3 className={`font-semibold text-sm mb-1 ${headingClass}`}>100% Private</h3>
-              <p className={`text-xs ${textClass}`}>Runs locally.</p>
-            </div>
           </div>
         </div>
 
@@ -204,13 +163,13 @@ export default function HomePage({ darkMode }) {
           </div>
         </div>
 
-        {/* CTA - Compact */}
+        {/* CTA */}
         <div className="text-center py-6">
           <Link
             to="/command-center"
             className="inline-block px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-lg font-semibold rounded-xl hover:from-sky-400 hover:to-indigo-400 transition-all shadow-lg shadow-sky-500/25"
           >
-            Launch Command Center
+            Open Command Center
           </Link>
         </div>
       </div>
