@@ -10,8 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:time": "node scripts/generate-converter-pages.mjs",
-    "predeploy": "npm run generate:time && rm -rf dist && vite build && touch dist/.nojekyll && echo www.geosyncx.com > dist/CNAME",
-    "deploy": "gh-pages -d dist -b gh-pages"
+    "predeploy": "npm run generate && rm -rf dist && vite build && touch dist/.nojekyll && echo www.geosyncx.com > dist/CNAME",
+    "deploy": "gh-pages -d dist -b gh-pages",
+    "generate:site": "node scripts/generate-site-pages.mjs",
+    "generate": "npm run generate:time && npm run generate:site"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
