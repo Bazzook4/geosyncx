@@ -8,59 +8,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ADSENSE, SITE, siteFooter, siteHeader } from "./lib/layout.mjs";
+import { SITE, esc, pageShell } from "./lib/layout.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PUB = join(ROOT, "public");
 const YEAR = new Date().getFullYear();
-
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const jsonLd = (o) => `  <script type="application/ld+json">\n${JSON.stringify(o, null, 2).replace(/</g, "\\u003c")}\n  </script>`;
-
-function shell({ title, description, path, schema, body }) {
-  const url = `${SITE}${path}`;
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${esc(title)}</title>
-  <meta name="description" content="${esc(description)}">
-  <meta name="author" content="GeoSyncX Team">
-  <link rel="canonical" href="${url}">
-
-  <meta property="og:title" content="${esc(title)}">
-  <meta property="og:description" content="${esc(description)}">
-  <meta property="og:url" content="${url}">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="${SITE}/android-chrome-512x512.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="/favicon-32x32.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <meta name="theme-color" content="#0b1220">
-
-  ${ADSENSE}
-
-${schema.map(jsonLd).join("\n\n")}
-
-  <link rel="stylesheet" href="/css/site.css">
-</head>
-<body>
-<div class="wrap">
-${siteHeader()}
-
-  <main class="main">
-${body}
-  </main>
-
-${siteFooter(YEAR)}
-</div>
-</body>
-</html>
-`;
-}
+const shell = (o) => pageShell(o, YEAR);
 
 const write = (rel, html) => {
   const file = join(PUB, rel);

@@ -81,3 +81,27 @@ li::marker{color:#0ea5e9}
 .tool-card:hover{border-color:#0ea5e9;background:rgba(14,165,233,0.1);transform:translateY(-2px)}
 .tool-card.featured{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(99,102,241,0.12));border:2px solid rgba(14,165,233,0.35)}
 @media(max-width:700px){.hero h1{font-size:2rem}}
+/* Tool pages */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+ol{margin:12px 0 16px;padding-left:24px}
+ol li::marker{color:#0ea5e9;font-weight:700}
+.tc-label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin:0 0 6px}
+.tc-results{display:flex;flex-direction:column;max-height:260px;overflow:auto;margin-top:6px;background:#0f172a;border:1px solid rgba(255,255,255,0.15);border-radius:10px}
+.tc-results[hidden]{display:none}
+.tc-hit{background:none;border:0;border-bottom:1px solid rgba(255,255,255,0.06);color:#cbd5e1;text-align:left;padding:10px 14px;font:inherit;cursor:pointer}
+.tc-hit:hover,.tc-hit:focus{background:rgba(14,165,233,0.15);outline:none}
+.tc-hit span{color:#94a3b8;font-size:.85rem}
+.tc-empty{padding:12px 14px;color:#94a3b8}
+.tc-when{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin:18px 0}
+.tc-now-btn{background:rgba(255,255,255,0.1);color:#f1f5f9;border:1px solid rgba(255,255,255,0.15);padding:10px 14px;border-radius:10px;font:inherit;cursor:pointer;white-space:nowrap}
+.tc-now-btn:hover{background:rgba(255,255,255,0.2)}
+.tc-scroll{overflow-x:auto}
+.tc-table td{vertical-align:middle}
+.tc-primary{background:rgba(14,165,233,0.12)!important}
+.tc-sub{font-size:.8rem;color:#94a3b8}
+.tc-now,.tc-eq{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tc-actions{white-space:nowrap;text-align:right}
+.tc-btn{background:none;border:0;color:#94a3b8;font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px}
+.tc-btn:hover{background:rgba(255,255,255,0.1);color:#f1f5f9}
+.tc-btn.on{color:#fbbf24}
+@media(max-width:700px){.tc-when{grid-template-columns:1fr}}
