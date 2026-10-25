@@ -28,28 +28,8 @@ export default function Footer({ darkMode }) {
                 </Link>
               </li>
               <li>
-                <Link to="/tools/timezone-finder" className={`text-sm transition-colors ${linkClass}`}>
-                  Timezone Finder
-                </Link>
-              </li>
-              <li>
-                <Link to="/tools/timezone-compare" className={`text-sm transition-colors ${linkClass}`}>
-                  Timezone Compare
-                </Link>
-              </li>
-              <li>
-                <Link to="/tools/meeting-scheduler" className={`text-sm transition-colors ${linkClass}`}>
-                  Meeting Scheduler
-                </Link>
-              </li>
-              <li>
-                <Link to="/tools/best-meeting-time" className={`text-sm transition-colors ${linkClass}`}>
-                  Best Meeting Time
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard" className={`text-sm transition-colors ${linkClass}`}>
-                  Full Dashboard
+                <Link to="/command-center" className={`text-sm transition-colors ${linkClass}`}>
+                  Command Center
                 </Link>
               </li>
             </ul>

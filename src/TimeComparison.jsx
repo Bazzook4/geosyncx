@@ -25,31 +25,12 @@ const countryCallingCodes = (() => {
   return map;
 })();
 
-// Reverse mapping: country name -> phone code
-const countryToPhoneCode = (() => {
-  const map = {};
-  getSupportedRegionCodes().forEach((iso) => {
-    const code = `+${getCountryCodeForRegionCode(iso)}`;
-    const countryName = displayNames.of(iso) || iso;
-    // Store with lowercase key for easier matching
-    map[countryName.toLowerCase()] = code;
-  });
-  return map;
-})();
-
-// Helper to get phone code for a country name
-function getPhoneCodeForCountry(countryName) {
-  if (!countryName) return null;
-  const lower = countryName.toLowerCase();
-  // Try exact match first
-  if (countryToPhoneCode[lower]) return countryToPhoneCode[lower];
-  // Try partial match
-  for (const [key, code] of Object.entries(countryToPhoneCode)) {
-    if (lower.includes(key) || key.includes(lower)) {
-      return code;
-    }
-  }
-  return null;
+// Calling code for a timezone entry, from its ISO country code (exact, no name matching).
+function getPhoneCode(entry) {
+  const iso = entry?.countryCode;
+  if (!iso) return null;
+  const code = getCountryCodeForRegionCode(iso);
+  return code ? `+${code}` : null;
 }
 
 function encode(s = "") {
@@ -346,7 +327,7 @@ export default function TimeComparison({
               </div>
             )}
             {filteredTimezones.map((tz) => {
-              const phoneCodeForTz = getPhoneCodeForCountry(tz.country);
+              const phoneCodeForTz = getPhoneCode(tz);
               return (
                 <div
                   key={tz.value}
@@ -474,6 +455,14 @@ export default function TimeComparison({
                         >
                           {timezone?.gmt || ""}
                         </span>
+                        {getPhoneCode(timezone) && (
+                          <span
+                            className={`ml-1 text-xs font-mono px-2 py-1 rounded-full ${chipClass}`}
+                            title={`Calling code for ${timezone.country}`}
+                          >
+                            📞 {getPhoneCode(timezone)}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="p-2 md:w-1/4 w-[30%]">

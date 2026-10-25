@@ -1,4 +1,4 @@
-// Generates the static Home (/) and About (/about) pages.
+// Generates the static About (/about) page. "/" is the Command Center (React app).
 //
 //   node scripts/generate-site-pages.mjs
 //
@@ -20,96 +20,6 @@ const write = (rel, html) => {
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, html);
 };
-
-// ---------- Home ----------
-const TOOLS = [
-  ["/command-center", "🚀", "Command Center", "All timezone tools in one dashboard", true],
-  ["/tools/timezone-compare", "🌍", "Compare Timezones", "World clocks side by side with live updates"],
-  ["/tools/best-meeting-time", "✨", "Best Meeting Time", "Find times when everyone is awake and available"],
-  ["/tools/meeting-scheduler", "📅", "Meeting Scheduler", "Schedule across timezones with Google Calendar links"],
-  ["/tools/phone-code-lookup", "📞", "Phone Code Lookup", "Find the country and timezone from a phone number"],
-  ["/tools/timezone-finder", "🔍", "Timezone Finder", "Search timezones by city, country or GMT offset"],
-  ["/tools/formatter", "🔧", "JSON / XML Formatter", "Beautify JSON, XML and SOAP with syntax highlighting"],
-];
-
-// Highest-demand conversions first (Search Console, last 3 months: IST/UK/GMT queries).
-const POPULAR = [
-  ["ist-to-london", "IST to UK / London time"],
-  ["london-to-ist", "UK / London to IST"],
-  ["gmt-to-ist", "GMT to IST"],
-  ["ist-to-gmt", "IST to GMT"],
-  ["ist-to-est", "IST to EST"],
-  ["ist-to-pst", "IST to PST"],
-  ["est-to-ist", "EST to IST"],
-  ["pst-to-ist", "PST to IST"],
-  ["est-to-pst", "EST to PST"],
-  ["london-to-est", "London to EST"],
-];
-
-const homeFaq = [
-  ["What is the time difference between India and the UK?", "London is 5.5 hours behind India in winter (GMT) and 4.5 hours behind in summer (BST). India (IST, UTC+5:30) does not change its clocks, so the gap shifts when the UK changes clocks in late March and late October."],
-  ["Does GeoSyncX need a signup?", "No. Every tool is free and runs in your browser, with no account required."],
-  ["How do I find the best time for a meeting across timezones?", "Use the Best Meeting Time tool: add each participant's city and it highlights the hours when everyone is inside working hours."],
-  ["How do I find a caller's timezone from their phone number?", "Open the Phone Code Lookup tool, enter the country code or number, and it shows the country and its timezones so you know when it is safe to call."],
-];
-
-const home = shell({
-  title: "GeoSyncX: Free Time Zone Converter, IST to UK Time & Meeting Planner",
-  description: "Free time zone converter and meeting planner. Convert IST to UK, GMT to IST, EST and PST with live daylight-saving-aware charts, find the best meeting time and look up phone codes.",
-  path: "/",
-  schema: [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: "GeoSyncX",
-      url: `${SITE}/`,
-      description: "Free timezone converter, meeting planner and productivity tools for global teams.",
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "GeoSyncX",
-      url: `${SITE}/`,
-      logo: `${SITE}/android-chrome-512x512.png`,
-      email: "hello@geosyncx.com",
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: homeFaq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
-    },
-  ],
-  body: `    <section class="hero">
-      <h1>Free time zone converter <span>for global teams</span></h1>
-      <p class="lead">Convert IST to UK time, GMT to IST, EST and PST in one click, find a meeting slot that works for everyone, and look up the timezone behind any phone number. No signup.</p>
-      <a class="cta" href="/time/ist-to-london">IST to UK time converter →</a>
-    </section>
-
-    <h2>Popular time conversions</h2>
-    <div class="related-links">
-${POPULAR.map(([k, label]) => `      <a href="/time/${k}">${esc(label)}</a>`).join("\n")}
-    </div>
-
-    <h2>Timezone tools</h2>
-    <div class="tool-grid">
-${TOOLS.map(([href, icon, name, desc, featured]) => `      <a class="tool-card${featured ? " featured" : ""}" href="${href}"><span class="tool-icon">${icon}</span><strong>${esc(name)}</strong><span>${esc(desc)}</span></a>`).join("\n")}
-    </div>
-
-    <h2>Why GeoSyncX</h2>
-    <div class="info-grid">
-      <div class="info-card"><strong>No signup</strong><span>Open a tool and use it</span></div>
-      <div class="info-card"><strong>Daylight saving aware</strong><span>Charts show winter and summer</span></div>
-      <div class="info-card"><strong>Private</strong><span>Conversions run in your browser</span></div>
-    </div>
-
-    <h2>Frequently asked questions</h2>
-    <div class="faq">
-${homeFaq.map(([q, a]) => `      <details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n")}
-    </div>
-
-    <p class="also">Guides: <a href="/blog/timezone-comparison-tool">timezone comparison</a> · <a href="/blog/best-meeting-time-finder">best meeting time</a> · <a href="/blog/schedule-meeting-across-timezones">scheduling across timezones</a> · <a href="/blog">all articles</a></p>`,
-});
-write("index.html", home);
 
 // ---------- About ----------
 const about = shell({
@@ -145,8 +55,8 @@ const about = shell({
     <p>So I built <strong>GeoSyncX</strong>, everything I need in one place:</p>
     <ul>
       <li><strong>See a phone number?</strong> Instantly know where they're calling from with the <a href="/tools/phone-code-lookup">Phone Code Lookup</a>.</li>
-      <li><strong>Need to compare timezones?</strong> Add as many as you want in <a href="/tools/timezone-compare">Compare Timezones</a>.</li>
-      <li><strong>Scheduling a meeting?</strong> Find the best overlap in seconds with <a href="/tools/best-meeting-time">Best Meeting Time</a>.</li>
+      <li><strong>Need to compare timezones?</strong> Add as many as you want in <a href="/command-center">Command Center</a>.</li>
+      <li><strong>Scheduling a meeting?</strong> Find the best overlap in seconds with <a href="/command-center">Command Center</a>.</li>
       <li><strong>Converting a specific pair?</strong> Try <a href="/time/ist-to-london">IST to UK time</a> or <a href="/time/gmt-to-ist">GMT to IST</a>.</li>
     </ul>
     <p>No signups. No clutter. Just the tools I wish I had from day one.</p>
@@ -164,4 +74,4 @@ const about = shell({
 });
 write("about/index.html", about);
 
-console.log("Generated home and about pages.");
+console.log("Generated about page.");

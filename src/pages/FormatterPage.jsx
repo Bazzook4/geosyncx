@@ -77,7 +77,7 @@ export default function FormatterPage({ darkMode }) {
               </p>
             </Link>
             <Link
-              to="/tools/timezone-compare"
+              to="/command-center"
               className={`p-4 rounded-xl transition-all hover:scale-[1.02] ${darkMode ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
             >
               <h3 className="font-semibold text-sky-500">Timezone Compare</h3>

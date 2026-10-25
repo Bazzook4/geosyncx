@@ -12,10 +12,6 @@ export const siteHeader = () => `
         <a class="cc" href="/command-center">Command Center</a>
         <span class="sep tools"></span>
         <a class="tools" href="/tools/phone-code-lookup">Phone Lookup</a>
-        <a class="tools" href="/tools/timezone-finder">Finder</a>
-        <a class="tools" href="/tools/timezone-compare">Compare</a>
-        <a class="tools" href="/tools/best-meeting-time">Best Time</a>
-        <a class="tools" href="/tools/meeting-scheduler">Scheduler</a>
         <a class="tools" href="/tools/formatter">Formatter</a>
       </nav>
     </div>
@@ -29,10 +25,6 @@ export const siteFooter = (year) => `
         <div><h3>Tools</h3>
           <a href="/command-center">Command Center</a>
           <a href="/tools/phone-code-lookup">Phone Code Lookup</a>
-          <a href="/tools/timezone-finder">Timezone Finder</a>
-          <a href="/tools/timezone-compare">Timezone Compare</a>
-          <a href="/tools/meeting-scheduler">Meeting Scheduler</a>
-          <a href="/tools/best-meeting-time">Best Meeting Time</a>
         </div>
         <div><h3>Time Converters</h3>
           <a href="/time/ist-to-london">IST to London</a>
