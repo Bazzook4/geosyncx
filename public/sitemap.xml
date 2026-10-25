@@ -14,14 +14,14 @@
 
   <!-- Main Pages -->
   <url>
-    <loc>https://www.geosyncx.com/about.html</loc>
+    <loc>https://www.geosyncx.com/about</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/command-center.html</loc>
+    <loc>https://www.geosyncx.com/command-center</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
@@ -29,7 +29,7 @@
 
   <!-- Blog Index -->
   <url>
-    <loc>https://www.geosyncx.com/blog/index.html</loc>
+    <loc>https://www.geosyncx.com/blog</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -37,42 +37,42 @@
 
   <!-- Blog Posts -->
   <url>
-    <loc>https://www.geosyncx.com/blog/timezone-comparison-tool.html</loc>
+    <loc>https://www.geosyncx.com/blog/timezone-comparison-tool</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/blog/phone-code-timezone-search.html</loc>
+    <loc>https://www.geosyncx.com/blog/phone-code-timezone-search</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/blog/set-primary-timezone.html</loc>
+    <loc>https://www.geosyncx.com/blog/set-primary-timezone</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/blog/schedule-meeting-across-timezones.html</loc>
+    <loc>https://www.geosyncx.com/blog/schedule-meeting-across-timezones</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/blog/best-meeting-time-finder.html</loc>
+    <loc>https://www.geosyncx.com/blog/best-meeting-time-finder</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/blog/json-xml-soap-formatter.html</loc>
+    <loc>https://www.geosyncx.com/blog/json-xml-soap-formatter</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -80,42 +80,42 @@
 
   <!-- Tool Pages -->
   <url>
-    <loc>https://www.geosyncx.com/tools/phone-code-lookup.html</loc>
+    <loc>https://www.geosyncx.com/tools/phone-code-lookup</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/tools/timezone-finder.html</loc>
+    <loc>https://www.geosyncx.com/tools/timezone-finder</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/tools/timezone-compare.html</loc>
+    <loc>https://www.geosyncx.com/tools/timezone-compare</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/tools/best-meeting-time.html</loc>
+    <loc>https://www.geosyncx.com/tools/best-meeting-time</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/tools/meeting-scheduler.html</loc>
+    <loc>https://www.geosyncx.com/tools/meeting-scheduler</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.geosyncx.com/tools/formatter.html</loc>
+    <loc>https://www.geosyncx.com/tools/formatter</loc>
     <lastmod>2026-02-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>

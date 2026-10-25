@@ -60,9 +60,9 @@ export default function AppRouter() {
         <header className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center gap-3 md:gap-6 flex-wrap">
             {/* Bigger Logo */}
-            <Link to="/" className="text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight">
+            <a href="/" className="text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight">
               GeoSyncX
-            </Link>
+            </a>
 
             {/* Navigation - Dashboard FIRST, then tools */}
             <nav className="hidden md:flex items-center gap-2">
