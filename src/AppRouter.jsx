@@ -121,8 +121,8 @@ export default function AppRouter() {
 
         {/* Routes */}
         <Routes>
-          {/* Landing: open on the Command Center (main offering) */}
-          <Route path="/" element={<Navigate to="/command-center" replace />} />
+          {/* The Command Center is the front page (canonical https://www.geosyncx.com/) */}
+          <Route path="/" element={<App darkMode={darkMode} />} />
 
           {/* Command Center (renamed from Dashboard) */}
           <Route path="/command-center" element={<App darkMode={darkMode} />} />
