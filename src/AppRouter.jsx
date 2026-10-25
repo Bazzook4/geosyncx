@@ -1,6 +1,6 @@
 // /src/AppRouter.jsx
 import { useState, useEffect } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 
 // Main App (Dashboard)
 import App from "./App.jsx";
@@ -158,8 +158,9 @@ export default function AppRouter() {
 
         {/* Routes */}
         <Routes>
-          {/* Home */}
-          <Route path="/" element={<HomePage darkMode={darkMode} />} />
+          {/* Landing: open on the Command Center (main offering) */}
+          <Route path="/" element={<Navigate to="/command-center" replace />} />
+          <Route path="/home" element={<HomePage darkMode={darkMode} />} />
 
           {/* Command Center (renamed from Dashboard) */}
           <Route path="/command-center" element={<App darkMode={darkMode} />} />
