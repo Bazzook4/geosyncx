@@ -1,0 +1,56 @@
+/* SEO text on /time/* pages. Plain CSS (no Tailwind classes) because the same HTML is also prerendered
+   into the static page before the app loads. Dark by default; light when <html> has no .dark class. */
+.seo-content{
+  --sc-text:#f1f5f9;--sc-text2:#cbd5e1;--sc-muted:#94a3b8;--sc-faint:#94a3b8;--sc-heading:#f1f5f9;
+  --sc-accent:#38bdf8;--sc-card:rgba(255,255,255,.10);--sc-card-border:rgba(255,255,255,.15);--sc-line:rgba(255,255,255,.12);
+  --sc-soft:rgba(255,255,255,.05);--sc-zebra:rgba(255,255,255,.03);--sc-hl:rgba(14,165,233,.10);
+  color:var(--sc-text);line-height:1.7;
+}
+html:not(.dark) .seo-content{
+  --sc-text:#0f172a;--sc-text2:#334155;--sc-muted:#475569;--sc-faint:#64748b;--sc-heading:#0f172a;
+  --sc-accent:#0369a1;--sc-card:rgba(255,255,255,.70);--sc-card-border:rgba(255,255,255,.60);--sc-line:#e2e8f0;
+  --sc-soft:rgba(255,255,255,.60);--sc-zebra:rgba(15,23,42,.03);--sc-hl:rgba(14,165,233,.10);
+}
+.seo-content>*{max-width:900px;margin-left:auto;margin-right:auto}
+.seo-content>.info-grid{max-width:none}
+.seo-content a{color:var(--sc-accent)}
+.seo-content .crumbs{font-size:.875rem;color:var(--sc-muted);margin-bottom:16px}
+.seo-content .crumbs a{color:var(--sc-muted);text-decoration:none}
+.seo-content .crumbs a:hover{color:var(--sc-accent)}
+.seo-content h1{font-size:1.75rem;line-height:1.2;font-weight:700;color:var(--sc-heading);margin-bottom:12px}
+@media(min-width:768px){.seo-content h1{font-size:2.25rem}}
+.seo-content h1 span{color:var(--sc-accent)}
+.seo-content h1 small{font-size:.5em;color:var(--sc-muted);font-weight:500}
+.seo-content h2{font-size:1.5rem;font-weight:700;color:var(--sc-heading);margin-top:44px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--sc-line)}
+.seo-content h3{font-size:1.15rem;font-weight:600;color:var(--sc-text2);margin-top:24px;margin-bottom:10px}
+.seo-content p{margin-bottom:16px;color:var(--sc-text2)}
+.seo-content .lead{font-size:1.15rem;line-height:1.6;color:var(--sc-text);margin-bottom:0}
+.seo-content .quick{background:var(--sc-hl);border-left:4px solid #0ea5e9;padding:14px 18px;border-radius:12px;margin-bottom:20px;color:var(--sc-text);font-weight:600}
+.seo-content ul{list-style:disc;margin:12px auto 16px;padding-left:24px}
+.seo-content li{margin:8px 0;color:var(--sc-text2)}
+.seo-content li::marker{color:#0ea5e9}
+.seo-content .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 auto 8px}
+.seo-content .info-card{background:var(--sc-card);padding:16px;border-radius:16px;border:1px solid var(--sc-card-border);border-left:3px solid #0ea5e9;box-shadow:0 20px 25px -5px rgba(0,0,0,.2);backdrop-filter:blur(24px)}
+.seo-content .info-card strong{display:block;color:var(--sc-accent);font-size:.75rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.seo-content .info-card span{font-size:1rem;color:var(--sc-text);font-weight:600}
+.seo-content .table-scroll{overflow-x:auto}
+.seo-content table{width:100%;border-collapse:collapse;margin:16px 0;background:var(--sc-soft);border-radius:12px;overflow:hidden;border:1px solid var(--sc-line)}
+.seo-content th{background:#0369a1;color:#fff;padding:12px 16px;text-align:left;font-weight:600;font-size:.9rem}
+.seo-content td{padding:12px 16px;border-bottom:1px solid var(--sc-line);color:var(--sc-text2);font-size:.95rem}
+.seo-content tr:last-child td{border-bottom:none}
+.seo-content tbody tr:nth-child(even){background:var(--sc-zebra)}
+.seo-content .h24{color:var(--sc-faint);font-size:.85rem}
+.seo-content .highlight-box{background:var(--sc-hl);border-left:4px solid #0ea5e9;padding:20px;border-radius:12px;margin:20px auto}
+.seo-content .highlight-box p:last-child{margin-bottom:0}
+.seo-content .faq details{background:var(--sc-soft);border:1px solid var(--sc-line);border-radius:12px;padding:14px 18px;margin-bottom:10px}
+.seo-content .faq summary{cursor:pointer;font-weight:600;color:var(--sc-heading)}
+.seo-content .faq details p{margin:10px 0 0}
+.seo-content .related-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:16px auto}
+.seo-content .related-links a{background:var(--sc-soft);padding:14px;border-radius:12px;text-decoration:none;color:var(--sc-accent);font-weight:500;border:1px solid var(--sc-line);transition:all .2s}
+.seo-content .related-links a:hover{border-color:#0ea5e9;background:var(--sc-hl)}
+.seo-content .also{font-size:.9rem;color:var(--sc-muted)}
+/* Prerendered shell (before the app mounts) */
+.seo-prerender{max-width:1152px;margin:0 auto;padding:24px 16px}
+.seo-prerender .pre-nav{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:24px}
+.seo-prerender .pre-nav a{font-weight:600}
+.seo-prerender .pre-logo{font-size:1.5rem;font-weight:700;color:inherit;text-decoration:none}

@@ -31,8 +31,14 @@ function readPreload() {
   };
 }
 
-export default function App({ darkMode }) {
-  const [preload] = useState(readPreload);
+// `converter` ({ primary, add }) opens the tool on exactly that pair, without touching the visitor's saved zones.
+// Used by the /time/* converter pages.
+export default function App({ darkMode, converter }) {
+  const [preload] = useState(() =>
+    converter
+      ? { primary: normalizeTimezoneName(converter.primary), add: converter.add.map(normalizeTimezoneName) }
+      : readPreload()
+  );
 
   const [primaryZone, setPrimaryZone] = useState(() => {
     if (preload.primary) return preload.primary;
@@ -48,6 +54,7 @@ export default function App({ darkMode }) {
   });
 
   const [selectedZones, setSelectedZones] = useState(() => {
+    if (converter) return Array.from(new Set(preload.add));
     try {
       const raw = localStorage.getItem("selectedZones");
       // First visit: show two example cities so the table is not empty
@@ -64,13 +71,14 @@ export default function App({ darkMode }) {
   });
 
   useEffect(() => {
+    if (converter) return;
     try {
       localStorage.setItem("primaryZone", primaryZone);
       localStorage.setItem("selectedZones", JSON.stringify(selectedZones));
     } catch {
       // storage blocked; state still works for this session
     }
-  }, [primaryZone, selectedZones]);
+  }, [primaryZone, selectedZones, converter]);
 
   const sortedTimezones = useMemo(() => {
     const unique = selectedZones.filter((z) => z && z !== primaryZone);
@@ -82,9 +90,10 @@ export default function App({ darkMode }) {
 
   return (
     <>
-      <SEO {...DEFAULT_SEO} />
+      {!converter && <SEO {...DEFAULT_SEO} />}
       <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
-        {/* Header */}
+        {/* Header (converter pages bring their own h1) */}
+        {!converter && (
         <div className="text-center space-y-2">
           <h1 className={`text-2xl md:text-3xl font-bold ${headingClass}`}>
             Compare time zones and find a meeting time that works for everyone
@@ -93,6 +102,7 @@ export default function App({ darkMode }) {
             <strong>1.</strong> Add cities below &nbsp;·&nbsp; <strong>2.</strong> Pick a time &nbsp;·&nbsp; <strong>3.</strong> See it in every zone
           </p>
         </div>
+        )}
 
         {/* Main Tool */}
         <div className="space-y-4 xl:space-y-6">
@@ -103,7 +113,12 @@ export default function App({ darkMode }) {
             selectedZones={selectedZones}
             setSelectedZones={setSelectedZones}
           />
-          <BestMeetingFinder zones={sortedTimezones} darkMode={darkMode} />
+          <BestMeetingFinder
+            zones={sortedTimezones}
+            primaryZone={primaryZone}
+            onZonesChange={setSelectedZones}
+            darkMode={darkMode}
+          />
         </div>
 
         {/* In-App Help Guide */}

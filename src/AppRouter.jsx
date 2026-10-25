@@ -10,7 +10,7 @@ import Blog from "./Blog.jsx";
 import BlogPost from "./BlogPost.jsx";
 
 // Time Converters
-import TimezoneConverter from "./TimezoneConverter.jsx";
+import ConverterPage from "./ConverterPage.jsx";
 
 // Standalone Pages
 import AboutPage from "./pages/AboutPage.jsx";
@@ -201,7 +201,7 @@ export default function AppRouter() {
           <Route path="/blog/:postId" element={<BlogPost darkMode={darkMode} />} />
 
           {/* Time Converters (SEO pages) */}
-          <Route path="/time/:route" element={<TimezoneConverter darkMode={darkMode} />} />
+          <Route path="/time/:route" element={<ConverterPage darkMode={darkMode} />} />
         </Routes>
         </main>
 
