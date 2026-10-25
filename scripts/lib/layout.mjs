@@ -4,17 +4,43 @@ export const SITE = "https://www.geosyncx.com";
 export const ADSENSE = `<!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>`;
 
-export const siteHeader = () => `
+// Applies the saved theme before first paint. Shares the "darkMode" key with the React app, so the
+// choice carries across Command Center and these pages. Falls back to the OS preference.
+export const THEME_INIT = `<script>(function(){var d=true;try{var s=localStorage.getItem('darkMode');d=s===null?!(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches):s==='true'}catch(e){}var c=document.documentElement.classList;c.toggle('dark',d);c.toggle('light',!d)})()</script>`;
+
+const NAV = [
+  ["/tools/phone-code-lookup", "Phone Lookup"],
+  ["/tools/formatter", "Formatter"],
+  ["/tools/live-board", "Live Board"],
+  ["/blog", "Blog"],
+  ["/about", "About"],
+];
+
+// Same header as AppRouter.jsx: logo, Command Center pill, tool links, theme toggle, feedback;
+// plus the scrollable link row used on phones. `current` is the active nav href, if any.
+export const siteHeader = (current = "") => `
+  <a href="#main" class="skip-link">Skip to content</a>
   <header class="site-header">
-    <div class="site-left">
-      <a href="/" class="site-logo">GeoSyncX</a>
-      <nav class="site-nav" aria-label="Main">
-        <a class="cc" href="/command-center">Command Center</a>
-        <span class="sep tools"></span>
-        <a class="tools" href="/tools/phone-code-lookup">Phone Lookup</a>
-        <a class="tools" href="/tools/formatter">Formatter</a>
-      </nav>
+    <div class="site-top">
+      <div class="site-left">
+        <a href="/" class="site-logo">GeoSyncX</a>
+        <nav class="site-nav" aria-label="Main">
+          <a class="cc" href="/command-center">Command Center</a>
+          <span class="sep"></span>
+${NAV.map(([h, l]) => `          <a href="${h}"${current === h ? ' aria-current="page"' : ""}>${l}</a>`).join("\n")}
+        </nav>
+      </div>
+      <div class="site-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch theme" title="Switch theme"><span aria-hidden="true" id="theme-icon">🌞</span></button>
+        <a class="feedback" href="mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback">Feedback</a>
+      </div>
     </div>
+    <nav class="site-nav-m" aria-label="Main (mobile)">
+      <ul>
+        <li><a class="cc" href="/command-center">Command Center</a></li>
+${NAV.map(([h, l]) => `        <li><a href="${h}"${current === h ? ' aria-current="page"' : ""}>${l}</a></li>`).join("\n")}
+      </ul>
+    </nav>
   </header>
 `;
 
@@ -23,15 +49,17 @@ export const siteFooter = (year) => `
     <div class="footer-in">
       <div class="footer-grid">
         <div><h3>Tools</h3>
-          <a href="/command-center">Command Center</a>
           <a href="/tools/phone-code-lookup">Phone Code Lookup</a>
+          <a href="/command-center">Command Center</a>
+          <a href="/tools/formatter">JSON / XML Formatter</a>
+          <a href="/tools/live-board">Live Board</a>
         </div>
         <div><h3>Time Converters</h3>
           <a href="/time/ist-to-london">IST to London</a>
-          <a href="/time/london-to-ist">London to IST</a>
           <a href="/time/ist-to-est">IST to EST</a>
           <a href="/time/ist-to-pst">IST to PST</a>
           <a href="/time/est-to-pst">EST to PST</a>
+          <a href="/time/london-to-ist">London to IST</a>
           <a href="/time/pst-to-ist">PST to IST</a>
         </div>
         <div><h3>Resources</h3>
@@ -78,6 +106,7 @@ export function pageShell({ title, description, path, schema, body, scripts = ""
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#0b1220">
+  ${THEME_INIT}
 
   ${ADSENSE}
 
@@ -89,12 +118,13 @@ ${schema.map(jsonLd).join("\n\n")}
 <div class="wrap">
 ${siteHeader()}
 
-  <main class="main">
+  <main class="main" id="main" tabindex="-1">
 ${body}
   </main>
 
 ${siteFooter(year)}
 </div>
+<script src="/js/site.js" defer></script>
 ${scripts}
 </body>
 </html>

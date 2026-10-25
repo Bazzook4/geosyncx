@@ -224,7 +224,11 @@ export default function TimeComparison({
     );
     if (!base.isValid) return null;
     const converted = base.setZone(zone);
-    const dayDiff = converted.startOf("day").diff(base.startOf("day"), "days").days;
+    // Compare calendar dates (as UTC midnights) so zone offsets don't produce fractional days
+    const dayDiff = Math.round(
+      DateTime.fromISO(converted.toISODate(), { zone: "utc" })
+        .diff(DateTime.fromISO(base.toISODate(), { zone: "utc" }), "days").days
+    );
     const [timePart, ampm] = converted.toFormat("hh:mm a").split(" ");
     return { time: timePart, ampm, date: converted.toFormat("dd MMM"), dayDiff };
   };

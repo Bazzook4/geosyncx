@@ -10,7 +10,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CONVERTER_ROUTES } from "../src/converter-routes.js";
-import { siteHeader, siteFooter } from "./lib/layout.mjs";
+import { siteHeader, siteFooter, THEME_INIT } from "./lib/layout.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "public", "time");
@@ -189,6 +189,8 @@ function page(route, r) {
   <meta property="og:image" content="${SITE}/android-chrome-512x512.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" href="/favicon-32x32.png">
+  <meta name="theme-color" content="#0b1220">
+  ${THEME_INIT}
 
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>
@@ -233,10 +235,10 @@ ${jsonLd({
 <div class="wrap">
 ${siteHeader()}
 
-  <main class="main">
+  <main class="main" id="main" tabindex="-1">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="/command-center">Command Center</a> / <a href="/time/ist-to-london">Time Converters</a> / ${esc(r.shortTitle)}</nav>
 
-    <h1>${esc(codeF)} to ${esc(codeT)} <span>Time Converter</span>${hasLondon ? ` <span style="font-size:.5em;color:#94a3b8;font-weight:500">(${esc(fromLabel)} to ${esc(toLabel)})</span>` : ""}</h1>
+    <h1>${esc(codeF)} to ${esc(codeT)} <span>Time Converter</span>${hasLondon ? ` <span style="font-size:.5em;color:var(--muted);font-weight:500">(${esc(fromLabel)} to ${esc(toLabel)})</span>` : ""}</h1>
     <p class="quick">${esc(answer)}</p>
     <p class="lead">${esc(r.subtitle)}. ${esc(headline)}. Use the live ${esc(fromLabel)} to ${esc(toLabel)} converter below or open the full <a href="/command-center">Command Center</a> to compare more cities.</p>
 
@@ -247,27 +249,39 @@ ${siteHeader()}
       <div class="info-card"><strong>Daylight saving</strong><span>${hasDST ? "Changes the gap" : "No change"}</span></div>
     </div>
 
-    <div class="converter-widget" id="live-converter">
-      <h2 style="margin:0 0 16px;border:none;padding:0">Live ${esc(F.code)} to ${esc(T.code)} converter</h2>
-      <div class="converter-grid">
-        <div class="conv-col">
-          <div class="conv-label">${esc(fromLabel)}</div>
-          <div class="conv-zone-badge" id="from-zone-badge"></div>
-          <input type="time" id="from-time" class="conv-time-input" aria-label="${esc(fromLabel)} time" />
-          <input type="date" id="from-date" class="conv-date-input" aria-label="${esc(fromLabel)} date" />
-          <div class="conv-live" id="from-live"></div>
+    <section class="converter-widget" id="live-converter" aria-labelledby="conv-h">
+      <h2 id="conv-h">Live ${esc(F.code)} to ${esc(T.code)} converter</h2>
+      <div class="conv-inputs">
+        <div class="conv-field">
+          <label for="from-date">Date</label>
+          <input type="date" id="from-date" class="conv-date-input" />
         </div>
-        <div class="conv-arrow">⇄</div>
-        <div class="conv-col">
-          <div class="conv-label">${esc(toLabel)}</div>
-          <div class="conv-zone-badge" id="to-zone-badge"></div>
-          <div class="conv-result" id="to-result">—</div>
-          <div class="conv-result-date" id="to-date"></div>
-          <div class="conv-live" id="to-live"></div>
+        <div class="conv-field">
+          <label for="from-time">Your time in ${esc(fromLabel)}</label>
+          <input type="time" id="from-time" class="conv-time-input" />
         </div>
       </div>
-      <p style="text-align:center;font-size:.8rem;color:#94a3b8;margin:16px 0 0">Enter a ${esc(fromLabel)} time on the left. Daylight saving is applied for the chosen date.</p>
-    </div>
+      <div class="conv-table-wrap">
+        <table class="conv-table">
+          <thead><tr><th scope="col">City</th><th scope="col">Current</th><th scope="col">Equivalent Time</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="conv-city">${esc(fromLabel)}</span><span class="conv-primary">Primary</span>
+                <div class="conv-sub">${esc(r.fromZone)}</div><span class="conv-chip">${esc(r.fromGMT)}</span></td>
+              <td><div class="conv-time" id="from-now">—</div><div class="conv-date" id="from-now-date"></div></td>
+              <td><div class="conv-time" id="from-eq">—</div><div class="conv-date" id="from-eq-date"></div></td>
+            </tr>
+            <tr>
+              <td><span class="conv-city">${esc(toLabel)}</span>
+                <div class="conv-sub">${esc(r.toZone)}</div><span class="conv-chip">${esc(r.toGMT)}</span></td>
+              <td><div class="conv-time" id="to-now">—</div><div class="conv-date" id="to-now-date"></div></td>
+              <td><div class="conv-time" id="to-eq">—</div><div class="conv-date" id="to-eq-date"></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="conv-note">Pick a ${esc(fromLabel)} time above. Daylight saving is applied for the chosen date.</p>
+    </section>
     <script>
     (function () {
       var FROM = ${JSON.stringify(r.fromZone)}, TO = ${JSON.stringify(r.toZone)};
@@ -293,25 +307,36 @@ ${siteHeader()}
         guess = Date.UTC(y, mo, d, h, mi) - offset(tz, guess);
         return new Date(guess);
       }
-      $('from-zone-badge').textContent = abbr(FROM);
-      $('to-zone-badge').textContent = abbr(TO);
-      $('from-date').value = ymd(new Date(), FROM);
+      function split(d, tz) {
+        var p = fmtTime(d, tz).split(' ');
+        return '<span>' + p[0] + '</span> <span class="conv-ampm">' + (p[1] || '') + '</span>';
+      }
+      function show(id, d, tz, extra) {
+        $(id).innerHTML = split(d, tz);
+        $(id + '-date').innerHTML = fmtDate(d, tz) + ' ' + abbr(tz, d) + (extra || '');
+      }
+      // Default to "now" in the source zone so the Equivalent Time column is filled on load.
+      var now0 = new Date();
+      $('from-date').value = ymd(now0, FROM);
+      $('from-time').value = new Intl.DateTimeFormat('en-GB', { timeZone: FROM, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now0);
       function convert() {
         var t = $('from-time').value, dt = $('from-date').value;
-        if (!t || !dt) { $('to-result').textContent = '—'; $('to-date').textContent = ''; return; }
+        if (!t || !dt) { ['from-eq', 'to-eq'].forEach(function (k) { $(k).textContent = '\u2014'; $(k + '-date').textContent = ''; }); return; }
         var tp = t.split(':'), dp = dt.split('-');
         var utc = toUtc(+dp[0], +dp[1] - 1, +dp[2], +tp[0], +tp[1], FROM);
         var diff = Math.round((Date.parse(ymd(utc, TO)) - Date.parse(ymd(utc, FROM))) / 864e5);
-        $('to-result').textContent = fmtTime(utc, TO);
-        $('to-date').textContent = fmtDate(utc, TO) + ' ' + abbr(TO, utc) + (diff ? (diff > 0 ? ' (+' + diff + ' day)' : ' (' + diff + ' day)') : '');
+        show('from-eq', utc, FROM);
+        var badge = diff ? ' <span class="conv-badge' + (diff < 0 ? ' neg' : '') + '">' + (diff > 0 ? '+' : '') + diff + 'd</span>' : '';
+        show('to-eq', utc, TO, badge);
       }
       $('from-time').addEventListener('input', convert);
       $('from-date').addEventListener('input', convert);
       function tick() {
         var n = new Date();
-        $('from-live').textContent = 'Now: ' + fmtTime(n, FROM) + ', ' + fmtDate(n, FROM);
-        $('to-live').textContent = 'Now: ' + fmtTime(n, TO) + ', ' + fmtDate(n, TO);
+        show('from-now', n, FROM);
+        show('to-now', n, TO);
       }
+      convert();
       tick(); setInterval(tick, 1000);
     })();
     </script>
@@ -355,6 +380,7 @@ ${relatedLinks}
 
 ${siteFooter(YEAR)}
 </div>
+<script src="/js/site.js" defer></script>
 </body>
 </html>
 `;
