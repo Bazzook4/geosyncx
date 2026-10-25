@@ -28,7 +28,11 @@ export default function QuickLinks({ darkMode }) {
   const [url, setUrl] = useState("");
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+    } catch {
+      // storage blocked; links stay for this session only
+    }
   }, [links]);
 
   const panelClass = useMemo(
@@ -40,8 +44,8 @@ export default function QuickLinks({ darkMode }) {
   );
 
   const inputClass = darkMode
-    ? "bg-white/5 text-white placeholder:text-white/50"
-    : "bg-white/60 text-gray-900 placeholder:text-gray-500";
+    ? "bg-white/5 text-white placeholder:text-slate-300"
+    : "bg-white/60 text-gray-900 placeholder:text-gray-600";
 
   const handleAdd = () => {
     const trimmedLabel = label.trim();
@@ -67,24 +71,25 @@ export default function QuickLinks({ darkMode }) {
     <div
       className={`p-6 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${panelClass}`}
     >
-      <h3 className="font-semibold mb-3 tracking-wide uppercase text-xs opacity-80">
-        Quick Links
-      </h3>
+      <h2 className="font-semibold mb-3 text-lg">Quick Links</h2>
 
       <div className="flex flex-col sm:flex-row gap-2">
         <input
+          aria-label="Link label"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Label"
           className={`p-3 rounded-xl shadow-inner ${inputClass}`}
         />
         <input
+          aria-label="Link URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
           className={`p-3 rounded-xl shadow-inner ${inputClass}`}
         />
         <button
+          type="button"
           onClick={handleAdd}
           className="px-4 py-3 rounded-xl bg-indigo-500 text-white hover:bg-indigo-400 transition-transform active:scale-95"
           title="Add link"
@@ -94,7 +99,7 @@ export default function QuickLinks({ darkMode }) {
       </div>
 
       {links.length === 0 ? (
-        <p className="text-xs opacity-70 mt-3">
+        <p className="text-sm mt-3">
           Save your frequently used links here. They stay until you clear your browser data.
         </p>
       ) : (
@@ -118,11 +123,13 @@ export default function QuickLinks({ darkMode }) {
                   {item.label}
                 </a>
                 <button
+                  type="button"
                   onClick={() => handleRemove(item.id)}
-                  className="text-xs px-2 py-1 rounded-full bg-rose-500 text-white hover:bg-rose-400 transition-transform active:scale-95"
+                  className="inline-flex items-center justify-center min-w-[32px] min-h-[32px] text-sm rounded-full bg-rose-600 text-white hover:bg-rose-500 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  aria-label={`Remove link ${item.label}`}
                   title="Remove link"
                 >
-                  ×
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
             </li>

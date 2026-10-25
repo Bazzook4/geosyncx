@@ -104,22 +104,23 @@ export default function TelephoneCodeLookup({ darkMode, onCountrySelect }) {
         className={`p-4 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${cardBase}`}
       >
         <div className="flex items-center justify-between gap-3 mb-2">
-          <label className="font-semibold tracking-wide uppercase text-xs opacity-80">
+          <label htmlFor="tcl-query" className="font-semibold text-sm">
             Telephone Codes
           </label>
-          <span className="text-[11px] opacity-60">
+          <span className="text-xs">
             Click a country to add its primary timezone
           </span>
         </div>
         <input
+          id="tcl-query"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search country, code, or paste full phone number"
           className={`w-full p-3 rounded-xl shadow-inner transition ${
             darkMode
-              ? "bg-white/5 text-white placeholder:text-white/40"
-              : "bg-white/60 text-gray-900 placeholder:text-gray-500"
+              ? "bg-white/5 text-white placeholder:text-slate-300"
+              : "bg-white/60 text-gray-900 placeholder:text-gray-600"
           }`}
         />
 

@@ -23,13 +23,22 @@ import Footer from "./Footer.jsx";
 
 export default function AppRouter() {
   const [darkMode, setDarkMode] = useState(() => {
-    const stored = localStorage.getItem("darkMode");
-    return stored === null ? true : stored === "true";
+    try {
+      const stored = localStorage.getItem("darkMode");
+      if (stored !== null) return stored === "true";
+    } catch {
+      // storage blocked (private mode); fall through to the OS preference
+    }
+    return window.matchMedia?.("(prefers-color-scheme: light)").matches ? false : true;
   });
   const location = useLocation();
 
   useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
+    try {
+      localStorage.setItem("darkMode", darkMode);
+    } catch {
+      // ignore
+    }
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
@@ -48,78 +57,124 @@ export default function AppRouter() {
 
   const navLinkActiveClass = "bg-sky-500 text-white";
 
+  const focusRing =
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+
+  // Command Center is the front page too, so treat "/" and "/dashboard" as active for it.
+  const isActive = (to) =>
+    to === "/command-center"
+      ? ["/", "/command-center", "/dashboard"].includes(location.pathname)
+      : location.pathname === to || location.pathname.startsWith(`${to}/`);
+
+  const NAV_LINKS = [
+    { to: "/tools/phone-code-lookup", label: "Phone Lookup" },
+    { to: "/tools/formatter", label: "Formatter" },
+    { to: "/tools/live-board", label: "Live Board" },
+    { to: "/blog", label: "Blog" },
+    { to: "/about", label: "About" },
+  ];
+
   return (
     <div className={`min-h-screen w-full transition-colors ${backgroundClass}`}>
       <div className="px-4 py-6 md:px-8 md:py-10 space-y-6 md:space-y-8">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-sky-500 focus:text-white"
+        >
+          Skip to content
+        </a>
+
         {/* Header */}
-        <header className="flex items-center justify-between max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 md:gap-6 flex-wrap">
-            {/* Bigger Logo */}
-            <a href="/" className="text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight">
-              GeoSyncX
-            </a>
+        <header className="max-w-6xl mx-auto space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 md:gap-6 flex-wrap">
+              <Link to="/" className={`text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight rounded ${focusRing}`}>
+                GeoSyncX
+              </Link>
 
-            {/* Navigation - Dashboard FIRST, then tools */}
-            <nav className="hidden md:flex items-center gap-2">
-              <Link
-                to="/command-center"
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                  location.pathname === '/command-center'
-                    ? navLinkActiveClass
-                    : 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-400 hover:to-indigo-400 shadow-lg'
-                }`}
+              {/* Desktop navigation */}
+              <nav aria-label="Main" className="hidden md:flex items-center gap-2">
+                <Link
+                  to="/command-center"
+                  aria-current={isActive("/command-center") ? "page" : undefined}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${focusRing} ${
+                    isActive("/command-center")
+                      ? navLinkActiveClass
+                      : "bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-400 hover:to-indigo-400 shadow-lg"
+                  }`}
+                >
+                  Command Center
+                </Link>
+                <div className={`h-6 w-px ${darkMode ? "bg-white/20" : "bg-slate-300"}`} />
+                {NAV_LINKS.map(({ to, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    aria-current={isActive(to) ? "page" : undefined}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-all ${focusRing} ${
+                      isActive(to) ? navLinkActiveClass : navLinkClass
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setDarkMode(!darkMode)}
+                className={`px-3 py-2 rounded-xl transition-transform active:scale-95 shadow-lg ${themeToggleClass} ${focusRing}`}
+                aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
+                title={darkMode ? "Switch to light theme" : "Switch to dark theme"}
               >
-                Command Center
-              </Link>
-              <div className={`h-6 w-px ${darkMode ? 'bg-white/20' : 'bg-slate-300'}`} />
-              <Link
-                to="/tools/phone-code-lookup"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/phone-code-lookup' ? navLinkActiveClass : navLinkClass
-                }`}
+                <span aria-hidden="true">{darkMode ? "🌞" : "🌙"}</span>
+              </button>
+              <a
+                href="mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback"
+                className={`px-3 py-2 rounded-xl text-sm font-medium bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg ${focusRing}`}
               >
-                Phone Lookup
-              </Link>
-              <Link
-                to="/tools/formatter"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/formatter' ? navLinkActiveClass : navLinkClass
-                }`}
-              >
-                Formatter
-              </Link>
-            </nav>
+                Feedback
+              </a>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Mobile: Show Command Center button */}
-            <Link
-              to="/command-center"
-              className="md:hidden px-3 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white text-sm font-semibold"
-            >
-              Go
-            </Link>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className={`px-3 py-2 rounded-xl transition-transform active:scale-95 shadow-lg ${themeToggleClass}`}
-              title="Toggle theme"
-            >
-              {darkMode ? "🌞" : "🌙"}
-            </button>
-            <button
-              onClick={() =>
-                (window.location.href =
-                  "mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback")
-              }
-              className="hidden md:block px-3 py-2 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg"
-              title="Send feedback"
-            >
-              📩
-            </button>
-          </div>
+          {/* Mobile navigation: scrollable row so every page is reachable */}
+          <nav aria-label="Main (mobile)" className="md:hidden -mx-4 px-4 overflow-x-auto">
+            <ul className="flex items-center gap-2 pb-1 w-max">
+              <li>
+                <Link
+                  to="/command-center"
+                  aria-current={isActive("/command-center") ? "page" : undefined}
+                  className={`block px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap ${focusRing} ${
+                    isActive("/command-center")
+                      ? navLinkActiveClass
+                      : "bg-gradient-to-r from-sky-500 to-indigo-500 text-white"
+                  }`}
+                >
+                  Command Center
+                </Link>
+              </li>
+              {NAV_LINKS.map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    aria-current={isActive(to) ? "page" : undefined}
+                    className={`block px-4 py-2.5 rounded-xl text-sm whitespace-nowrap ${focusRing} ${
+                      isActive(to) ? navLinkActiveClass : navLinkClass
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </header>
 
         {/* Routes */}
+        <main id="main" tabIndex={-1} className="outline-none">
         <Routes>
           {/* The Command Center is the front page (canonical https://www.geosyncx.com/) */}
           <Route path="/" element={<App darkMode={darkMode} />} />
@@ -148,6 +203,7 @@ export default function AppRouter() {
           {/* Time Converters (SEO pages) */}
           <Route path="/time/:route" element={<TimezoneConverter darkMode={darkMode} />} />
         </Routes>
+        </main>
 
         {/* Footer */}
         <Footer darkMode={darkMode} />

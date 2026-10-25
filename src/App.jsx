@@ -36,7 +36,12 @@ export default function App({ darkMode }) {
 
   const [primaryZone, setPrimaryZone] = useState(() => {
     if (preload.primary) return preload.primary;
-    const stored = localStorage.getItem("primaryZone");
+    let stored = null;
+    try {
+      stored = localStorage.getItem("primaryZone");
+    } catch {
+      // storage blocked; use the detected zone
+    }
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const tz = stored || detected || "UTC";
     return normalizeTimezoneName(tz);
@@ -44,7 +49,10 @@ export default function App({ darkMode }) {
 
   const [selectedZones, setSelectedZones] = useState(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("selectedZones") || "[]");
+      const raw = localStorage.getItem("selectedZones");
+      // First visit: show two example cities so the table is not empty
+      if (raw === null && preload.add.length === 0) return ["Europe/London", "America/New_York"];
+      const saved = JSON.parse(raw || "[]");
       if (!Array.isArray(saved)) return Array.from(new Set(preload.add));
       const filtered = saved
         .filter((zone) => typeof zone === "string" && zone.trim().length > 0)
@@ -56,8 +64,12 @@ export default function App({ darkMode }) {
   });
 
   useEffect(() => {
-    localStorage.setItem("primaryZone", primaryZone);
-    localStorage.setItem("selectedZones", JSON.stringify(selectedZones));
+    try {
+      localStorage.setItem("primaryZone", primaryZone);
+      localStorage.setItem("selectedZones", JSON.stringify(selectedZones));
+    } catch {
+      // storage blocked; state still works for this session
+    }
   }, [primaryZone, selectedZones]);
 
   const sortedTimezones = useMemo(() => {
@@ -66,7 +78,7 @@ export default function App({ darkMode }) {
   }, [primaryZone, selectedZones]);
 
   const headingClass = darkMode ? "text-white" : "text-slate-900";
-  const textClass = darkMode ? "text-white/70" : "text-slate-600";
+  const textClass = darkMode ? "text-slate-300" : "text-slate-700";
 
   return (
     <>
@@ -75,10 +87,10 @@ export default function App({ darkMode }) {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className={`text-2xl md:text-3xl font-bold ${headingClass}`}>
-            Command Center
+            Compare time zones and find a meeting time that works for everyone
           </h1>
-          <p className={`text-sm ${textClass}`}>
-            All your timezone tools in one place
+          <p className={`text-sm md:text-base ${textClass}`}>
+            <strong>1.</strong> Add cities below &nbsp;·&nbsp; <strong>2.</strong> Pick a time &nbsp;·&nbsp; <strong>3.</strong> See it in every zone
           </p>
         </div>
 

@@ -22,8 +22,8 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
   }, [query]);
 
   const inputClass = darkMode
-    ? "bg-white/10 text-white placeholder:text-white/40 border border-white/15"
-    : "bg-white text-slate-900 placeholder:text-slate-400 border border-slate-200";
+    ? "bg-white/10 text-white placeholder:text-slate-300 border border-white/15"
+    : "bg-white text-slate-900 placeholder:text-slate-600 border border-slate-200";
 
   return (
     <div className="space-y-3">
@@ -40,7 +40,7 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
                   : darkMode ? "bg-white/10 text-white" : "bg-slate-100 text-slate-700"
               }`}>
                 {label}
-                <button onClick={() => onRemove(z)} className="opacity-60 hover:opacity-100 text-xs leading-none">✕</button>
+                <button type="button" onClick={() => onRemove(z)} aria-label={`Remove ${label}`} className="inline-flex items-center justify-center min-w-[28px] min-h-[28px] opacity-80 hover:opacity-100 text-xs leading-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"><span aria-hidden="true">✕</span></button>
               </span>
             );
           })}
@@ -49,13 +49,23 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
 
       {/* Search input */}
       <div className="relative">
+        <label htmlFor="bmf-add-city" className="sr-only">Add a city or country to compare</label>
         <input
+          id="bmf-add-city"
           ref={inputRef}
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter" && results.length > 0) {
+              e.preventDefault();
+              onAdd(results[0].value);
+              setQuery("");
+              setResults([]);
+            }
+          }}
           placeholder="Add a city or country..."
-          className={`w-full px-4 py-2.5 rounded-xl text-sm outline-none ${inputClass}`}
+          className={`w-full px-4 py-2.5 rounded-xl text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${inputClass}`}
         />
         {results.length > 0 && (
           <div className={`absolute z-20 mt-1 w-full rounded-xl shadow-lg overflow-hidden ${
@@ -64,13 +74,14 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
             {results.map(tz => (
               <button
                 key={tz.value}
+                type="button"
                 onClick={() => { onAdd(tz.value); setQuery(""); setResults([]); inputRef.current?.focus(); }}
                 className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between ${
                   darkMode ? "hover:bg-white/10 text-white" : "hover:bg-slate-50 text-slate-900"
                 }`}
               >
                 <span className="font-medium">{tz.city}</span>
-                <span className={`text-xs ${darkMode ? "text-white/50" : "text-slate-400"}`}>{tz.country}</span>
+                <span className={`text-xs ${darkMode ? "text-slate-300" : "text-slate-600"}`}>{tz.country}</span>
               </button>
             ))}
           </div>
@@ -84,7 +95,8 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
   // If zones are managed externally use them, else manage internally
   const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [internalPrimary, setInternalPrimary] = useState(() => {
-    const stored = localStorage.getItem("primaryZone");
+    let stored = null;
+    try { stored = localStorage.getItem("primaryZone"); } catch { /* storage blocked */ }
     return stored || detected || "UTC";
   });
   const [internalZones, setInternalZones] = useState(() => {
@@ -295,7 +307,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
       </div>
 
       {!hasEnoughZones && (
-        <div className="text-center py-6 opacity-60 text-sm">
+        <div className="text-center py-6 text-sm">
           Add at least 2 locations to find overlapping times
         </div>
       )}
@@ -303,22 +315,25 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
       {hasEnoughZones && (<>
       {/* Header + collapsible hours editor */}
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-semibold tracking-wide uppercase text-xs opacity-80">
-          Best Times
-        </h3>
+        <div>
+          <h2 className="font-semibold text-lg">Best Times</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-300">
+            Overlap within each city's working hours (default 11:00 – 19:00; edit under Working hours).
+          </p>
+        </div>
         <details className="ml-auto">
-          <summary className="cursor-pointer text-sm opacity-80 hover:opacity-100">
+          <summary className="cursor-pointer text-sm font-medium hover:underline">
             Working hours
           </summary>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full border-collapse text-xs md:text-sm">
               <thead>
                 <tr className={tableHeaderClass}>
-                  <th className="p-2 text-left">City</th>
-                  <th className="p-2 text-left">Timezone</th>
-                  <th className="p-2 text-left">Start</th>
-                  <th className="p-2 text-left">End</th>
-                  <th className="p-2 text-left">Actions</th>
+                  <th scope="col" className="p-2 text-left">City</th>
+                  <th scope="col" className="p-2 text-left">Timezone</th>
+                  <th scope="col" className="p-2 text-left">Start</th>
+                  <th scope="col" className="p-2 text-left">End</th>
+                  <th scope="col" className="p-2 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -332,6 +347,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                       <td className="p-2">
                         <input
                           type="time"
+                          aria-label={`Working hours start in ${city}`}
                           value={p.start}
                           onChange={(e) => updatePref(z, "start", e.target.value)}
                           className={`p-2 rounded-lg ${inputClass}`}
@@ -340,6 +356,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                       <td className="p-2">
                         <input
                           type="time"
+                          aria-label={`Working hours end in ${city}`}
                           value={p.end}
                           onChange={(e) => updatePref(z, "end", e.target.value)}
                           className={`p-2 rounded-lg ${inputClass}`}
@@ -347,7 +364,9 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                       </td>
                       <td className="p-2">
                         <button
+                          type="button"
                           onClick={() => copyToAll(z)}
+                          aria-label={`Copy ${city} working hours to all cities`}
                           className="px-3 py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-400 text-xs transition-transform active:scale-95"
                           title="Copy these hours to all"
                         >
@@ -366,7 +385,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
       {/* Compact WRAP layout: fixed-width cards */}
       <div className="mt-3 flex flex-wrap gap-3">
         {recommendations.length === 0 ? (
-          <div className="text-sm opacity-80">
+          <div className="text-sm">
             No perfect overlap found in the next 24 hours. Try adjusting hours.
           </div>
         ) : (
@@ -385,16 +404,16 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                 }`}
                 title={r.cards.map((c) => `${c.city}: ${c.time}`).join(" • ")}
               >
-                <div className="text-[11px] opacity-80 leading-none flex items-center justify-between">
+                <div className="text-xs leading-none flex items-center justify-between">
                   <span className="font-semibold uppercase tracking-wide">Best Slot</span>
-                  <span className="text-[10px] px-2 py-1 rounded-full bg-black/10 dark:bg-white/10">
+                  <span className="text-xs px-2 py-1 rounded-full bg-black/10 dark:bg-white/10">
                     {r.cards.length} cities
                   </span>
                 </div>
 
                 {/* Cities & times */}
                 <div
-                  className={`text-xs leading-tight ${
+                  className={`text-sm leading-snug ${
                     isOpen ? "max-h-40 overflow-auto pr-1" : ""
                   }`}
                 >
@@ -405,8 +424,10 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                   ))}
                   {!isOpen && hiddenCount > 0 && (
                     <button
-                      className={`opacity-80 hover:opacity-100 underline ${
-                        darkMode ? "text-sky-200" : "text-sky-700"
+                      type="button"
+                      aria-expanded="false"
+                      className={`underline py-1 ${
+                        darkMode ? "text-sky-200" : "text-sky-800"
                       }`}
                       onClick={() => toggleCard(idx)}
                     >
@@ -416,14 +437,16 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                 </div>
 
                 {/* Footer */}
-                <div className="text-[11px] opacity-80 mt-1 flex items-center justify-between">
+                <div className="text-xs mt-1 flex items-center justify-between">
                   <span>
                     In {r.cards[0].city}: <span className="font-medium">{r.cards[0].time}</span>
                   </span>
                   {isOpen && (
                     <button
-                      className={`underline opacity-80 hover:opacity-100 ${
-                        darkMode ? "text-sky-200" : "text-sky-700"
+                      type="button"
+                      aria-expanded="true"
+                      className={`underline py-1 ${
+                        darkMode ? "text-sky-200" : "text-sky-800"
                       }`}
                       onClick={() => toggleCard(idx)}
                     >

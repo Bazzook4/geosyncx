@@ -10,7 +10,7 @@ export default function TimezoneConverter() {
   useEffect(() => {
     // Redirect to static HTML version for SEO
     if (routeData) {
-      window.location.href = `/time/${route}.html`;
+      window.location.replace(`/time/${route}.html`);
     }
   }, [route, routeData]);
 
@@ -19,14 +19,8 @@ export default function TimezoneConverter() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '50vh',
-      color: '#f1f5f9'
-    }}>
-      <div>Loading...</div>
+    <div className="flex justify-center items-center min-h-[50vh]" role="status">
+      <div>Loading converter…</div>
     </div>
   );
 }

@@ -47,7 +47,11 @@ export default function TimeComparison({
 }) {
   const [currentTime, setCurrentTime] = useState({});
   const [currentDate, setCurrentDate] = useState({});
-  const [selectedTime, setSelectedTime] = useState(""); // HH:mm
+  // HH:mm in the primary zone; defaults to "now" so the Equivalent Time column is filled on load
+  const [selectedTime, setSelectedTime] = useState(() => {
+    const zone = primaryZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    return DateTime.now().setZone(zone).toFormat("HH:mm");
+  });
   const [selectedDate, setSelectedDate] = useState(() => {
     // Always default to today's date
     const zone = primaryZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -68,17 +72,24 @@ export default function TimeComparison({
     ? "bg-white/10 text-white border border-white/15 shadow-xl"
     : "bg-white/70 text-gray-900 border border-white/60 shadow-xl";
   const inputClass = darkMode
-    ? "bg-white/5 text-white placeholder:text-white/50"
-    : "bg-white/60 text-gray-900 placeholder:text-gray-500";
+    ? "bg-white/5 text-white placeholder:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+    : "bg-white/60 text-gray-900 placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500";
   const tableHeaderClass = darkMode
     ? "bg-gradient-to-b from-white/10 to-white/5 border-b border-white/20"
     : "bg-gradient-to-b from-white/90 to-white/70 border-b border-white/40";
   const rowHoverClass = darkMode ? "hover:bg-white/10" : "hover:bg-white/80";
+  const mutedClass = darkMode ? "text-slate-300" : "text-slate-600";
+  const iconBtn =
+    "inline-flex items-center justify-center min-w-[40px] min-h-[40px] rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400";
   const chipClass = darkMode ? "bg-white/10 text-white" : "bg-white/80 text-gray-900";
 
   // Clear old cached date (one-time cleanup)
   useEffect(() => {
-    localStorage.removeItem("selectedDate");
+    try {
+      localStorage.removeItem("selectedDate");
+    } catch {
+      // ignore
+    }
   }, []);
 
   // Tick current times every second
@@ -291,16 +302,15 @@ export default function TimeComparison({
         className={`p-6 rounded-2xl backdrop-blur-xl transition-colors duration-300 ${cardBase}`}
       >
         {/* Search & add zone */}
-        <label className="block mb-2 text-xs font-semibold uppercase tracking-wide opacity-80">
-          Add a Timezone
-        </label>
+        <h2 className="block mb-2 text-lg font-semibold">Add a Timezone</h2>
         <div className="grid md:grid-cols-2 gap-3">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <PhoneIcon className="w-4 h-4 opacity-70" />
-              <label className="text-xs opacity-70">Search by Phone Code</label>
+              <label htmlFor="tc-phone" className={`text-sm ${mutedClass}`}>Search by Phone Code</label>
             </div>
             <input
+              id="tc-phone"
               type="text"
               value={phoneCode}
               onChange={(e) => setPhoneCode(e.target.value)}
@@ -309,11 +319,20 @@ export default function TimeComparison({
             />
           </div>
           <div>
-            <label className="text-xs opacity-70 mb-1 block">Search by Location</label>
+            <label htmlFor="tc-search" className={`text-sm ${mutedClass} mb-1 block`}>Search by Location</label>
             <input
+              id="tc-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && filteredTimezones.length > 0) {
+                  e.preventDefault();
+                  addZone(filteredTimezones[0].value);
+                  setSearchQuery("");
+                  setPhoneCode("");
+                }
+              }}
               placeholder="City, country, IANA, or GMT..."
               className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
             />
@@ -321,17 +340,21 @@ export default function TimeComparison({
         </div>
         {(searchQuery || phoneCode) && (
           <div className="mt-2 max-h-56 overflow-y-auto rounded-xl border border-white/10">
+            <div className="sr-only" role="status" aria-live="polite">
+              {filteredTimezones.length} matching timezone{filteredTimezones.length === 1 ? "" : "s"}. Press Enter to add the first match.
+            </div>
             {phoneCode && phoneCodeMatches.length > 0 && (
-              <div className="p-2 bg-emerald-500/20 text-xs font-semibold sticky top-0 backdrop-blur-sm">
+              <div className="p-2 bg-emerald-500/20 text-sm font-semibold sticky top-0 backdrop-blur-sm">
                 Found {phoneCodeMatches.length} timezone(s) for {phoneCode}
               </div>
             )}
             {filteredTimezones.map((tz) => {
               const phoneCodeForTz = getPhoneCode(tz);
               return (
-                <div
+                <button
+                  type="button"
                   key={tz.value}
-                  className={`p-2 cursor-pointer ${rowHoverClass} transition flex items-center justify-between gap-2`}
+                  className={`w-full text-left p-3 cursor-pointer ${rowHoverClass} transition flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400`}
                   onClick={() => {
                     addZone(tz.value);
                     setSearchQuery("");
@@ -340,18 +363,18 @@ export default function TimeComparison({
                 >
                   <span>
                     {tz.city}, {tz.country} ({tz.gmt}) —{" "}
-                    <span className="text-xs opacity-70">{tz.value}</span>
+                    <span className={`text-xs ${mutedClass}`}>{tz.value}</span>
                   </span>
                   {phoneCodeForTz && (
                     <span className={`text-xs font-mono px-2 py-0.5 rounded ${darkMode ? "bg-white/10" : "bg-gray-200"}`}>
                       {phoneCodeForTz}
                     </span>
                   )}
-                </div>
+                </button>
               );
             })}
             {filteredTimezones.length === 0 && (
-              <div className="p-2 opacity-70">
+              <div className={`p-2 ${mutedClass}`}>
                 {phoneCode ? `No timezones found for phone code ${phoneCode}` : "No matches"}
               </div>
             )}
@@ -361,8 +384,9 @@ export default function TimeComparison({
         {/* Primary date and time */}
         <div className="grid md:grid-cols-2 gap-3 mt-4">
           <div>
-            <label className="block mb-1 font-semibold">Primary Date</label>
+            <label htmlFor="tc-date" className="block mb-1 font-semibold">Primary Date</label>
             <input
+              id="tc-date"
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
@@ -370,17 +394,18 @@ export default function TimeComparison({
             />
           </div>
           <div>
-            <label className="block mb-1 font-semibold">
+            <label htmlFor="tc-time" className="block mb-1 font-semibold">
               {primaryZone
                 ? `Your Time at ${
                     timezoneData.find((tz) => tz.value === primaryZone)?.city || primaryZone.split("/").pop()
                   }, ${timezoneData.find((tz) => tz.value === primaryZone)?.country || ""}`
-                : "Your Time (Click ⭐ to set primary timezone)"}
+                : "Your Time (click the star to set a primary timezone)"}
             </label>
             <input
+              id="tc-time"
               type="time"
+              value={selectedTime}
               onChange={(e) => setSelectedTime(e.target.value)}
-              placeholder="Set time"
               className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
             />
           </div>
@@ -391,9 +416,9 @@ export default function TimeComparison({
           <table className="w-full border-collapse">
             <thead>
               <tr className={tableHeaderClass}>
-                <th className="p-3 text-left md:w-1/2 w-[40%] rounded-tl-xl">City</th>
-                <th className="p-3 text-left md:w-1/4 w-[30%]">Current</th>
-                <th className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">Equivalent Time</th>
+                <th scope="col" className="p-3 text-left md:w-1/2 w-[40%] rounded-tl-xl">City</th>
+                <th scope="col" className="p-3 text-left md:w-1/4 w-[30%]">Current</th>
+                <th scope="col" className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">Equivalent Time</th>
               </tr>
             </thead>
             <tbody>
@@ -411,41 +436,50 @@ export default function TimeComparison({
                       <div className="flex flex-col gap-1">
                         <button
                           onClick={() => setAsPrimary(tz)}
-                          className={`p-1 rounded-lg ${
+                          type="button"
+                          className={`${iconBtn} ${
                             tz === primaryZone
-                              ? "text-yellow-400 hover:text-yellow-300"
-                              : "text-gray-400 hover:text-yellow-400"
+                              ? "text-yellow-500 hover:text-yellow-400"
+                              : darkMode ? "text-slate-300 hover:text-yellow-400" : "text-slate-600 hover:text-yellow-600"
                           } transition-all transform hover:scale-110 active:scale-95`}
+                          aria-label={
+                            tz === primaryZone
+                              ? `${timezone?.city || tz} is the primary timezone`
+                              : `Set ${timezone?.city || tz} as primary timezone`
+                          }
+                          aria-pressed={tz === primaryZone}
                           title={tz === primaryZone ? "Primary Timezone" : "Set as Primary Timezone"}
                         >
                           {tz === primaryZone ? (
-                            <StarIconSolid className="w-5 h-5" />
+                            <StarIconSolid className="w-5 h-5" aria-hidden="true" />
                           ) : (
-                            <StarIconOutline className="w-5 h-5" />
+                            <StarIconOutline className="w-5 h-5" aria-hidden="true" />
                           )}
                         </button>
                         <button
+                          type="button"
                           onClick={() =>
                             setSelectedZones((prev) => prev.filter((zone) => zone !== tz))
                           }
-                          className="p-1 rounded-lg text-rose-400 hover:text-rose-300 transition-transform transform hover:scale-110 active:scale-95"
+                          className={`${iconBtn} ${darkMode ? "text-rose-300 hover:text-rose-200" : "text-rose-600 hover:text-rose-500"} transition-transform transform hover:scale-110 active:scale-95`}
+                          aria-label={`Remove ${timezone?.city || tz}`}
                           title="Remove Timezone"
                         >
-                          <TrashIcon className="w-5 h-5" />
+                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
                         </button>
                       </div>
                       <div>
                         <p className="font-bold">
                           {timezone?.city || tz}
                           {tz === primaryZone && (
-                            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 hidden md:inline">
+                            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 inline-block ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
                               Primary
                             </span>
                           )}
                         </p>
                         <p
                           className={`text-sm ${
-                            darkMode ? "text-white/60" : "text-gray-500"
+                            mutedClass
                           }`}
                         >
                           {timezone?.country || ""}
@@ -460,7 +494,7 @@ export default function TimeComparison({
                             className={`ml-1 text-xs font-mono px-2 py-1 rounded-full ${chipClass}`}
                             title={`Calling code for ${timezone.country}`}
                           >
-                            📞 {getPhoneCode(timezone)}
+                            <span aria-hidden="true">📞</span> {getPhoneCode(timezone)}
                           </span>
                         )}
                       </div>
@@ -472,7 +506,7 @@ export default function TimeComparison({
                         </span>
                         <span className="text-lg">{currentTimeFormatted.ampm}</span>
                         {currentDate[tz] && (
-                          <span className={`text-xs mt-0.5 ${darkMode ? "text-white/50" : "text-gray-400"}`}>
+                          <span className={`text-xs mt-0.5 ${mutedClass}`}>
                             {currentDate[tz]}
                           </span>
                         )}
@@ -486,13 +520,13 @@ export default function TimeComparison({
                               <span>{converted.time}</span>
                             </span>
                             <span className="text-lg">{converted.ampm}</span>
-                            <span className={`text-xs mt-0.5 ${darkMode ? "text-white/50" : "text-gray-400"}`}>
+                            <span className={`text-xs mt-0.5 ${mutedClass}`}>
                               {converted.date}
                               {converted.dayDiff !== 0 && (
                                 <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-semibold ${
                                   converted.dayDiff > 0
-                                    ? "bg-sky-500/20 text-sky-400"
-                                    : "bg-rose-500/20 text-rose-400"
+                                    ? darkMode ? "bg-sky-500/20 text-sky-300" : "bg-sky-500/20 text-sky-800"
+                                    : darkMode ? "bg-rose-500/20 text-rose-300" : "bg-rose-500/20 text-rose-800"
                                 }`}>
                                   {converted.dayDiff > 0 ? `+${converted.dayDiff}d` : `${converted.dayDiff}d`}
                                 </span>
@@ -500,7 +534,7 @@ export default function TimeComparison({
                             </span>
                           </>
                         ) : (
-                          <span className="opacity-50">-</span>
+                          <span className={`text-sm ${mutedClass}`}>Enter a time above</span>
                         )}
                       </div>
                     </td>
@@ -509,7 +543,7 @@ export default function TimeComparison({
               })}
               {sortedTimezones.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="p-4 text-center opacity-70">
+                  <td colSpan={3} className={`p-4 text-center ${mutedClass}`}>
                     Add a timezone above to get started.
                   </td>
                 </tr>
@@ -521,35 +555,47 @@ export default function TimeComparison({
         {/* Inline scheduling (inside TimeComparison) - only show if showCalendar is true */}
         {showCalendar && (
           <div className="mt-6 p-3 rounded-lg border border-dashed border-gray-400/40">
-            <div className="font-semibold mb-2">Schedule this time</div>
+            <h2 className="font-semibold text-lg mb-2">Schedule this time</h2>
             <div className="grid md:grid-cols-4 gap-3">
+              <label className="block text-sm">
+                <span className={`block mb-1 ${mutedClass}`}>Title</span>
               <input
-                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+              </label>
+              <label className="block text-sm">
+                <span className={`block mb-1 ${mutedClass}`}>Location</span>
               <input
-                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
+              </label>
+              <label className="block text-sm">
+                <span className={`block mb-1 ${mutedClass}`}>Duration (min)</span>
               <input
                 type="number"
                 min={15}
                 step={15}
-                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
                 placeholder="Duration (min)"
                 value={durationMin}
                 onChange={(e) => setDurationMin(parseInt(e.target.value || "30", 10))}
               />
+              </label>
+              <label className="block text-sm">
+                <span className={`block mb-1 ${mutedClass}`}>Details</span>
               <input
-                className={`p-3 rounded-xl shadow-inner transition ${inputClass}`}
+                className={`w-full p-3 rounded-xl shadow-inner transition ${inputClass}`}
                 placeholder="Details"
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
               />
+              </label>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -557,10 +603,12 @@ export default function TimeComparison({
                 href={calendarReady ? gcalUrl : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`px-4 py-2 rounded-xl transition-transform ${
+                role={calendarReady ? undefined : "link"}
+                aria-disabled={calendarReady ? undefined : "true"}
+                className={`px-4 py-2 rounded-xl transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                   calendarReady
-                    ? "bg-emerald-500 hover:bg-emerald-400 text-white active:scale-95"
-                    : "bg-white/20 text-white/60 cursor-not-allowed"
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95"
+                    : darkMode ? "bg-white/10 text-slate-300 cursor-not-allowed" : "bg-slate-200 text-slate-600 cursor-not-allowed"
                 }`}
                 onClick={(e) => {
                   if (!calendarReady) e.preventDefault();
@@ -568,8 +616,10 @@ export default function TimeComparison({
               >
                 Add to Google Calendar
               </a>
-              <span className="text-xs opacity-70">
-                Times are saved in UTC; Calendar shows them in each attendee's local timezone.
+              <span className={`text-sm ${mutedClass}`}>
+                {calendarReady
+                  ? "Times are saved in UTC; Calendar shows them in each attendee's local timezone."
+                  : "Enter a time above to enable this button."}
               </span>
             </div>
           </div>

@@ -6,11 +6,11 @@ export default function Footer({ darkMode }) {
     ? "bg-slate-900/50 border-slate-800"
     : "bg-white/50 border-slate-200";
 
-  const textClass = darkMode ? "text-slate-400" : "text-slate-600";
+  const textClass = darkMode ? "text-slate-300" : "text-slate-700";
   const headingClass = darkMode ? "text-slate-300" : "text-slate-700";
   const linkClass = darkMode
-    ? "text-slate-400 hover:text-sky-400"
-    : "text-slate-600 hover:text-sky-600";
+    ? "text-slate-300 hover:text-sky-300"
+    : "text-slate-700 hover:text-sky-700";
 
   return (
     <footer className={`mt-16 border-t ${bgClass} backdrop-blur-sm`}>
@@ -30,6 +30,16 @@ export default function Footer({ darkMode }) {
               <li>
                 <Link to="/command-center" className={`text-sm transition-colors ${linkClass}`}>
                   Command Center
+                </Link>
+              </li>
+              <li>
+                <Link to="/tools/formatter" className={`text-sm transition-colors ${linkClass}`}>
+                  JSON / XML Formatter
+                </Link>
+              </li>
+              <li>
+                <Link to="/tools/live-board" className={`text-sm transition-colors ${linkClass}`}>
+                  Live Board
                 </Link>
               </li>
             </ul>
@@ -143,7 +153,7 @@ export default function Footer({ darkMode }) {
               © {new Date().getFullYear()} GeoSyncX. Free timezone tools for global teams.
             </p>
             <div className="flex items-center gap-6">
-              <Link to="/about" className={`text-xs hover:text-sky-500 ${textClass}`}>
+              <Link to="/about" className={`text-sm hover:text-sky-500 ${textClass}`}>
                 Built by a sales exec, for global teams
               </Link>
             </div>

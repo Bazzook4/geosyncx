@@ -1,5 +1,5 @@
 // /src/InAppGuide.jsx
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { QuestionMarkCircleIcon, XMarkIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 
@@ -53,6 +53,23 @@ const GUIDE_SECTIONS = {
 
 export default function InAppGuide({ darkMode, activeTab }) {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef(null);
+  const closeRef = useRef(null);
+
+  // Escape closes the panel; focus moves in on open and returns to the trigger on close
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    closeRef.current?.focus();
+    const onKey = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const trigger = triggerRef.current;
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      trigger?.focus();
+    };
+  }, [isOpen]);
 
   const guides = GUIDE_SECTIONS[activeTab] || [];
 
@@ -70,20 +87,26 @@ export default function InAppGuide({ darkMode, activeTab }) {
     <>
       {/* Help Button */}
       <button
+        ref={triggerRef}
+        type="button"
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 p-3 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 ${
-          darkMode
-            ? "bg-sky-500 text-white hover:bg-sky-400"
-            : "bg-sky-500 text-white hover:bg-sky-400"
-        }`}
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 bg-sky-600 text-white hover:bg-sky-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-400"
+        aria-label="Open quick guide"
+        aria-haspopup="dialog"
         title="Quick Guide"
       >
-        <QuestionMarkCircleIcon className="w-6 h-6" />
+        <QuestionMarkCircleIcon className="w-6 h-6" aria-hidden="true" />
+        <span className="hidden md:inline text-sm font-medium">Help</span>
       </button>
 
       {/* Slide-out Panel */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
+        <div
+          className="fixed inset-0 z-50 flex justify-end"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="quick-guide-title"
+        >
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -96,18 +119,21 @@ export default function InAppGuide({ darkMode, activeTab }) {
           >
             <div className="sticky top-0 p-4 border-b border-inherit bg-inherit z-10">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold flex items-center gap-2">
+                <h2 id="quick-guide-title" className="text-xl font-bold flex items-center gap-2">
                   <BookOpenIcon className="w-6 h-6 text-sky-500" />
                   Quick Guide
                 </h2>
                 <button
+                  ref={closeRef}
+                  type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-lg hover:bg-white/10 transition"
+                  className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-lg hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                  aria-label="Close quick guide"
                 >
-                  <XMarkIcon className="w-5 h-5" />
+                  <XMarkIcon className="w-5 h-5" aria-hidden="true" />
                 </button>
               </div>
-              <p className="text-sm opacity-70 mt-1">
+              <p className="text-sm mt-1">
                 Tips for the {activeTab === "timezones" ? "Timezones" : "Formatter"} tab
               </p>
             </div>
@@ -120,7 +146,7 @@ export default function InAppGuide({ darkMode, activeTab }) {
                     {section.tips.map((tip, tipIdx) => (
                       <li key={tipIdx} className="flex items-start gap-2 text-sm">
                         <span className="text-sky-500 mt-0.5">•</span>
-                        <span className="opacity-90">{tip}</span>
+                        <span>{tip}</span>
                       </li>
                     ))}
                   </ul>

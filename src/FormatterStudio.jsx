@@ -538,6 +538,7 @@ export default function FormatterStudio({ darkMode }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <select
+          aria-label="Formatter mode"
           value={mode}
           onChange={(e) => setMode(e.target.value)}
           className={`px-4 py-2 rounded-xl text-sm transition-colors ${
@@ -592,10 +593,11 @@ export default function FormatterStudio({ darkMode }) {
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start">
         {/* Input: 30% width */}
         <div className="lg:w-[30%] flex flex-col">
-          <label className={`text-xs font-semibold uppercase tracking-wide mb-2 ${darkMode ? "text-white/70" : "text-gray-600"}`}>
+          <label htmlFor="fs-input" className={`text-sm font-semibold mb-2 ${darkMode ? "text-slate-200" : "text-gray-700"}`}>
             Input
           </label>
           <textarea
+            id="fs-input"
             ref={inputRef}
             value={raw}
             onChange={(e) => setRaw(e.target.value)}
@@ -613,9 +615,9 @@ export default function FormatterStudio({ darkMode }) {
 
         {/* Result: 70% width */}
         <div className="lg:w-[70%] flex flex-col">
-          <label className={`text-xs font-semibold uppercase tracking-wide mb-2 ${darkMode ? "text-white/70" : "text-gray-600"}`}>
+          <h2 className={`text-sm font-semibold mb-2 ${darkMode ? "text-slate-200" : "text-gray-700"}`}>
             Result
-          </label>
+          </h2>
           {output ? (
             <CodeViewer
               highlighted={highlighted}
