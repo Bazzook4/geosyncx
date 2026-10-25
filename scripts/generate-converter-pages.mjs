@@ -53,13 +53,14 @@ function diffPhrase(r, m, fromLabel, toLabel) {
   return `${toLabel} is ${hoursText(m)} ${m > 0 ? "ahead of" : "behind"} ${fromLabel}`;
 }
 
-function convertTable(r, day) {
-  const rows = [0, 6, 8, 9, 10, 12, 15, 18, 21];
-  return rows.map((h) => {
-    const from = DateTime.fromISO(day, { zone: r.fromZone }).set({ hour: h, minute: 0 });
+function convertTable(r, day, step = 60) {
+  const rows = [];
+  for (let m = 0; m < 24 * 60; m += step) rows.push(m);
+  return rows.map((mins) => {
+    const from = DateTime.fromISO(day, { zone: r.fromZone }).set({ hour: Math.floor(mins / 60), minute: mins % 60 });
     const to = from.setZone(r.toZone);
     const dayDiff = Math.round(to.startOf("day").diff(from.startOf("day"), "days").days);
-    return { from: fmtHM(from), to: fmtHM(to), note: dayDiff === 0 ? "" : dayDiff > 0 ? " (next day)" : " (previous day)" };
+    return { from: fmtHM(from), from24: from.toFormat("HH:mm"), to: fmtHM(to), note: dayDiff === 0 ? "" : dayDiff > 0 ? " (next day)" : " (previous day)" };
   });
 }
 
@@ -77,6 +78,11 @@ function page(route, r) {
   const fromLabel = r.fromCity;
   const toLabel = r.toCity;
   const url = `${SITE}/time/${route}`;
+  // Searchers write "UK time" far more often than "London time" (Search Console), so London pages lead with UK.
+  const hasLondon = fromKey === "london" || toKey === "london";
+  const disp = (k, code) => (k === "london" ? "UK" : code);
+  const codeF = disp(fromKey, F.code);
+  const codeT = disp(toKey, T.code);
 
   const wDiff = diffFor(r, WINTER);
   const sDiff = diffFor(r, SUMMER);
@@ -88,6 +94,7 @@ function page(route, r) {
   // Keywords: every route is searched under several phrasings.
   const pair = `${F.code} to ${T.code}`;
   const kw = new Set([
+    ...(hasLondon ? [`${codeF} to ${codeT} time`, `${codeF} to ${codeT} time converter`, `${codeF} to ${codeT} time difference`] : []),
     `${pair} time converter`,
     `${pair} time`,
     `${pair.toLowerCase()}`,
@@ -115,8 +122,15 @@ function page(route, r) {
   }
   const keywords = [...kw].join(", ");
 
-  const metaDesc = `${pair} time converter: ${headline}. Live ${fromLabel} to ${toLabel} time calculator with ${toLabel} timing and best call times.`.slice(0, 200);
-  const title = `${r.title} | ${fromLabel} to ${toLabel} Time Difference - GeoSyncX`;
+  const sample = DateTime.fromISO(WINTER, { zone: r.fromZone }).set({ hour: 14, minute: 0 });
+  const sampleS = DateTime.fromISO(SUMMER, { zone: r.fromZone }).set({ hour: 14, minute: 0 });
+  const answer = hasDST
+    ? `${fmtHM(sample)} ${F.code} = ${fmtHM(sample.setZone(r.toZone))} ${T.code} (winter) / ${fmtHM(sampleS.setZone(r.toZone))} (summer)`
+    : `${fmtHM(sample)} ${F.code} = ${fmtHM(sample.setZone(r.toZone))} ${T.code}`;
+  const metaDesc = `${codeF} to ${codeT} time converter: ${answer}. ${headline}. Full hour-by-hour chart.`.slice(0, 200);
+  const title = hasLondon
+    ? `${codeF} to ${codeT} Time Converter (${fromLabel} to ${toLabel}) - GeoSyncX`
+    : `${r.title} | ${fromLabel} to ${toLabel} Time Difference - GeoSyncX`;
 
   // FAQ, written around real search questions
   const nineFrom = DateTime.fromISO(WINTER, { zone: r.fromZone }).set({ hour: 9, minute: 0 });
@@ -132,6 +146,12 @@ function page(route, r) {
     [`What is the best time for a call between ${fromLabel} and ${toLabel}?`, r.bestTimes || `Pick a window where both sides fall within 9 AM - 6 PM; use the GeoSyncX Best Meeting Time finder to find it automatically.`],
     [`Does the ${F.code} to ${T.code} difference change during the year?`, r.dstNote || (hasDST ? `Yes. Daylight saving changes shift the gap between ${wDiff / 60} and ${sDiff / 60} hours.` : `No. The difference is constant all year.`)],
   ];
+  for (const h of [14, 18]) {
+    const w = DateTime.fromISO(WINTER, { zone: r.fromZone }).set({ hour: h, minute: 0 });
+    const su = DateTime.fromISO(SUMMER, { zone: r.fromZone }).set({ hour: h, minute: 0 });
+    faq.push([`What is ${fmtHM(w).replace(":00", "")} ${F.code} in ${codeT} time?`,
+      hasDST ? `${fmtHM(w)} ${F.code} is ${fmtHM(w.setZone(r.toZone))} in ${toLabel} in winter and ${fmtHM(su.setZone(r.toZone))} in summer.` : `${fmtHM(w)} ${F.code} is ${fmtHM(w.setZone(r.toZone))} in ${toLabel}.`]);
+  }
   if (fromKey === "ist" || toKey === "ist") {
     faq.push([`What is the IST offset?`, `India Standard Time (IST) is UTC+5:30 (IANA zone Asia/Kolkata). India does not observe daylight saving time, so IST never changes.`]);
   }
@@ -139,9 +159,10 @@ function page(route, r) {
     faq.push([`What is London time?`, `London uses Greenwich Mean Time (GMT, UTC+0) in winter and British Summer Time (BST, UTC+1) from the last Sunday of March to the last Sunday of October.`]);
   }
 
-  const wTable = convertTable(r, WINTER);
-  const sTable = convertTable(r, SUMMER);
-  const tableRows = wTable.map((w, i) => `        <tr><td>${w.from}</td><td>${w.to}${w.note}</td>${hasDST ? `<td>${sTable[i].to}${sTable[i].note}</td>` : ""}</tr>`).join("\n");
+  const step = fromKey === "ist" || fromKey === "gmt" ? 30 : 60;
+  const wTable = convertTable(r, WINTER, step);
+  const sTable = convertTable(r, SUMMER, step);
+  const tableRows = wTable.map((w, i) => `        <tr><td>${w.from} <span class="h24">(${w.from24})</span></td><td>${w.to}${w.note}</td>${hasDST ? `<td>${sTable[i].to}${sTable[i].note}</td>` : ""}</tr>`).join("\n");
 
   const related = (r.relatedRoutes || []).filter((k) => CONVERTER_ROUTES[k]);
   const sameFamily = Object.keys(CONVERTER_ROUTES).filter((k) => k !== route && !related.includes(k) && (k.startsWith(`${fromKey}-to-`) || k.startsWith(`${toKey}-to-`) || k.endsWith(`-to-${fromKey}`) || k.endsWith(`-to-${toKey}`))).slice(0, 4);
@@ -254,6 +275,8 @@ ${jsonLd({
     .related-links a{background:rgba(255,255,255,0.05);padding:14px;border-radius:10px;text-decoration:none;color:#38bdf8;font-weight:500;border:1px solid rgba(255,255,255,0.1);transition:all .2s}
     .related-links a:hover{border-color:#0ea5e9;background:rgba(14,165,233,0.1)}
     .also{font-size:.9rem;color:#94a3b8}
+    .h24{color:#64748b;font-size:.85rem}
+    .quick{background:rgba(14,165,233,0.1);border-left:4px solid #0ea5e9;padding:14px 18px;border-radius:12px;margin:0 0 24px;color:#e2e8f0;font-weight:600}
     /* Live converter */
     .converter-widget{background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.25);border-radius:16px;padding:24px;margin:28px 0}
     .converter-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px}
@@ -298,7 +321,8 @@ ${jsonLd({
   <main class="main">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="/command-center">Command Center</a> / <a href="/time/ist-to-london">Time Converters</a> / ${esc(r.shortTitle)}</nav>
 
-    <h1>${esc(F.code)} to ${esc(T.code)} <span>Time Converter</span></h1>
+    <h1>${esc(codeF)} to ${esc(codeT)} <span>Time Converter</span>${hasLondon ? ` <span style="font-size:.5em;color:#94a3b8;font-weight:500">(${esc(fromLabel)} to ${esc(toLabel)})</span>` : ""}</h1>
+    <p class="quick">${esc(answer)}</p>
     <p class="lead">${esc(r.subtitle)}. ${esc(headline)}. Use the live ${esc(fromLabel)} to ${esc(toLabel)} converter below or open the full <a href="/command-center">Command Center</a> to compare more cities.</p>
 
     <div class="info-grid">
@@ -384,7 +408,7 @@ ${jsonLd({
     <p>${esc(F.code)} to ${esc(T.code)}: <strong>${esc(wLine)}</strong>${hasDST ? ` in winter, and <strong>${esc(sLine)}</strong> in summer` : " all year round"}.</p>
     ${r.dstNote ? `<p>${esc(r.dstNote)}</p>` : ""}
 
-    <h2>${esc(fromLabel)} time to ${esc(toLabel)} time chart</h2>
+    <h2>${esc(fromLabel)} time to ${esc(hasLondon ? `${toLabel} / UK` : toLabel)} time chart</h2>
     <p>Quick reference for converting ${esc(F.code)} to ${esc(T.code)}${hasDST ? ` (winter vs summer, using ${WINTER} and ${SUMMER})` : ""}.</p>
     <table>
       <thead><tr><th>${esc(fromLabel)} (${esc(F.code)})</th><th>${esc(toLabel)}${hasDST ? " (winter)" : ""}</th>${hasDST ? `<th>${esc(toLabel)} (summer)</th>` : ""}</tr></thead>
