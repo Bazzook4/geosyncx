@@ -23,12 +23,8 @@ const write = (rel, html) => {
 
 // ---------- Home ----------
 const TOOLS = [
-  ["/command-center", "🚀", "Command Center", "All timezone tools in one dashboard", true],
-  ["/tools/timezone-compare", "🌍", "Compare Timezones", "World clocks side by side with live updates"],
-  ["/tools/best-meeting-time", "✨", "Best Meeting Time", "Find times when everyone is awake and available"],
-  ["/tools/meeting-scheduler", "📅", "Meeting Scheduler", "Schedule across timezones with Google Calendar links"],
+  ["/command-center", "🚀", "Command Center", "Compare timezones, find the best meeting time and see calling codes in one dashboard", true],
   ["/tools/phone-code-lookup", "📞", "Phone Code Lookup", "Find the country and timezone from a phone number"],
-  ["/tools/timezone-finder", "🔍", "Timezone Finder", "Search timezones by city, country or GMT offset"],
   ["/tools/formatter", "🔧", "JSON / XML Formatter", "Beautify JSON, XML and SOAP with syntax highlighting"],
 ];
 
@@ -145,8 +141,8 @@ const about = shell({
     <p>So I built <strong>GeoSyncX</strong>, everything I need in one place:</p>
     <ul>
       <li><strong>See a phone number?</strong> Instantly know where they're calling from with the <a href="/tools/phone-code-lookup">Phone Code Lookup</a>.</li>
-      <li><strong>Need to compare timezones?</strong> Add as many as you want in <a href="/tools/timezone-compare">Compare Timezones</a>.</li>
-      <li><strong>Scheduling a meeting?</strong> Find the best overlap in seconds with <a href="/tools/best-meeting-time">Best Meeting Time</a>.</li>
+      <li><strong>Need to compare timezones?</strong> Add as many as you want in <a href="/command-center">Command Center</a>.</li>
+      <li><strong>Scheduling a meeting?</strong> Find the best overlap in seconds with <a href="/command-center">Command Center</a>.</li>
       <li><strong>Converting a specific pair?</strong> Try <a href="/time/ist-to-london">IST to UK time</a> or <a href="/time/gmt-to-ist">GMT to IST</a>.</li>
     </ul>
     <p>No signups. No clutter. Just the tools I wish I had from day one.</p>

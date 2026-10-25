@@ -10,5 +10,52 @@
       "source": "/(.*)",
       "destination": "/app.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/tools/timezone-compare",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/timezone-compare/",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/best-meeting-time",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/best-meeting-time/",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/meeting-scheduler",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/meeting-scheduler/",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/timezone-finder",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/timezone-finder/",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/command-center",
+      "permanent": true
+    }
   ]
 }

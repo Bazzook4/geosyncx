@@ -94,7 +94,7 @@ export default function PhoneCodeLookupPage({ darkMode }) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
-              to="/tools/timezone-finder"
+              to="/command-center"
               className={`p-4 rounded-xl transition-all hover:scale-[1.02] ${darkMode ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
             >
               <h3 className="font-semibold text-sky-500">Timezone Finder →</h3>
@@ -103,7 +103,7 @@ export default function PhoneCodeLookupPage({ darkMode }) {
               </p>
             </Link>
             <Link
-              to="/tools/meeting-scheduler"
+              to="/command-center"
               className={`p-4 rounded-xl transition-all hover:scale-[1.02] ${darkMode ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
             >
               <h3 className="font-semibold text-sky-500">Meeting Scheduler →</h3>

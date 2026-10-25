@@ -13,13 +13,8 @@ import BlogPost from "./BlogPost.jsx";
 import TimezoneConverter from "./TimezoneConverter.jsx";
 
 // Standalone Pages
-import HomePage from "./pages/HomePage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
 import PhoneCodeLookupPage from "./pages/PhoneCodeLookupPage.jsx";
-import TimezoneFinderPage from "./pages/TimezoneFinderPage.jsx";
-import TimezoneComparePage from "./pages/TimezoneComparePage.jsx";
-import MeetingSchedulerPage from "./pages/MeetingSchedulerPage.jsx";
-import BestMeetingTimePage from "./pages/BestMeetingTimePage.jsx";
 import FormatterPage from "./pages/FormatterPage.jsx";
 import LiveBoardPage from "./pages/LiveBoardPage.jsx";
 
@@ -86,38 +81,6 @@ export default function AppRouter() {
                 Phone Lookup
               </Link>
               <Link
-                to="/tools/timezone-finder"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/timezone-finder' ? navLinkActiveClass : navLinkClass
-                }`}
-              >
-                Finder
-              </Link>
-              <Link
-                to="/tools/timezone-compare"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/timezone-compare' ? navLinkActiveClass : navLinkClass
-                }`}
-              >
-                Compare
-              </Link>
-              <Link
-                to="/tools/best-meeting-time"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/best-meeting-time' ? navLinkActiveClass : navLinkClass
-                }`}
-              >
-                Best Time
-              </Link>
-              <Link
-                to="/tools/meeting-scheduler"
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                  location.pathname === '/tools/meeting-scheduler' ? navLinkActiveClass : navLinkClass
-                }`}
-              >
-                Scheduler
-              </Link>
-              <Link
                 to="/tools/formatter"
                 className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
                   location.pathname === '/tools/formatter' ? navLinkActiveClass : navLinkClass
@@ -160,7 +123,6 @@ export default function AppRouter() {
         <Routes>
           {/* Landing: open on the Command Center (main offering) */}
           <Route path="/" element={<Navigate to="/command-center" replace />} />
-          <Route path="/home" element={<HomePage darkMode={darkMode} />} />
 
           {/* Command Center (renamed from Dashboard) */}
           <Route path="/command-center" element={<App darkMode={darkMode} />} />
@@ -172,10 +134,10 @@ export default function AppRouter() {
 
           {/* Standalone Tools */}
           <Route path="/tools/phone-code-lookup" element={<PhoneCodeLookupPage darkMode={darkMode} />} />
-          <Route path="/tools/timezone-finder" element={<TimezoneFinderPage darkMode={darkMode} />} />
-          <Route path="/tools/timezone-compare" element={<TimezoneComparePage darkMode={darkMode} />} />
-          <Route path="/tools/meeting-scheduler" element={<MeetingSchedulerPage darkMode={darkMode} />} />
-          <Route path="/tools/best-meeting-time" element={<BestMeetingTimePage darkMode={darkMode} />} />
+          <Route path="/tools/timezone-finder" element={<Navigate to="/command-center" replace />} />
+          <Route path="/tools/timezone-compare" element={<Navigate to="/command-center" replace />} />
+          <Route path="/tools/meeting-scheduler" element={<Navigate to="/command-center" replace />} />
+          <Route path="/tools/best-meeting-time" element={<Navigate to="/command-center" replace />} />
           <Route path="/tools/formatter" element={<FormatterPage darkMode={darkMode} />} />
           <Route path="/tools/live-board" element={<LiveBoardPage darkMode={darkMode} />} />
 

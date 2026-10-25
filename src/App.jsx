@@ -7,8 +7,35 @@ import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import InAppGuide from "./InAppGuide.jsx";
 import { normalizeTimezoneName } from "./timezones.js";
 
+const isValidZone = (tz) => {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Links from the /time/* converter pages arrive as /command-center?primary=Asia/Kolkata&add=Europe/London
+// so the table opens with the pair already loaded. Invalid zone names are ignored.
+function readPreload() {
+  const params = new URLSearchParams(window.location.search);
+  const primary = normalizeTimezoneName(params.get("primary") || "");
+  const add = (params.get("add") || "")
+    .split(",")
+    .map((z) => normalizeTimezoneName(z.trim()))
+    .filter(Boolean);
+  return {
+    primary: primary && isValidZone(primary) ? primary : null,
+    add: add.filter(isValidZone),
+  };
+}
+
 export default function App({ darkMode }) {
+  const [preload] = useState(readPreload);
+
   const [primaryZone, setPrimaryZone] = useState(() => {
+    if (preload.primary) return preload.primary;
     const stored = localStorage.getItem("primaryZone");
     const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const tz = stored || detected || "UTC";
@@ -18,13 +45,13 @@ export default function App({ darkMode }) {
   const [selectedZones, setSelectedZones] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("selectedZones") || "[]");
-      if (!Array.isArray(saved)) return [];
+      if (!Array.isArray(saved)) return Array.from(new Set(preload.add));
       const filtered = saved
         .filter((zone) => typeof zone === "string" && zone.trim().length > 0)
         .map(normalizeTimezoneName);
-      return Array.from(new Set(filtered));
+      return Array.from(new Set([...filtered, ...preload.add]));
     } catch {
-      return [];
+      return Array.from(new Set(preload.add));
     }
   });
 

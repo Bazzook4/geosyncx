@@ -316,7 +316,7 @@ ${siteHeader()}
     })();
     </script>
 
-    <div style="text-align:center;margin:8px 0 0"><a class="cta" href="/command-center">Compare ${esc(fromLabel)}, ${esc(toLabel)} &amp; more in the Command Center →</a></div>
+    <div style="text-align:center;margin:8px 0 0"><a class="cta" href="/command-center?primary=${encodeURIComponent(r.fromZone).replace(/%2F/g, "/")}&amp;add=${encodeURIComponent(r.toZone).replace(/%2F/g, "/")}">Compare ${esc(fromLabel)}, ${esc(toLabel)} &amp; more in the Command Center →</a></div>
 
     <h2>${esc(fromLabel)} to ${esc(toLabel)} time difference</h2>
     <p>${esc(r.description)}</p>
