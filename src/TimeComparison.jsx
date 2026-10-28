@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback, memo, Fragment } fro
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
 import { DEFAULT_WORK_HOURS } from "./workHours.js";
-import { TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PhoneIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import {
@@ -213,8 +213,7 @@ export default function TimeComparison({
       // ignore
     }
   }, [is24State, is24Prop]);
-  const [currentTime, setCurrentTime] = useState({});
-  const [currentDate, setCurrentDate] = useState({});
+  const [showHours, setShowHours] = useState(false);
   // HH:mm in the primary zone; defaults to "now" so the Equivalent Time column is filled on load
   const [selectedTime, setSelectedTime] = useState(() => {
     const zone = primaryZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -261,28 +260,6 @@ export default function TimeComparison({
       // ignore
     }
   }, []);
-
-  // Tick current times (seconds are not shown, so a 15s tick keeps the minute accurate cheaply)
-  useEffect(() => {
-    const updateTimes = () => {
-      const newTimes = {};
-      const newDates = {};
-      const zones = new Set(selectedZones);
-      if (primaryZone) zones.add(primaryZone);
-      zones.forEach((tz) => {
-        const dt = DateTime.now().setZone(tz);
-        newTimes[tz] = dt.toFormat(timeFormat);
-        newDates[tz] = dt.toFormat("dd MMM");
-      });
-      setCurrentTime(newTimes);
-      setCurrentDate(newDates);
-    };
-    updateTimes();
-    const interval = setInterval(() => {
-      if (!document.hidden) updateTimes();
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [selectedZones, primaryZone, timeFormat]);
 
   // Phone code lookup - smart matching for partial codes and full numbers
   useEffect(() => {
@@ -418,12 +395,6 @@ export default function TimeComparison({
     const unique = selectedZones.filter((z) => z !== primaryZone);
     return primaryZone ? [primaryZone, ...unique] : unique;
   }, [selectedZones, primaryZone]);
-
-  const formatTimeWithAMPM = (time) => {
-    if (!time || time === "-") return { time: "-", ampm: "" };
-    const [timePart, ampm] = time.split(" ");
-    return { time: timePart || "-", ampm: ampm || "" };
-  };
 
   const addZone = (value) => {
     if (!value) return;
@@ -648,37 +619,122 @@ export default function TimeComparison({
               </li>
             ))}
           </ul>
-          <div role="group" aria-label="Time format" className="flex rounded-lg overflow-hidden border border-white/20 text-xs font-semibold">
-            {[["am/pm", false], ["24h", true]].map(([label, value]) => (
+          <div className="flex items-center gap-2">
+            <div role="group" aria-label="Time format" className="flex rounded-lg overflow-hidden border border-white/20 text-xs font-semibold">
+              {[["am/pm", false], ["24h", true]].map(([label, value]) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setIs24(value)}
+                  aria-pressed={is24 === value}
+                  className={`px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
+                    is24 === value ? "bg-sky-600 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {setWorkHours && sortedTimezones.length > 0 && (
               <button
-                key={label}
                 type="button"
-                onClick={() => setIs24(value)}
-                aria-pressed={is24 === value}
-                className={`px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
-                  is24 === value ? "bg-sky-600 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
+                onClick={() => setShowHours((v) => !v)}
+                aria-expanded={showHours}
+                aria-controls="working-hours-panel"
+                aria-label="Working hours settings"
+                title="Working hours settings"
+                className={`p-1.5 rounded-lg border border-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+                  showHours ? "bg-sky-600 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
                 }`}
               >
-                {label}
+                <Cog6ToothIcon className="w-5 h-5" aria-hidden="true" />
               </button>
-            ))}
+            )}
           </div>
         </div>
+        {/* Working hours (gear): drive the green/amber/grey hours below */}
+        {setWorkHours && showHours && sortedTimezones.length > 0 && (
+          <div id="working-hours-panel" className="mt-3">
+            <p className="text-sm font-medium px-1">
+              Working hours
+              <span className={`ml-2 font-normal ${mutedClass}`}>(default {DEFAULT_WORK_HOURS.start} – {DEFAULT_WORK_HOURS.end}). Colours update automatically.</span>
+            </p>
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className={tableHeaderClass}>
+                    <th scope="col" className="p-2 text-left">City</th>
+                    <th scope="col" className="p-2 text-left">Start</th>
+                    <th scope="col" className="p-2 text-left">End</th>
+                    <th scope="col" className="p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTimezones.map((tz) => {
+                    const city = timezoneData.find((zone) => zone.value === tz)?.city || tz.split("/").pop().replace(/_/g, " ");
+                    const p = workHours[tz] || DEFAULT_WORK_HOURS;
+                    const update = (key, value) =>
+                      setWorkHours((prev) => ({ ...prev, [tz]: { ...(prev[tz] || DEFAULT_WORK_HOURS), [key]: value } }));
+                    return (
+                      <tr key={tz} className={`${rowHoverClass} transition`}>
+                        <td className="p-2 font-medium">{city}</td>
+                        <td className="p-2">
+                          <input
+                            type="time"
+                            aria-label={`Working hours start in ${city}`}
+                            value={p.start}
+                            onChange={(e) => update("start", e.target.value)}
+                            className={`p-2 rounded-lg ${inputClass}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <input
+                            type="time"
+                            aria-label={`Working hours end in ${city}`}
+                            value={p.end}
+                            onChange={(e) => update("end", e.target.value)}
+                            className={`p-2 rounded-lg ${inputClass}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setWorkHours((prev) => {
+                                const next = { ...prev };
+                                for (const z of sortedTimezones) next[z] = { start: p.start, end: p.end };
+                                return next;
+                              })
+                            }
+                            aria-label={`Copy ${city} working hours to all cities`}
+                            className="px-3 py-2 rounded-lg bg-sky-700 text-white hover:bg-sky-600 text-xs transition-transform active:scale-95 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                          >
+                            Copy to all
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto w-full mt-2">
           <table className="w-full border-collapse xl:table-fixed">
             <thead>
               <tr className={tableHeaderClass}>
-                <th scope="col" className="p-3 text-left md:w-[58%] xl:w-[26%] w-[40%] rounded-tl-xl">City</th>
-                <th scope="col" className="p-3 text-left md:w-[21%] xl:w-[13%] w-[30%]">Now</th>
-                <th scope="col" className="p-3 text-left md:w-[21%] xl:w-[16%] w-[30%] xl:rounded-none rounded-tr-xl">At {formatSelected} {primaryEntry?.city || ""}</th>
-                <th scope="col" className="hidden xl:table-cell p-3 text-left xl:w-[45%] rounded-tr-xl">Day view <span className="font-normal opacity-80">(click an hour to pick it)</span></th>
+                <th scope="col" className="p-3 text-left md:w-[58%] xl:w-[28%] w-[50%] rounded-tl-xl">City</th>
+                <th scope="col" className="p-3 text-left md:w-[42%] xl:w-[22%] w-[50%] xl:rounded-none rounded-tr-xl">At {formatSelected} {primaryEntry?.city || ""}</th>
+                <th scope="col" className="hidden xl:table-cell p-3 text-left xl:w-[50%] rounded-tr-xl">Day view <span className="font-normal opacity-80">(click an hour to pick it)</span></th>
               </tr>
             </thead>
             <tbody>
               {overlap && (
                 <Fragment>
                   <tr className={`xl:border-b xl:border-white/10 ${darkMode ? "bg-emerald-500/10" : "bg-emerald-500/10"}`}>
-                    <td colSpan={3} className="p-2">
+                    <td colSpan={2} className="p-2">
                       <p className="font-semibold">Everyone available</p>
                       <p className={`text-sm ${mutedClass}`}>
                         {overlap.summary.length > 0
@@ -700,7 +756,7 @@ export default function TimeComparison({
                     </td>
                   </tr>
                   <tr className="border-b border-white/10 xl:hidden">
-                    <td colSpan={3} className="px-2 pb-3">
+                    <td colSpan={2} className="px-2 pb-3">
                       <OverlapStrip
                         kinds={overlap.kinds}
                         selectedHour={Number((selectedTime || "").split(":")[0])}
@@ -715,7 +771,6 @@ export default function TimeComparison({
               )}
               {sortedTimezones.map((tz) => {
                 const timezone = timezoneData.find((zone) => zone.value === tz);
-                const currentTimeFormatted = formatTimeWithAMPM(currentTime[tz]);
                 const converted = convertTime(tz);
                 const status = converted ? hourStatus(convertedLocal(tz), workHours[tz]) : null;
 
@@ -724,7 +779,7 @@ export default function TimeComparison({
                   <tr
                     className={`${rowHoverClass} transition xl:border-b xl:border-white/10 ${tz === primaryZone ? (darkMode ? "bg-white/5" : "bg-sky-500/5") : ""}`}
                   >
-                    <td className="p-2 md:w-[58%] xl:w-auto w-[40%]">
+                    <td className="p-2 md:w-[58%] xl:w-auto w-[50%]">
                       <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1 shrink-0">
                         <button
@@ -793,17 +848,7 @@ export default function TimeComparison({
                       </div>
                       </div>
                     </td>
-                    <td className="p-2 md:w-[21%] xl:w-auto w-[30%]">
-                      <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
-                        <span className="text-2xl font-semibold tabular-nums">
-                          {currentTimeFormatted.time} {currentTimeFormatted.ampm}
-                        </span>
-                        {currentDate[tz] && (
-                          <span className={`text-xs ${mutedClass}`}>{currentDate[tz]}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-2 md:w-[21%] xl:w-auto w-[30%]">
+                    <td className="p-2 md:w-[42%] xl:w-auto w-[50%]">
                       <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
                         {converted ? (
                           <>
@@ -853,7 +898,7 @@ export default function TimeComparison({
                     </td>
                   </tr>
                   <tr className="border-b border-white/10 xl:hidden">
-                    <td colSpan={3} className="px-2 pb-3">
+                    <td colSpan={2} className="px-2 pb-3">
                       <DayStrip
                         zone={tz}
                         primaryZone={primaryZone}
@@ -871,7 +916,7 @@ export default function TimeComparison({
               })}
               {sortedTimezones.length === 0 && (
                 <tr>
-                  <td colSpan={4} className={`p-4 text-center ${mutedClass}`}>
+                  <td colSpan={3} className={`p-4 text-center ${mutedClass}`}>
                     Add a timezone above to get started.
                   </td>
                 </tr>
@@ -879,75 +924,6 @@ export default function TimeComparison({
             </tbody>
           </table>
         </div>
-
-        {/* Working hours: drive the green/amber/grey hours above */}
-        {setWorkHours && sortedTimezones.length > 0 && (
-          <details className="mt-3">
-            <summary className="cursor-pointer select-none text-sm font-medium hover:underline rounded px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-              Edit working hours
-              <span className={`ml-2 font-normal ${mutedClass}`}>(default {DEFAULT_WORK_HOURS.start} – {DEFAULT_WORK_HOURS.end})</span>
-            </summary>
-            <div className="mt-2 overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className={tableHeaderClass}>
-                    <th scope="col" className="p-2 text-left">City</th>
-                    <th scope="col" className="p-2 text-left">Start</th>
-                    <th scope="col" className="p-2 text-left">End</th>
-                    <th scope="col" className="p-2 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedTimezones.map((tz) => {
-                    const city = timezoneData.find((zone) => zone.value === tz)?.city || tz.split("/").pop().replace(/_/g, " ");
-                    const p = workHours[tz] || DEFAULT_WORK_HOURS;
-                    const update = (key, value) =>
-                      setWorkHours((prev) => ({ ...prev, [tz]: { ...(prev[tz] || DEFAULT_WORK_HOURS), [key]: value } }));
-                    return (
-                      <tr key={tz} className={`${rowHoverClass} transition`}>
-                        <td className="p-2 font-medium">{city}</td>
-                        <td className="p-2">
-                          <input
-                            type="time"
-                            aria-label={`Working hours start in ${city}`}
-                            value={p.start}
-                            onChange={(e) => update("start", e.target.value)}
-                            className={`p-2 rounded-lg ${inputClass}`}
-                          />
-                        </td>
-                        <td className="p-2">
-                          <input
-                            type="time"
-                            aria-label={`Working hours end in ${city}`}
-                            value={p.end}
-                            onChange={(e) => update("end", e.target.value)}
-                            className={`p-2 rounded-lg ${inputClass}`}
-                          />
-                        </td>
-                        <td className="p-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setWorkHours((prev) => {
-                                const next = { ...prev };
-                                for (const z of sortedTimezones) next[z] = { start: p.start, end: p.end };
-                                return next;
-                              })
-                            }
-                            aria-label={`Copy ${city} working hours to all cities`}
-                            className="px-3 py-2 rounded-lg bg-sky-700 text-white hover:bg-sky-600 text-xs transition-transform active:scale-95 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-                          >
-                            Copy to all
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </details>
-        )}
 
         {/* Inline scheduling (inside TimeComparison) - only show if showCalendar is true */}
         {showCalendar && (
