@@ -425,6 +425,7 @@ export default function FormatterStudio({ darkMode }) {
   const [highlighted, setHighlighted] = useState("");
   const [error, setError] = useState("");
   const [detected, setDetected] = useState(null);
+  const [copyStatus, setCopyStatus] = useState("");
   const [mode, setMode] = useState("format"); // "format", "escape", "unescape"
   const inputRef = useRef(null);
 
@@ -437,8 +438,8 @@ export default function FormatterStudio({ darkMode }) {
   );
 
   const inputClass = darkMode
-    ? "bg-white/5 text-white placeholder:text-white/40"
-    : "bg-white/90 text-gray-900 placeholder:text-gray-500";
+    ? "bg-white/5 border border-white/40 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+    : "bg-white/90 border border-slate-400 text-gray-900 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500";
 
   useEffect(() => {
     if (!inputRef.current) return;
@@ -502,14 +503,20 @@ export default function FormatterStudio({ darkMode }) {
     }
   };
 
+  useEffect(() => {
+    if (!copyStatus) return undefined;
+    const id = setTimeout(() => setCopyStatus(""), 2500);
+    return () => clearTimeout(id);
+  }, [copyStatus]);
+
   const handleCopy = async () => {
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
-      alert("Formatted content copied to clipboard.");
+      setCopyStatus("Copied to clipboard");
     } catch (err) {
       console.error("Clipboard error", err);
-      alert("Couldn't copy. Select the text manually.");
+      setCopyStatus("Couldn't copy. Select the text manually.");
     }
   };
 
@@ -563,14 +570,15 @@ export default function FormatterStudio({ darkMode }) {
           <button
             onClick={handleCopy}
             disabled={!output}
-            className={`px-4 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 ${
+            className={`px-4 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
               output
-                ? "bg-blue-500 text-white hover:bg-blue-400 shadow-lg"
+                ? "bg-blue-700 text-white hover:bg-blue-600 shadow-lg"
                 : "bg-gray-400 text-gray-200 cursor-not-allowed"
             }`}
           >
-            📋 Copy
+            <span aria-hidden="true">📋 </span>{copyStatus ? "Copied" : "Copy"}
           </button>
+          <span role="status" aria-live="polite" className="sr-only">{copyStatus}</span>
           <button
             onClick={() => {
               setRaw("");
@@ -632,13 +640,13 @@ export default function FormatterStudio({ darkMode }) {
               }`}
               style={{ minHeight: "220px" }}
             >
-              <div className="text-xs opacity-60">Formatted output will appear here.</div>
+              <div className={`text-xs ${darkMode ? "text-slate-300" : "text-slate-600"}`}>Formatted output will appear here.</div>
             </div>
           )}
         </div>
       </div>
 
-      {error && <p className="text-xs text-rose-400 mt-2">{error}</p>}
+      {error && <p role="alert" className={`text-xs mt-2 ${darkMode ? "text-rose-300" : "text-rose-700"}`}>{error}</p>}
     </div>
   );
 }

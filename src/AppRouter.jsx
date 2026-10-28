@@ -1,4 +1,5 @@
 // /src/AppRouter.jsx
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 
@@ -53,7 +54,7 @@ export default function AppRouter() {
     ? "bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
     : "bg-white/70 text-slate-600 hover:bg-white hover:text-slate-900 border border-slate-200";
 
-  const navLinkActiveClass = "bg-sky-500 text-white";
+  const navLinkActiveClass = "bg-sky-700 text-white";
 
   const focusRing =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
@@ -73,16 +74,16 @@ export default function AppRouter() {
       <div className="px-4 py-6 md:px-8 md:py-10 space-y-6 md:space-y-8">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-sky-500 focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-sky-700 focus:text-white"
         >
           Skip to content
         </a>
 
         {/* Header */}
-        <header className="max-w-6xl mx-auto space-y-3">
+        <header className="max-w-7xl mx-auto space-y-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 md:gap-6 flex-wrap">
-              <Link to="/" className={`text-2xl md:text-3xl font-bold hover:text-sky-500 transition-colors tracking-tight rounded ${focusRing}`}>
+              <Link to="/" className={`text-2xl md:text-3xl font-bold hover:text-sky-600 transition-colors tracking-tight rounded ${focusRing}`}>
                 GeoSyncX
               </Link>
 
@@ -94,7 +95,7 @@ export default function AppRouter() {
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${focusRing} ${
                     isActive("/command-center")
                       ? navLinkActiveClass
-                      : "bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-400 hover:to-indigo-400 shadow-lg"
+                      : navLinkClass
                   }`}
                 >
                   Command Center
@@ -119,15 +120,15 @@ export default function AppRouter() {
               <button
                 type="button"
                 onClick={() => setDarkMode(!darkMode)}
-                className={`px-3 py-2 rounded-xl transition-transform active:scale-95 shadow-lg ${themeToggleClass} ${focusRing}`}
+                className={`px-3 py-2 rounded-xl transition-transform active:scale-95 motion-reduce:transform-none shadow-lg ${themeToggleClass} ${focusRing}`}
                 aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
                 title={darkMode ? "Switch to light theme" : "Switch to dark theme"}
               >
-                <span aria-hidden="true">{darkMode ? "🌞" : "🌙"}</span>
+                {darkMode ? <SunIcon className="w-5 h-5" aria-hidden="true" /> : <MoonIcon className="w-5 h-5" aria-hidden="true" />}
               </button>
               <a
                 href="mailto:hello@geosyncx.com?subject=GeoSyncX%20Feedback"
-                className={`px-3 py-2 rounded-xl text-sm font-medium bg-sky-500 text-white hover:bg-sky-400 transition-transform active:scale-95 shadow-lg ${focusRing}`}
+                className={`px-3 py-2 rounded-xl text-sm font-medium border transition-transform active:scale-95 motion-reduce:transform-none ${darkMode ? "border-white/40 text-white hover:bg-white/10" : "border-slate-400 text-slate-800 hover:bg-white"} ${focusRing}`}
               >
                 Feedback
               </a>
@@ -144,7 +145,7 @@ export default function AppRouter() {
                   className={`block px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap ${focusRing} ${
                     isActive("/command-center")
                       ? navLinkActiveClass
-                      : "bg-gradient-to-r from-sky-500 to-indigo-500 text-white"
+                      : navLinkClass
                   }`}
                 >
                   Command Center

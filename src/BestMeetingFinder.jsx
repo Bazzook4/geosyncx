@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
+import { DEFAULT_WORK_HOURS } from "./workHours.js";
 
 // Inline zone search bar
 function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
@@ -22,8 +23,8 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
   }, [query]);
 
   const inputClass = darkMode
-    ? "bg-white/10 text-white placeholder:text-slate-300 border border-white/15"
-    : "bg-white text-slate-900 placeholder:text-slate-600 border border-slate-200";
+    ? "bg-white/10 text-white placeholder:text-slate-300 border border-white/40"
+    : "bg-white text-slate-900 placeholder:text-slate-600 border border-slate-400";
 
   return (
     <div className="space-y-3">
@@ -36,11 +37,14 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
             return (
               <span key={z} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${
                 isPrimary
-                  ? "bg-sky-500 text-white"
+                  ? "bg-sky-700 text-white"
                   : darkMode ? "bg-white/10 text-white" : "bg-slate-100 text-slate-700"
               }`}>
                 {label}
-                <button type="button" onClick={() => onRemove(z)} aria-label={`Remove ${label}`} className="inline-flex items-center justify-center min-w-[28px] min-h-[28px] opacity-80 hover:opacity-100 text-xs leading-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"><span aria-hidden="true">✕</span></button>
+                {!isPrimary && (
+                  <button type="button" onClick={() => onRemove(z)} aria-label={`Remove ${label}`} className="inline-flex items-center justify-center min-w-[28px] min-h-[28px] opacity-80 hover:opacity-100 text-xs leading-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"><span aria-hidden="true">✕</span></button>
+                )}
+                {isPrimary && <span className="sr-only">(primary)</span>}
               </span>
             );
           })}
@@ -56,7 +60,12 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
+          onBlur={e => {
+            // Close the list when focus leaves the search box and its results
+            if (!e.currentTarget.parentElement.contains(e.relatedTarget)) setResults([]);
+          }}
           onKeyDown={e => {
+            if (e.key === "Escape") { setResults([]); return; }
             if (e.key === "Enter" && results.length > 0) {
               e.preventDefault();
               onAdd(results[0].value);
@@ -76,7 +85,7 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
                 key={tz.value}
                 type="button"
                 onClick={() => { onAdd(tz.value); setQuery(""); setResults([]); inputRef.current?.focus(); }}
-                className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between ${
+                className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
                   darkMode ? "hover:bg-white/10 text-white" : "hover:bg-slate-50 text-slate-900"
                 }`}
               >
@@ -91,7 +100,7 @@ function ZoneSearch({ zones, primaryZone, onAdd, onRemove, darkMode }) {
   );
 }
 
-export default function BestMeetingFinder({ zones: zonesProp, primaryZone: primaryZoneProp, onZonesChange, darkMode, prefs: prefsProp, setPrefs: setPrefsProp }) {
+export default function BestMeetingFinder({ zones: zonesProp, primaryZone: primaryZoneProp, onZonesChange, darkMode, is24 = false, prefs: prefsProp, setPrefs: setPrefsProp }) {
   // If zones are managed externally use them, else manage internally
   const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [internalPrimary, setInternalPrimary] = useState(() => {
@@ -193,7 +202,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
       // Add defaults for new
           for (const z of validZones) {
             if (!next[z]) {
-              next[z] = { start: "11:00", end: "19:00" };
+              next[z] = { ...DEFAULT_WORK_HOURS };
           changed = true;
         }
       }
@@ -229,7 +238,13 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
     return minutes >= startMin || minutes < endMin; // overnight (22:00 -> 06:00)
   }
 
-  // Next 24h, every 30 minutes, in UTC (recomputed hourly)
+  // Next 24h, every 30 minutes, in UTC
+  // Re-roll the window every 5 minutes so a tab left open doesn't show stale slots
+  const [slotTick, setSlotTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => { if (!document.hidden) setSlotTick((t) => t + 1); }, 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
   const slotsUtc = useMemo(() => {
     const now = DateTime.utc().startOf("minute");
     const rounded = now.set({
@@ -240,34 +255,52 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
     const arr = [];
     for (let i = 0; i < 48; i++) arr.push(rounded.plus({ minutes: 30 * i }));
     return arr;
-  }, []); // static window is fine; new recommendations will reflect zones/prefs
+  }, [slotTick]);
 
-  // Build recommendations; re-run on zonesKey or prefs change
+  // Build recommendations: consecutive 30-minute slots where everyone is in working hours
+  // are merged into one range, so a 4-hour overlap is one card, not eight.
+  const timeFormat = is24 ? "HH:mm" : "h:mm a";
   const recommendations = useMemo(() => {
     if (!hasEnoughZones) return [];
-    const out = [];
+    const okSlots = slotsUtc.filter((slot) =>
+      validZones.every((z) => {
+        const pref = prefs[z] || DEFAULT_WORK_HOURS;
+        return isWithinRange(slot.setZone(z), pref.start, pref.end);
+      })
+    );
 
-    for (const slot of slotsUtc) {
-      const cards = validZones.map((z) => {
-        const local = slot.setZone(z);
-        const pref = prefs[z] || { start: "09:00", end: "18:00" };
-        const ok = isWithinRange(local, pref.start, pref.end);
-        const label = labelByZone.get(z) || z.split("/").pop()?.replace(/_/g, " ") || z;
-        return { zone: z, city: label, time: local.toFormat("hh:mm a"), ok };
-      });
-
-      if (cards.every((c) => c.ok)) out.push({ slot, cards });
-
-      if (out.length >= 24) break; // keep UI tidy
+    const ranges = [];
+    for (const slot of okSlots) {
+      const last = ranges[ranges.length - 1];
+      if (last && slot.toMillis() - last.end.toMillis() === 30 * 60 * 1000) {
+        last.end = slot;
+      } else {
+        ranges.push({ start: slot, end: slot });
+      }
     }
-    return out;
-  }, [hasEnoughZones, slotsUtc, zonesKey, prefs, labelByZone, validZones]);
+
+    return ranges.slice(0, 12).map(({ start, end }) => {
+      const endExclusive = end.plus({ minutes: 30 });
+      const cards = validZones.map((z) => {
+        const s0 = start.setZone(z);
+        const e0 = endExclusive.setZone(z);
+        const label = labelByZone.get(z) || z.split("/").pop()?.replace(/_/g, " ") || z;
+        return {
+          zone: z,
+          city: label,
+          day: s0.toFormat("ccc d LLL"),
+          time: `${s0.toFormat(timeFormat)} – ${e0.toFormat(timeFormat)}`,
+        };
+      });
+      return { start, cards };
+    });
+  }, [hasEnoughZones, slotsUtc, zonesKey, prefs, labelByZone, validZones, timeFormat]);
 
   // Update working hours for a zone
   const updatePref = (zone, key, value) => {
     setPrefs((prev) => ({
       ...prev,
-      [zone]: { ...(prev[zone] || { start: "09:00", end: "18:00" }), [key]: value },
+      [zone]: { ...(prev[zone] || DEFAULT_WORK_HOURS), [key]: value },
     }));
   };
 
@@ -288,8 +321,8 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
     ? "bg-white/10 text-white border border-white/15 shadow-xl"
     : "bg-white/70 text-gray-900 border border-white/60 shadow-xl";
   const inputClass = darkMode
-    ? "bg-white/5 text-white placeholder:text-white/50"
-    : "bg-white/60 text-gray-900 placeholder:text-gray-500";
+    ? "bg-white/5 border border-white/40 text-white placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+    : "bg-white/60 border border-slate-400 text-gray-900 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500";
   const tableHeaderClass = darkMode ? "bg-white/5" : "bg-white/70";
   const rowHoverClass = darkMode ? "hover:bg-white/10" : "hover:bg-white/80";
 
@@ -318,19 +351,19 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
         <div>
           <h2 className="font-semibold text-lg">Best Times</h2>
           <p className="text-sm text-slate-500 dark:text-slate-300">
-            Overlap within each city's working hours (default 11:00 – 19:00; edit under Working hours).
+            Overlap within each city's working hours (default 09:00 – 18:00; change them under Edit working hours).
           </p>
         </div>
         <details className="ml-auto">
-          <summary className="cursor-pointer text-sm font-medium hover:underline">
-            Working hours
+          <summary className="cursor-pointer select-none text-sm font-medium hover:underline rounded px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+            <span aria-hidden="true">▸ </span>Edit working hours
           </summary>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full border-collapse text-xs md:text-sm">
               <thead>
                 <tr className={tableHeaderClass}>
                   <th scope="col" className="p-2 text-left">City</th>
-                  <th scope="col" className="p-2 text-left">Timezone</th>
+                  <th scope="col" className="p-2 text-left hidden md:table-cell">Timezone</th>
                   <th scope="col" className="p-2 text-left">Start</th>
                   <th scope="col" className="p-2 text-left">End</th>
                   <th scope="col" className="p-2 text-left">Actions</th>
@@ -339,11 +372,11 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
               <tbody>
                 {validZones.map((z) => {
                   const city = labelByZone.get(z) || z.split("/").pop()?.replace(/_/g, " ") || z;
-                  const p = prefs[z] || { start: "11:00", end: "19:00" };
+                  const p = prefs[z] || DEFAULT_WORK_HOURS;
                   return (
                     <tr key={z} className={`${rowHoverClass} transition`}>
                       <td className="p-2 font-medium">{city}</td>
-                      <td className="p-2">{z}</td>
+                      <td className="p-2 hidden md:table-cell">{z}</td>
                       <td className="p-2">
                         <input
                           type="time"
@@ -367,7 +400,7 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
                           type="button"
                           onClick={() => copyToAll(z)}
                           aria-label={`Copy ${city} working hours to all cities`}
-                          className="px-3 py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-400 text-xs transition-transform active:scale-95"
+                          className="px-3 py-2 rounded-lg bg-sky-700 text-white hover:bg-sky-600 text-xs transition-transform active:scale-95 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                           title="Copy these hours to all"
                         >
                           Copy to all
@@ -382,10 +415,10 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
         </details>
       </div>
 
-      {/* Compact WRAP layout: fixed-width cards */}
-      <div className="mt-3 flex flex-wrap gap-3">
+      {/* One card per overlap range; the first is the earliest option */}
+      <div className="mt-3 grid gap-3 grid-cols-[repeat(auto-fill,minmax(230px,1fr))]">
         {recommendations.length === 0 ? (
-          <div className="text-sm">
+          <div className="text-sm col-span-full">
             No perfect overlap found in the next 24 hours. Try adjusting hours.
           </div>
         ) : (
@@ -393,67 +426,48 @@ export default function BestMeetingFinder({ zones: zonesProp, primaryZone: prima
             const isOpen = expandedCards.has(idx);
             const visible = isOpen ? r.cards : r.cards.slice(0, 3); // show 3 by default
             const hiddenCount = Math.max(0, r.cards.length - visible.length);
+            const linkClass = darkMode ? "text-sky-200" : "text-sky-800";
 
             return (
               <div
                 key={`${zonesKey}-${idx}`} // key includes zonesKey so list remounts on zone changes
-                className={`shrink-0 w-[220px] md:w-[240px] lg:w-[260px] rounded-xl border p-3 flex flex-col gap-2 transition ${
+                className={`rounded-xl border p-3 flex flex-col gap-2 transition ${
                   darkMode
                     ? "border-emerald-400/40 bg-emerald-500/10"
-                    : "border-emerald-500/30 bg-emerald-500/10"
+                    : "border-emerald-600/40 bg-emerald-500/10"
                 }`}
-                title={r.cards.map((c) => `${c.city}: ${c.time}`).join(" • ")}
               >
                 <div className="text-xs leading-none flex items-center justify-between">
-                  <span className="font-semibold uppercase tracking-wide">Best Slot</span>
+                  <span className="font-semibold uppercase tracking-wide">
+                    {idx === 0 ? "Earliest overlap" : `Option ${idx + 1}`}
+                  </span>
                   <span className="text-xs px-2 py-1 rounded-full bg-black/10 dark:bg-white/10">
                     {r.cards.length} cities
                   </span>
                 </div>
 
-                {/* Cities & times */}
-                <div
-                  className={`text-sm leading-snug ${
-                    isOpen ? "max-h-40 overflow-auto pr-1" : ""
-                  }`}
-                >
+                {/* Cities & time ranges, with the date in each city */}
+                <ul className={`text-sm leading-snug space-y-1 ${isOpen ? "max-h-48 overflow-auto pr-1" : ""}`}>
                   {visible.map((c) => (
-                    <div key={c.zone}>
-                      <span className="font-medium">{c.city}</span>: {c.time}
-                    </div>
+                    <li key={c.zone}>
+                      <span className="font-medium">{c.city}</span>
+                      <span className="block tabular-nums">
+                        {c.time} <span className={`text-xs ${darkMode ? "text-slate-300" : "text-slate-600"}`}>{c.day}</span>
+                      </span>
+                    </li>
                   ))}
-                  {!isOpen && hiddenCount > 0 && (
-                    <button
-                      type="button"
-                      aria-expanded="false"
-                      className={`underline py-1 ${
-                        darkMode ? "text-sky-200" : "text-sky-800"
-                      }`}
-                      onClick={() => toggleCard(idx)}
-                    >
-                      +{hiddenCount} more…
-                    </button>
-                  )}
-                </div>
+                </ul>
 
-                {/* Footer */}
-                <div className="text-xs mt-1 flex items-center justify-between">
-                  <span>
-                    In {r.cards[0].city}: <span className="font-medium">{r.cards[0].time}</span>
-                  </span>
-                  {isOpen && (
-                    <button
-                      type="button"
-                      aria-expanded="true"
-                      className={`underline py-1 ${
-                        darkMode ? "text-sky-200" : "text-sky-800"
-                      }`}
-                      onClick={() => toggleCard(idx)}
-                    >
-                      Collapse
-                    </button>
-                  )}
-                </div>
+                {(hiddenCount > 0 || isOpen) && (
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    className={`self-start underline py-1 text-sm rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${linkClass}`}
+                    onClick={() => toggleCard(idx)}
+                  >
+                    {isOpen ? "Show fewer" : `+${hiddenCount} more…`}
+                  </button>
+                )}
               </div>
             );
           })

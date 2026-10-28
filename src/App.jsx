@@ -81,6 +81,39 @@ export default function App({ darkMode, converter }) {
     }
   }, [primaryZone, selectedZones, converter]);
 
+  // 12h/24h display, shared by the clock table and the Best Times cards
+  const [is24, setIs24] = useState(() => {
+    try {
+      return localStorage.getItem("timeFormat24") === "true";
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("timeFormat24", is24);
+    } catch {
+      // ignore
+    }
+  }, [is24]);
+
+  // Per-city working hours, shared so the table can show who is in working hours
+  const [prefs, setPrefs] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("bmf_prefs") || "{}");
+      return saved && typeof saved === "object" ? saved : {};
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("bmf_prefs", JSON.stringify(prefs));
+    } catch {
+      // ignore
+    }
+  }, [prefs]);
+
   const sortedTimezones = useMemo(() => {
     const unique = selectedZones.filter((z) => z && z !== primaryZone);
     return primaryZone ? [primaryZone, ...unique] : unique;
@@ -113,12 +146,18 @@ export default function App({ darkMode, converter }) {
             setPrimaryZone={setPrimaryZone}
             selectedZones={selectedZones}
             setSelectedZones={setSelectedZones}
+            is24={is24}
+            setIs24={setIs24}
+            workHours={prefs}
           />
           <BestMeetingFinder
             zones={sortedTimezones}
             primaryZone={primaryZone}
             onZonesChange={setSelectedZones}
             darkMode={darkMode}
+            is24={is24}
+            prefs={prefs}
+            setPrefs={setPrefs}
           />
         </div>
 
