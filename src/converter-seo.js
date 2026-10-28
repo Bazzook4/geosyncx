@@ -19,6 +19,11 @@ const ZONE_TERMS = {
   sydney: { code: "Sydney", names: ["Sydney", "Australia", "AEST", "AEDT"] },
   dubai: { code: "Dubai", names: ["Dubai", "UAE", "GST", "Gulf time"] },
   singapore: { code: "Singapore", names: ["Singapore", "SGT", "Singapore time"] },
+  bst: { code: "BST", names: ["BST", "British Summer Time", "UK summer time", "UK time"] },
+  cet: { code: "CET", names: ["CET", "CEST", "Paris", "Berlin", "Central European time"] },
+  toronto: { code: "Toronto", names: ["Toronto", "Canada", "Eastern time", "EST"] },
+  tokyo: { code: "Tokyo", names: ["Tokyo", "Japan", "JST", "Japan time"] },
+  hongkong: { code: "Hong Kong", names: ["Hong Kong", "HKT", "Hong Kong time"] },
 };
 
 export const esc = (s) =>
