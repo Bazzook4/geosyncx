@@ -133,12 +133,6 @@ export default function AboutPage({ darkMode }) {
             >
               Open Dashboard
             </Link>
-            <Link
-              to="/tools/phone-code-lookup"
-              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${darkMode ? "bg-white/10 hover:bg-white/20 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-900"}`}
-            >
-              Try Phone Lookup
-            </Link>
           </div>
         </div>
 

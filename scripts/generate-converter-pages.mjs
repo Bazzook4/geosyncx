@@ -72,11 +72,7 @@ ${seo.schema.map((s) => `  <script type="application/ld+json" data-rh="true">\n$
   <nav class="pre-nav" aria-label="Main">
     <a class="pre-logo" href="/">GeoSyncX</a>
     <a href="/command-center">Command Center</a>
-    <a href="/tools/phone-code-lookup">Phone Lookup</a>
     <a href="/tools/formatter">Formatter</a>
-    <a href="/tools/live-board">Live Board</a>
-    <a href="/blog">Blog</a>
-    <a href="/about">About</a>
   </nav>
   <div class="seo-content">
 ${seo.top}

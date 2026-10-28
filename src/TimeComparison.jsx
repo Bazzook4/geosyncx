@@ -39,7 +39,7 @@ function encode(s = "") {
 
 // Thin 24-hour strip for one city: night/day shading, with the chosen hour highlighted.
 // Every strip starts at midnight of the primary date, so columns line up across rows.
-function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode }) {
+function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode, is24 }) {
   if (!primaryZone || !selectedDate) return null;
   const start = DateTime.fromISO(selectedDate, { zone: primaryZone }).startOf("day");
   if (!start.isValid) return null;
@@ -60,14 +60,17 @@ function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkM
             type="button"
             key={h}
             onClick={() => onPick(h)}
-            title={local.toFormat("ccc d LLL, h:mm a")}
-            aria-label={local.toFormat("ccc d LLL, h:mm a")}
+            title={local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")}
+            aria-label={local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")}
             aria-pressed={h === selectedHour}
             className={`flex-1 h-6 text-[9px] leading-6 text-center tabular-nums ${tone} ${
               h === selectedHour ? "ring-2 ring-inset ring-amber-400" : "hover:brightness-110"
             }`}
           >
-            <span className="hidden md:inline">{local.hour}</span>
+            <span className="hidden md:inline">
+              {is24 ? local.hour : local.toFormat("h")}
+              {!is24 && <span className="opacity-70">{local.hour < 12 ? "a" : "p"}</span>}
+            </span>
           </button>
         );
       })}
@@ -83,6 +86,22 @@ export default function TimeComparison({
   setSelectedZones,
   showCalendar = true,
 }) {
+  // 12h (am/pm) or 24h display, remembered between visits
+  const [is24, setIs24] = useState(() => {
+    try {
+      return localStorage.getItem("timeFormat24") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const timeFormat = is24 ? "HH:mm" : "hh:mm a";
+  useEffect(() => {
+    try {
+      localStorage.setItem("timeFormat24", is24);
+    } catch {
+      // ignore
+    }
+  }, [is24]);
   const [currentTime, setCurrentTime] = useState({});
   const [currentDate, setCurrentDate] = useState({});
   // HH:mm in the primary zone; defaults to "now" so the Equivalent Time column is filled on load
@@ -139,7 +158,7 @@ export default function TimeComparison({
       if (primaryZone) zones.add(primaryZone);
       zones.forEach((tz) => {
         const dt = DateTime.now().setZone(tz);
-        newTimes[tz] = dt.toFormat("hh:mm a");
+        newTimes[tz] = dt.toFormat(timeFormat);
         newDates[tz] = dt.toFormat("dd MMM");
       });
       setCurrentTime(newTimes);
@@ -148,7 +167,7 @@ export default function TimeComparison({
     updateTimes();
     const interval = setInterval(updateTimes, 1000);
     return () => clearInterval(interval);
-  }, [selectedZones, primaryZone]);
+  }, [selectedZones, primaryZone, timeFormat]);
 
   // Phone code lookup - smart matching for partial codes and full numbers
   useEffect(() => {
@@ -267,7 +286,7 @@ export default function TimeComparison({
       DateTime.fromISO(converted.toISODate(), { zone: "utc" })
         .diff(DateTime.fromISO(base.toISODate(), { zone: "utc" }), "days").days
     );
-    const [timePart, ampm] = converted.toFormat("hh:mm a").split(" ");
+    const [timePart, ampm] = converted.toFormat(timeFormat).split(" ");
     return { time: timePart, ampm, date: converted.toFormat("dd MMM"), dayDiff };
   };
 
@@ -454,7 +473,24 @@ export default function TimeComparison({
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto w-full mt-6">
+        <div className="flex justify-end mt-6">
+          <div role="group" aria-label="Time format" className="flex rounded-lg overflow-hidden border border-white/20 text-xs font-semibold">
+            {[["am/pm", false], ["24h", true]].map(([label, value]) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setIs24(value)}
+                aria-pressed={is24 === value}
+                className={`px-3 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-400 ${
+                  is24 === value ? "bg-sky-500 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-x-auto w-full mt-2">
           <table className="w-full border-collapse">
             <thead>
               <tr className={tableHeaderClass}>
@@ -475,7 +511,7 @@ export default function TimeComparison({
                     className={`${rowHoverClass} transition`}
                   >
                     <td className="p-2 flex items-center gap-2 md:w-1/2 w-[40%]">
-                      <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => setAsPrimary(tz)}
                           type="button"
@@ -510,7 +546,7 @@ export default function TimeComparison({
                           <TrashIcon className="w-5 h-5" aria-hidden="true" />
                         </button>
                       </div>
-                      <div>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
                         <p className="font-bold">
                           {timezone?.city || tz}
                           {tz === primaryZone && (
@@ -520,9 +556,7 @@ export default function TimeComparison({
                           )}
                         </p>
                         <p
-                          className={`text-sm ${
-                            mutedClass
-                          }`}
+                          className={`text-sm ${mutedClass}`}
                         >
                           {timezone?.country || ""}
                         </p>
@@ -533,7 +567,7 @@ export default function TimeComparison({
                         </span>
                         {getPhoneCode(timezone) && (
                           <span
-                            className={`ml-1 text-xs font-mono px-2 py-1 rounded-full ${chipClass}`}
+                            className={`text-xs font-mono px-2 py-1 rounded-full ${chipClass}`}
                             title={`Calling code for ${timezone.country}`}
                           >
                             <span aria-hidden="true">📞</span> {getPhoneCode(timezone)}
@@ -542,27 +576,23 @@ export default function TimeComparison({
                       </div>
                     </td>
                     <td className="p-2 md:w-1/4 w-[30%]">
-                      <div className="flex flex-col">
-                        <span className="flex items-center gap-1">
-                          <span>{currentTimeFormatted.time}</span>
+                      <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
+                        <span className="text-lg font-semibold tabular-nums">
+                          {currentTimeFormatted.time} {currentTimeFormatted.ampm}
                         </span>
-                        <span className="text-lg">{currentTimeFormatted.ampm}</span>
                         {currentDate[tz] && (
-                          <span className={`text-xs mt-0.5 ${mutedClass}`}>
-                            {currentDate[tz]}
-                          </span>
+                          <span className={`text-xs ${mutedClass}`}>{currentDate[tz]}</span>
                         )}
                       </div>
                     </td>
                     <td className="p-2 md:w-1/4 w-[30%]">
-                      <div className="flex flex-col">
+                      <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
                         {converted ? (
                           <>
-                            <span className="flex items-center gap-1">
-                              <span>{converted.time}</span>
+                            <span className="text-lg font-semibold tabular-nums">
+                              {converted.time} {converted.ampm}
                             </span>
-                            <span className="text-lg">{converted.ampm}</span>
-                            <span className={`text-xs mt-0.5 ${mutedClass}`}>
+                            <span className={`text-xs ${mutedClass}`}>
                               {converted.date}
                               {converted.dayDiff !== 0 && (
                                 <span className={`ml-1 px-1.5 py-0.5 rounded text-xs font-semibold ${
@@ -592,6 +622,7 @@ export default function TimeComparison({
                           setSelectedTime(`${String(h).padStart(2, "0")}:${(selectedTime || "00:00").split(":")[1] || "00"}`)
                         }
                         darkMode={darkMode}
+                        is24={is24}
                       />
                     </td>
                   </tr>

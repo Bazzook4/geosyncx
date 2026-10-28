@@ -23,11 +23,6 @@ export default function Footer({ darkMode }) {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/tools/phone-code-lookup" className={`text-sm transition-colors ${linkClass}`}>
-                  Phone Code Lookup
-                </Link>
-              </li>
-              <li>
                 <Link to="/command-center" className={`text-sm transition-colors ${linkClass}`}>
                   Command Center
                 </Link>
@@ -35,11 +30,6 @@ export default function Footer({ darkMode }) {
               <li>
                 <Link to="/tools/formatter" className={`text-sm transition-colors ${linkClass}`}>
                   JSON / XML Formatter
-                </Link>
-              </li>
-              <li>
-                <Link to="/tools/live-board" className={`text-sm transition-colors ${linkClass}`}>
-                  Live Board
                 </Link>
               </li>
             </ul>

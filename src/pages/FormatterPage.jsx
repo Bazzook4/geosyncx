@@ -68,15 +68,6 @@ export default function FormatterPage({ darkMode }) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
-              to="/tools/phone-code-lookup"
-              className={`p-4 rounded-xl transition-all hover:scale-[1.02] ${darkMode ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
-            >
-              <h3 className="font-semibold text-sky-500">Phone Code Lookup</h3>
-              <p className={`text-sm mt-1 ${textClass}`}>
-                Identify country from phone number
-              </p>
-            </Link>
-            <Link
               to="/command-center"
               className={`p-4 rounded-xl transition-all hover:scale-[1.02] ${darkMode ? "bg-white/5 hover:bg-white/10" : "bg-slate-50 hover:bg-slate-100"}`}
             >

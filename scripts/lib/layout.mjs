@@ -9,11 +9,7 @@ export const ADSENSE = `<!-- Google AdSense -->
 export const THEME_INIT = `<script>(function(){var d=true;try{var s=localStorage.getItem('darkMode');d=s===null?!(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches):s==='true'}catch(e){}var c=document.documentElement.classList;c.toggle('dark',d);c.toggle('light',!d)})()</script>`;
 
 const NAV = [
-  ["/tools/phone-code-lookup", "Phone Lookup"],
   ["/tools/formatter", "Formatter"],
-  ["/tools/live-board", "Live Board"],
-  ["/blog", "Blog"],
-  ["/about", "About"],
 ];
 
 // Same header as AppRouter.jsx: logo, Command Center pill, tool links, theme toggle, feedback;
@@ -49,10 +45,8 @@ export const siteFooter = (year) => `
     <div class="footer-in">
       <div class="footer-grid">
         <div><h3>Tools</h3>
-          <a href="/tools/phone-code-lookup">Phone Code Lookup</a>
           <a href="/command-center">Command Center</a>
           <a href="/tools/formatter">JSON / XML Formatter</a>
-          <a href="/tools/live-board">Live Board</a>
         </div>
         <div><h3>Time Converters</h3>
           <a href="/time/ist-to-london">IST to London</a>

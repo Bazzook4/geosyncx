@@ -56,6 +56,21 @@
       "source": "/dashboard",
       "destination": "/command-center",
       "permanent": true
+    },
+    {
+      "source": "/tools/phone-code-lookup",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/timeline",
+      "destination": "/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/tools/live-board",
+      "destination": "/command-center",
+      "permanent": true
     }
   ]
 }
