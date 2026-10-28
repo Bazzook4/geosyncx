@@ -232,7 +232,6 @@ export default function TimeComparison({
   // Small calendar fields
   const [title, setTitle] = useState("Meeting");
   const [durationMin, setDurationMin] = useState(30);
-  const [location, setLocation] = useState("");
   const [details, setDetails] = useState("Planned via GeoSyncX");
 
   const primaryEntry = timezoneData.find((tz) => tz.value === primaryZone);
@@ -444,10 +443,9 @@ export default function TimeComparison({
       `https://calendar.google.com/calendar/render?action=TEMPLATE` +
       `&text=${encode(title)}` +
       `&dates=${startUtc}/${endUtc}` +
-      `&details=${encode(fullDetails)}` +
-      `&location=${encode(location)}`
+      `&details=${encode(fullDetails)}`
     );
-  }, [startPrimary, endPrimary, title, details, location, primaryZone, sortedTimezones]);
+  }, [startPrimary, endPrimary, title, details, primaryZone, sortedTimezones]);
 
   const selectedMinutes = (selectedTime || "00:00").split(":")[1] || "00";
   const pickHour = useCallback(
@@ -620,6 +618,21 @@ export default function TimeComparison({
             ))}
           </ul>
           <div className="flex items-center gap-2">
+            {setWorkHours && sortedTimezones.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowHours((v) => !v)}
+                aria-expanded={showHours}
+                aria-controls="working-hours-panel"
+                title="Edit working hours"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+                  showHours ? "bg-sky-600 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
+                }`}
+              >
+                <Cog6ToothIcon className="w-4 h-4" aria-hidden="true" />
+                Edit hours
+              </button>
+            )}
             <div role="group" aria-label="Time format" className="flex rounded-lg overflow-hidden border border-white/20 text-xs font-semibold">
               {[["am/pm", false], ["24h", true]].map(([label, value]) => (
                 <button
@@ -635,21 +648,6 @@ export default function TimeComparison({
                 </button>
               ))}
             </div>
-            {setWorkHours && sortedTimezones.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowHours((v) => !v)}
-                aria-expanded={showHours}
-                aria-controls="working-hours-panel"
-                aria-label="Working hours settings"
-                title="Working hours settings"
-                className={`p-1.5 rounded-lg border border-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                  showHours ? "bg-sky-600 text-white" : darkMode ? "hover:bg-white/10" : "hover:bg-slate-200"
-                }`}
-              >
-                <Cog6ToothIcon className="w-5 h-5" aria-hidden="true" />
-              </button>
-            )}
           </div>
         </div>
         {/* Working hours (gear): drive the green/amber/grey hours below */}
@@ -929,56 +927,45 @@ export default function TimeComparison({
         {showCalendar && (
           <div className="mt-3 p-3 rounded-lg border border-dashed border-gray-400/40">
             <h2 className="font-semibold mb-2">Schedule this time</h2>
-            <div className="grid md:grid-cols-4 gap-2">
+            <div className="grid md:grid-cols-[1fr_8rem_1fr_auto] gap-2 items-end">
               <label className="block text-sm">
                 <span className={`block mb-1 ${mutedClass}`}>Title</span>
-              <input
-                className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              </label>
-              <label className="block text-sm">
-                <span className={`block mb-1 ${mutedClass}`}>Location</span>
-              <input
-                className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
-                placeholder="Location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
+                <input
+                  className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
+                  placeholder="Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </label>
               <label className="block text-sm">
                 <span className={`block mb-1 ${mutedClass}`}>Duration (min)</span>
-              <input
-                type="number"
-                min={15}
-                step={15}
-                className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
-                placeholder="Duration (min)"
-                value={durationMin}
-                onChange={(e) => setDurationMin(Math.max(15, parseInt(e.target.value || "30", 10) || 30))}
-              />
+                <input
+                  type="number"
+                  min={15}
+                  step={15}
+                  className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
+                  placeholder="Duration (min)"
+                  value={durationMin}
+                  onChange={(e) => setDurationMin(Math.max(15, parseInt(e.target.value || "30", 10) || 30))}
+                />
               </label>
               <label className="block text-sm">
                 <span className={`block mb-1 ${mutedClass}`}>Details</span>
-              <input
-                className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
-                placeholder="Details"
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-              />
+                <input
+                  className={`w-full px-3 py-2 rounded-xl shadow-inner transition ${inputClass}`}
+                  placeholder="Details"
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                />
               </label>
-            </div>
-
-            <div className="mt-2 flex flex-wrap items-center gap-3">
               <a
                 href={calendarReady ? gcalUrl : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 role={calendarReady ? undefined : "link"}
                 aria-disabled={calendarReady ? undefined : "true"}
-                className={`px-4 py-2 rounded-xl transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+                title={calendarReady ? "Times are saved in UTC; Calendar shows them in each attendee's local timezone." : "Enter a time above to enable this button."}
+                className={`px-4 py-2 rounded-xl text-center whitespace-nowrap transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                   calendarReady
                     ? "bg-emerald-700 hover:bg-emerald-600 text-white active:scale-95"
                     : darkMode ? "bg-white/10 text-slate-300 cursor-not-allowed" : "bg-slate-200 text-slate-600 cursor-not-allowed"
@@ -989,11 +976,6 @@ export default function TimeComparison({
               >
                 Add to Google Calendar
               </a>
-              <span className={`text-sm ${mutedClass}`}>
-                {calendarReady
-                  ? "Times are saved in UTC; Calendar shows them in each attendee's local timezone."
-                  : "Enter a time above to enable this button."}
-              </span>
             </div>
           </div>
         )}

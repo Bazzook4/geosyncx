@@ -120,14 +120,14 @@ export default function App({ darkMode, converter }) {
     <>
       {!converter && <SEO {...DEFAULT_SEO} />}
       <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8">
-        {/* Header (converter pages bring their own h1) */}
+        {/* Header tagline (converter pages bring their own h1). Kept as the h1 for SEO, tucked up under the site header. */}
         {!converter && (
-        <div className="text-center space-y-2">
-          <h1 className={`text-2xl md:text-3xl font-bold ${headingClass}`}>
+        <div className="-mt-3 md:-mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h1 className={`text-base md:text-lg font-semibold ${headingClass}`}>
             Compare time zones and find a meeting time that works for everyone
           </h1>
-          <p className={`text-sm md:text-base ${textClass}`}>
-            <strong>1.</strong> Add cities below &nbsp;·&nbsp; <strong>2.</strong> Pick a time &nbsp;·&nbsp; <strong>3.</strong> See it in every zone
+          <p className={`text-xs md:text-sm ${textClass}`}>
+            <strong>1.</strong> Add cities &nbsp;·&nbsp; <strong>2.</strong> Pick a time &nbsp;·&nbsp; <strong>3.</strong> See it in every zone
           </p>
         </div>
         )}

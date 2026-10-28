@@ -19,7 +19,7 @@ const GUIDE_SECTIONS = {
       title: "Schedule Meetings",
       tips: [
         "Select a date and time in your primary timezone",
-        "Fill in meeting details (title, duration, location)",
+        "Fill in meeting details (title, duration, details)",
         "Click 'Add to Google Calendar' to create the event",
       ],
       blogLink: "/blog/schedule-meeting-across-timezones",
