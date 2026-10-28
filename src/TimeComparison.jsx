@@ -37,6 +37,20 @@ function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
 }
 
+// Part of the day -> colour, so the strip reads at a glance: black nights, pale mornings,
+// dark-orange afternoons, muted-orange evenings.
+const PERIODS = [
+  { key: "night", label: "Night", test: (h) => h < 6 || h >= 21,
+    dark: "bg-black text-slate-300", light: "bg-slate-900 text-slate-200" },
+  { key: "morning", label: "Morning", test: (h) => h < 12,
+    dark: "bg-white/20 text-white", light: "bg-amber-100 text-amber-900" },
+  { key: "afternoon", label: "Afternoon", test: (h) => h < 17,
+    dark: "bg-orange-700 text-white", light: "bg-orange-600 text-white" },
+  { key: "evening", label: "Evening", test: () => true,
+    dark: "bg-orange-950 text-orange-200", light: "bg-orange-300 text-orange-950" },
+];
+const periodFor = (hour) => PERIODS.find((p) => p.test(hour));
+
 // Thin 24-hour strip for one city: night/day shading, with the chosen hour highlighted.
 // Every strip starts at midnight of the primary date, so columns line up across rows.
 function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode, is24 }) {
@@ -48,27 +62,26 @@ function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkM
     <div className="flex gap-px rounded-md overflow-hidden" role="group" aria-label="Pick an hour">
       {Array.from({ length: 24 }, (_, h) => {
         const local = start.plus({ hours: h }).setZone(zone);
-        const night = local.hour < 6 || local.hour >= 21;
-        const shoulder = !night && (local.hour < 8 || local.hour >= 19);
-        const tone = night
-          ? darkMode ? "bg-sky-950 text-sky-300" : "bg-slate-600 text-white"
-          : shoulder
-          ? darkMode ? "bg-sky-900/50 text-sky-200" : "bg-sky-200 text-sky-900"
-          : darkMode ? "bg-white/15 text-white" : "bg-sky-50 text-slate-700";
+        const period = periodFor(local.hour);
+        const tone = darkMode ? period.dark : period.light;
         return (
           <button
             type="button"
             key={h}
             onClick={() => onPick(h)}
-            title={local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")}
+            title={`${local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")} (${period.label.toLowerCase()})`}
             aria-label={local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")}
             aria-pressed={h === selectedHour}
             className={`flex-1 h-6 text-[9px] leading-6 text-center tabular-nums ${tone} ${
-              h === selectedHour ? "ring-2 ring-inset ring-amber-400" : "hover:brightness-110"
+              h === selectedHour ? "ring-2 ring-inset ring-sky-400" : "hover:brightness-110"
             }`}
           >
-            <span className="hidden md:inline">
+            <span className="hidden md:inline whitespace-nowrap">
               {is24 ? local.hour : local.toFormat("h")}
+              {/* Half-hour and 45-minute zones (India, Nepal, ...) show their real minutes */}
+              {local.minute !== 0 && (
+                <span className="text-[8px] opacity-80">:{String(local.minute).padStart(2, "0")}</span>
+              )}
               {!is24 && <span className="opacity-70">{local.hour < 12 ? "a" : "p"}</span>}
             </span>
           </button>
@@ -473,7 +486,15 @@ export default function TimeComparison({
         </div>
 
         {/* Table */}
-        <div className="flex justify-end mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-6">
+          <ul className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs ${mutedClass}`} aria-label="Colour key">
+            {PERIODS.map((p) => (
+              <li key={p.key} className="flex items-center gap-1.5">
+                <span className={`inline-block w-3 h-3 rounded-sm border border-white/20 ${darkMode ? p.dark : p.light}`} aria-hidden="true" />
+                {p.label}
+              </li>
+            ))}
+          </ul>
           <div role="group" aria-label="Time format" className="flex rounded-lg overflow-hidden border border-white/20 text-xs font-semibold">
             {[["am/pm", false], ["24h", true]].map(([label, value]) => (
               <button
@@ -494,9 +515,9 @@ export default function TimeComparison({
           <table className="w-full border-collapse">
             <thead>
               <tr className={tableHeaderClass}>
-                <th scope="col" className="p-3 text-left md:w-1/2 w-[40%] rounded-tl-xl">City</th>
-                <th scope="col" className="p-3 text-left md:w-1/4 w-[30%]">Current</th>
-                <th scope="col" className="p-3 text-left md:w-1/4 w-[30%] rounded-tr-xl">Equivalent Time</th>
+                <th scope="col" className="p-3 text-left md:w-[58%] w-[40%] rounded-tl-xl">City</th>
+                <th scope="col" className="p-3 text-left md:w-[21%] w-[30%]">Current</th>
+                <th scope="col" className="p-3 text-left md:w-[21%] w-[30%] rounded-tr-xl">Equivalent Time</th>
               </tr>
             </thead>
             <tbody>
@@ -510,7 +531,7 @@ export default function TimeComparison({
                   <tr
                     className={`${rowHoverClass} transition`}
                   >
-                    <td className="p-2 flex items-center gap-2 md:w-1/2 w-[40%]">
+                    <td className="p-2 flex items-center gap-2 md:w-[58%] w-[40%]">
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => setAsPrimary(tz)}
@@ -546,7 +567,7 @@ export default function TimeComparison({
                           <TrashIcon className="w-5 h-5" aria-hidden="true" />
                         </button>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
+                      <div className="flex flex-wrap md:flex-nowrap items-center gap-x-2 gap-y-1 min-w-0 whitespace-nowrap">
                         <p className="font-bold">
                           {timezone?.city || tz}
                           {tz === primaryZone && (
@@ -561,13 +582,13 @@ export default function TimeComparison({
                           {timezone?.country || ""}
                         </p>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full ${chipClass}`}
+                          className={`text-xs px-2 py-1 rounded-full shrink-0 ${chipClass}`}
                         >
                           {timezone?.gmt || ""}
                         </span>
                         {getPhoneCode(timezone) && (
                           <span
-                            className={`text-xs font-mono px-2 py-1 rounded-full ${chipClass}`}
+                            className={`text-xs font-mono px-2 py-1 rounded-full shrink-0 ${chipClass}`}
                             title={`Calling code for ${timezone.country}`}
                           >
                             <span aria-hidden="true">📞</span> {getPhoneCode(timezone)}
@@ -575,7 +596,7 @@ export default function TimeComparison({
                         )}
                       </div>
                     </td>
-                    <td className="p-2 md:w-1/4 w-[30%]">
+                    <td className="p-2 md:w-[21%] w-[30%]">
                       <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
                         <span className="text-lg font-semibold tabular-nums">
                           {currentTimeFormatted.time} {currentTimeFormatted.ampm}
@@ -585,7 +606,7 @@ export default function TimeComparison({
                         )}
                       </div>
                     </td>
-                    <td className="p-2 md:w-1/4 w-[30%]">
+                    <td className="p-2 md:w-[21%] w-[30%]">
                       <div className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
                         {converted ? (
                           <>
