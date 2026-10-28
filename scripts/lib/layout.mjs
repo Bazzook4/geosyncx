@@ -2,6 +2,7 @@
 // Mirrors the Command Center nav (AppRouter.jsx) and Footer.jsx. Styles live in public/css/site.css.
 export const SITE = "https://www.geosyncx.com";
 export const ADSENSE = `<!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-6118286051054894">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6118286051054894" crossorigin="anonymous"></script>`;
 
 // Applies the saved theme before first paint. Shares the "darkMode" key with the React app, so the
