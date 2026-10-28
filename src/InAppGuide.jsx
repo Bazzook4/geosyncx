@@ -29,8 +29,9 @@ const GUIDE_SECTIONS = {
       title: "Find Best Meeting Time",
       tips: [
         "Add all participant timezones first",
-        "Use the Best Meeting Time finder below the timezone table",
-        "It shows overlap windows during business hours for all zones",
+        "Look at the \"Everyone available\" row at the top of the table",
+        "Green hours are working hours in every city; amber is early or late; grey is night",
+        "Click a green hour to pick it, and use Edit working hours to change each city's window",
       ],
       blogLink: "/blog/best-meeting-time-finder",
       blogTitle: "Full Guide: Best Meeting Time",

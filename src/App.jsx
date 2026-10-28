@@ -1,9 +1,8 @@
 // /src/App.jsx
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SEO from "./SEO";
 import { DEFAULT_SEO } from "./seo-config";
 import TimeComparison from "./TimeComparison.jsx";
-import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import InAppGuide from "./InAppGuide.jsx";
 import AdUnit from "./AdUnit.jsx";
 import { normalizeTimezoneName } from "./timezones.js";
@@ -81,7 +80,7 @@ export default function App({ darkMode, converter }) {
     }
   }, [primaryZone, selectedZones, converter]);
 
-  // 12h/24h display, shared by the clock table and the Best Times cards
+  // 12h/24h display, shown in the clock table
   const [is24, setIs24] = useState(() => {
     try {
       return localStorage.getItem("timeFormat24") === "true";
@@ -114,11 +113,6 @@ export default function App({ darkMode, converter }) {
     }
   }, [prefs]);
 
-  const sortedTimezones = useMemo(() => {
-    const unique = selectedZones.filter((z) => z && z !== primaryZone);
-    return primaryZone ? [primaryZone, ...unique] : unique;
-  }, [primaryZone, selectedZones]);
-
   const headingClass = darkMode ? "text-white" : "text-slate-900";
   const textClass = darkMode ? "text-slate-300" : "text-slate-700";
 
@@ -149,15 +143,7 @@ export default function App({ darkMode, converter }) {
             is24={is24}
             setIs24={setIs24}
             workHours={prefs}
-          />
-          <BestMeetingFinder
-            zones={sortedTimezones}
-            primaryZone={primaryZone}
-            onZonesChange={setSelectedZones}
-            darkMode={darkMode}
-            is24={is24}
-            prefs={prefs}
-            setPrefs={setPrefs}
+            setWorkHours={setPrefs}
           />
         </div>
 

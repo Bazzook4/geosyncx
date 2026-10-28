@@ -38,19 +38,17 @@ function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
 }
 
-// Part of the day -> colour, so the strip reads at a glance: black nights, pale mornings,
-// dark-orange afternoons, muted-orange evenings.
-const PERIODS = [
-  { key: "night", label: "Night", test: (h) => h < 6 || h >= 21,
-    dark: "bg-black text-slate-300", light: "bg-slate-900 text-slate-200" },
-  { key: "morning", label: "Morning", test: (h) => h < 12,
-    dark: "bg-white/20 text-white", light: "bg-amber-100 text-amber-900" },
-  { key: "afternoon", label: "Afternoon", test: (h) => h < 17,
-    dark: "bg-orange-700 text-white", light: "bg-orange-700 text-white" },
-  { key: "evening", label: "Evening", test: () => true,
-    dark: "bg-orange-950 text-orange-200", light: "bg-orange-300 text-orange-950" },
-];
-const periodFor = (hour) => PERIODS.find((p) => p.test(hour));
+// Availability -> colour, shared by the strips and the status chips:
+// green = working hours, amber = early/late, grey = night.
+const NIGHT_START = 22;
+const NIGHT_END = 6;
+const isNightHour = (h) => h >= NIGHT_START || h < NIGHT_END;
+const KINDS = {
+  work: { label: "Working hours", dark: "bg-emerald-700 text-white font-semibold", light: "bg-emerald-700 text-white font-semibold" },
+  shoulder: { label: "Early / late", dark: "bg-amber-500/40 text-amber-100", light: "bg-amber-200 text-amber-950" },
+  night: { label: "Night", dark: "bg-slate-800 text-slate-400", light: "bg-slate-200 text-slate-600" },
+};
+const KIND_ORDER = ["work", "shoulder", "night"];
 
 const toMinutes = (hhmm = "") => {
   const [h, m] = hhmm.split(":").map(Number);
@@ -64,24 +62,26 @@ function isWorkingHour(local, hours) {
   const now = local.hour * 60 + local.minute;
   return s <= e ? now >= s && now < e : now >= s || now < e;
 }
+// work | shoulder | night for one local time
+function kindFor(local, hours) {
+  if (isWorkingHour(local, hours)) return "work";
+  return isNightHour(local.hour) ? "night" : "shoulder";
+}
 // Short status for the Equivalent Time cell
 function hourStatus(local, hours) {
-  if (isWorkingHour(local, hours)) return { label: "Working hours", tone: "ok" };
-  const h = local.hour;
-  if (h >= 22 || h < 6) return { label: "Night", tone: "bad" };
+  const kind = kindFor(local, hours);
+  if (kind === "work") return { label: KINDS.work.label, tone: "ok" };
+  if (kind === "night") return { label: KINDS.night.label, tone: "bad" };
   const s = toMinutes(hours?.start ?? DEFAULT_WORK_HOURS.start);
   return { label: local.hour * 60 + local.minute < s ? "Early" : "Late", tone: "warn" };
 }
 
-// Thin 24-hour strip for one city: night/day shading, with the chosen hour highlighted.
-// Every strip starts at midnight of the primary date, so columns line up across rows.
-// One tab stop per strip (the selected hour); Left/Right/Home/End move between hours.
-// Hours inside the city's working window get a bottom bar, so "good hour" is not colour-only.
-const DayStrip = memo(function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode, is24, workHours }) {
+// 24 hour tiles in a row. Every strip starts at midnight of the primary date, so columns line up
+// across rows. One tab stop per strip (the selected hour); Left/Right/Home/End move between hours.
+// `tiles` is 24 items of { kind, text, label }; kind drives the colour, label is the tooltip/aria text,
+// so "good hour" is never colour-only.
+function HourStrip({ tiles, selectedHour, onPick, darkMode, groupLabel }) {
   const refs = useRef([]);
-  if (!primaryZone || !selectedDate) return null;
-  const start = DateTime.fromISO(selectedDate, { zone: primaryZone }).startOf("day");
-  if (!start.isValid) return null;
   const focusHour = Number.isInteger(selectedHour) && selectedHour >= 0 && selectedHour < 24 ? selectedHour : 0;
 
   const onKeyDown = (e, h) => {
@@ -94,13 +94,9 @@ const DayStrip = memo(function DayStrip({ zone, primaryZone, selectedDate, selec
   };
 
   return (
-    <div className="flex gap-px rounded-md overflow-hidden" role="group" aria-label="Pick an hour">
-      {Array.from({ length: 24 }, (_, h) => {
-        const local = start.plus({ hours: h }).setZone(zone);
-        const period = periodFor(local.hour);
-        const tone = darkMode ? period.dark : period.light;
-        const label = local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a");
-        const working = isWorkingHour(local, workHours);
+    <div className="flex gap-px rounded-md overflow-hidden" role="group" aria-label={groupLabel}>
+      {tiles.map((t, h) => {
+        const tone = darkMode ? KINDS[t.kind].dark : KINDS[t.kind].light;
         // Mobile: label every 6th tile; md+: label every tile
         const showMobileLabel = h % 6 === 0;
         return (
@@ -111,26 +107,79 @@ const DayStrip = memo(function DayStrip({ zone, primaryZone, selectedDate, selec
             tabIndex={h === focusHour ? 0 : -1}
             onClick={() => onPick(h)}
             onKeyDown={(e) => onKeyDown(e, h)}
-            title={`${label} (${period.label.toLowerCase()}${working ? ", working hours" : ""})`}
-            aria-label={`${label}${working ? ", working hours" : ""}`}
+            title={t.label}
+            aria-label={t.label}
             aria-pressed={h === selectedHour}
-            className={`flex-1 min-w-0 overflow-hidden h-8 md:h-7 text-[10px] leading-7 text-center tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${tone} ${
+            className={`flex-1 min-w-0 overflow-hidden h-8 md:h-7 text-[10px] leading-8 md:leading-7 text-center tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white ${tone} ${
               h === selectedHour ? "ring-2 ring-inset ring-sky-400" : "hover:brightness-110"
-            } ${working ? "border-b-4 border-emerald-400" : "border-b-4 border-transparent"}`}
+            }`}
           >
-            <span className={`${showMobileLabel ? "inline" : "hidden"} md:inline whitespace-nowrap`}>
-              {is24 ? local.hour : local.toFormat("h")}
-              {/* Half-hour and 45-minute zones (India, Nepal, ...) show their real minutes */}
-              {local.minute !== 0 && (
-                <span className="text-[9px] opacity-80 xl:hidden">:{String(local.minute).padStart(2, "0")}</span>
-              )}
-              {!is24 && <span className="opacity-70">{local.hour < 12 ? "a" : "p"}</span>}
-            </span>
+            <span className={`${showMobileLabel ? "inline" : "hidden"} md:inline whitespace-nowrap`}>{t.text}</span>
           </button>
         );
       })}
     </div>
   );
+}
+
+// One city: each tile shows that city's local hour, coloured by availability.
+const DayStrip = memo(function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode, is24, workHours }) {
+  if (!primaryZone || !selectedDate) return null;
+  const start = DateTime.fromISO(selectedDate, { zone: primaryZone }).startOf("day");
+  if (!start.isValid) return null;
+
+  const tiles = Array.from({ length: 24 }, (_, h) => {
+    const local = start.plus({ hours: h }).setZone(zone);
+    const kind = kindFor(local, workHours);
+    const when = local.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a");
+    return {
+      kind,
+      label: `${when} (${KINDS[kind].label.toLowerCase()})`,
+      // Half-hour and 45-minute zones (India, Nepal, ...) show their real minutes
+      text: (
+        <>
+          {is24 ? local.hour : local.toFormat("h")}
+          {local.minute !== 0 && (
+            <span className="text-[9px] opacity-80 xl:hidden">:{String(local.minute).padStart(2, "0")}</span>
+          )}
+          {!is24 && <span className="opacity-70">{local.hour < 12 ? "a" : "p"}</span>}
+        </>
+      ),
+    };
+  });
+
+  return <HourStrip tiles={tiles} selectedHour={selectedHour} onPick={onPick} darkMode={darkMode} groupLabel="Pick an hour" />;
+});
+
+// Hour-by-hour availability of one hour tile for all cities together: green only when everyone is
+// in working hours for the whole hour, grey when anyone is asleep, amber otherwise.
+function overlapKinds(zones, hoursByZone, primaryZone, selectedDate) {
+  const start = DateTime.fromISO(selectedDate, { zone: primaryZone }).startOf("day");
+  if (!start.isValid) return null;
+  return Array.from({ length: 24 }, (_, h) => {
+    const from = start.plus({ hours: h });
+    const to = from.plus({ minutes: 59 });
+    let worst = "work";
+    for (const z of zones) {
+      for (const t of [from, to]) {
+        const k = kindFor(t.setZone(z), hoursByZone[z]);
+        if (k === "night") return { kind: "night", at: from };
+        if (k === "shoulder") worst = "shoulder";
+      }
+    }
+    return { kind: worst, at: from };
+  });
+}
+
+const OverlapStrip = memo(function OverlapStrip({ kinds, selectedHour, onPick, darkMode, is24, cityCount }) {
+  const tiles = kinds.map(({ kind, at }) => ({
+    kind,
+    text: is24 ? at.hour : <>{at.toFormat("h")}<span className="opacity-70">{at.hour < 12 ? "a" : "p"}</span></>,
+    label: `${at.toFormat(is24 ? "ccc d LLL, HH:mm" : "ccc d LLL, h:mm a")}: ${
+      kind === "work" ? `all ${cityCount} cities in working hours` : kind === "shoulder" ? "someone is early or late" : "someone is at night"
+    }`,
+  }));
+  return <HourStrip tiles={tiles} selectedHour={selectedHour} onPick={onPick} darkMode={darkMode} groupLabel="Pick an hour when everyone is available" />;
 });
 
 export default function TimeComparison({
@@ -140,6 +189,7 @@ export default function TimeComparison({
   selectedZones,
   setSelectedZones,
   workHours = {},
+  setWorkHours,
   is24: is24Prop,
   setIs24: setIs24Prop,
   showCalendar = true,
@@ -433,6 +483,24 @@ export default function TimeComparison({
     (h) => setSelectedTime(`${String(h).padStart(2, "0")}:${selectedMinutes}`),
     [selectedMinutes]
   );
+  // Hours on the selected date when every city is available (same colours as the per-city strips)
+  const overlap = useMemo(() => {
+    if (!primaryZone || !selectedDate || sortedTimezones.length < 2) return null;
+    const kinds = overlapKinds(sortedTimezones, workHours, primaryZone, selectedDate);
+    if (!kinds) return null;
+    const fmt = is24 ? "HH:mm" : "h a";
+    const ranges = [];
+    kinds.forEach(({ kind, at }, h) => {
+      if (kind !== "work") return;
+      const last = ranges[ranges.length - 1];
+      if (last && last.endHour === h) last.endHour = h + 1;
+      else ranges.push({ startHour: h, endHour: h + 1, from: at });
+    });
+    const summary = ranges.map((r) => `${r.from.toFormat(fmt)} – ${r.from.plus({ hours: r.endHour - r.startHour }).toFormat(fmt)}`);
+    const hasAmber = kinds.some((k) => k.kind === "shoulder");
+    return { kinds, summary, hasAmber };
+  }, [sortedTimezones, workHours, primaryZone, selectedDate, is24]);
+
   const snapToNow = () => {
     const zone = primaryZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
     const now = DateTime.now().setZone(zone);
@@ -573,10 +641,10 @@ export default function TimeComparison({
         {/* Table */}
         <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
           <ul className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs ${mutedClass}`} aria-label="Colour key">
-            {PERIODS.map((p) => (
-              <li key={p.key} className="flex items-center gap-1.5">
-                <span className={`inline-block w-3 h-3 rounded-sm border border-white/20 ${darkMode ? p.dark : p.light}`} aria-hidden="true" />
-                {p.label}
+            {KIND_ORDER.map((k) => (
+              <li key={k} className="flex items-center gap-1.5">
+                <span className={`inline-block w-3 h-3 rounded-sm border border-white/20 ${darkMode ? KINDS[k].dark : KINDS[k].light}`} aria-hidden="true" />
+                {KINDS[k].label}
               </li>
             ))}
           </ul>
@@ -603,10 +671,48 @@ export default function TimeComparison({
                 <th scope="col" className="p-3 text-left md:w-[58%] xl:w-[26%] w-[40%] rounded-tl-xl">City</th>
                 <th scope="col" className="p-3 text-left md:w-[21%] xl:w-[13%] w-[30%]">Now</th>
                 <th scope="col" className="p-3 text-left md:w-[21%] xl:w-[16%] w-[30%] xl:rounded-none rounded-tr-xl">At {formatSelected} {primaryEntry?.city || ""}</th>
-                <th scope="col" className="hidden xl:table-cell p-3 text-left xl:w-[45%] rounded-tr-xl">Day view</th>
+                <th scope="col" className="hidden xl:table-cell p-3 text-left xl:w-[45%] rounded-tr-xl">Day view <span className="font-normal opacity-80">(click an hour to pick it)</span></th>
               </tr>
             </thead>
             <tbody>
+              {overlap && (
+                <Fragment>
+                  <tr className={`xl:border-b xl:border-white/10 ${darkMode ? "bg-emerald-500/10" : "bg-emerald-500/10"}`}>
+                    <td colSpan={3} className="p-2">
+                      <p className="font-semibold">Everyone available</p>
+                      <p className={`text-sm ${mutedClass}`}>
+                        {overlap.summary.length > 0
+                          ? `Working hours overlap: ${overlap.summary.join(", ")} (${primaryEntry?.city || "primary"} time)`
+                          : overlap.hasAmber
+                            ? "No hour where everyone is in working hours. Amber hours are the next best."
+                            : "No overlap on this date. Someone is at night in every hour."}
+                      </p>
+                    </td>
+                    <td className="hidden xl:table-cell p-2">
+                      <OverlapStrip
+                        kinds={overlap.kinds}
+                        selectedHour={Number((selectedTime || "").split(":")[0])}
+                        onPick={pickHour}
+                        darkMode={darkMode}
+                        is24={is24}
+                        cityCount={sortedTimezones.length}
+                      />
+                    </td>
+                  </tr>
+                  <tr className="border-b border-white/10 xl:hidden">
+                    <td colSpan={3} className="px-2 pb-3">
+                      <OverlapStrip
+                        kinds={overlap.kinds}
+                        selectedHour={Number((selectedTime || "").split(":")[0])}
+                        onPick={pickHour}
+                        darkMode={darkMode}
+                        is24={is24}
+                        cityCount={sortedTimezones.length}
+                      />
+                    </td>
+                  </tr>
+                </Fragment>
+              )}
               {sortedTimezones.map((tz) => {
                 const timezone = timezoneData.find((zone) => zone.value === tz);
                 const currentTimeFormatted = formatTimeWithAMPM(currentTime[tz]);
@@ -773,6 +879,75 @@ export default function TimeComparison({
             </tbody>
           </table>
         </div>
+
+        {/* Working hours: drive the green/amber/grey hours above */}
+        {setWorkHours && sortedTimezones.length > 0 && (
+          <details className="mt-3">
+            <summary className="cursor-pointer select-none text-sm font-medium hover:underline rounded px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+              Edit working hours
+              <span className={`ml-2 font-normal ${mutedClass}`}>(default {DEFAULT_WORK_HOURS.start} – {DEFAULT_WORK_HOURS.end})</span>
+            </summary>
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className={tableHeaderClass}>
+                    <th scope="col" className="p-2 text-left">City</th>
+                    <th scope="col" className="p-2 text-left">Start</th>
+                    <th scope="col" className="p-2 text-left">End</th>
+                    <th scope="col" className="p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTimezones.map((tz) => {
+                    const city = timezoneData.find((zone) => zone.value === tz)?.city || tz.split("/").pop().replace(/_/g, " ");
+                    const p = workHours[tz] || DEFAULT_WORK_HOURS;
+                    const update = (key, value) =>
+                      setWorkHours((prev) => ({ ...prev, [tz]: { ...(prev[tz] || DEFAULT_WORK_HOURS), [key]: value } }));
+                    return (
+                      <tr key={tz} className={`${rowHoverClass} transition`}>
+                        <td className="p-2 font-medium">{city}</td>
+                        <td className="p-2">
+                          <input
+                            type="time"
+                            aria-label={`Working hours start in ${city}`}
+                            value={p.start}
+                            onChange={(e) => update("start", e.target.value)}
+                            className={`p-2 rounded-lg ${inputClass}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <input
+                            type="time"
+                            aria-label={`Working hours end in ${city}`}
+                            value={p.end}
+                            onChange={(e) => update("end", e.target.value)}
+                            className={`p-2 rounded-lg ${inputClass}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setWorkHours((prev) => {
+                                const next = { ...prev };
+                                for (const z of sortedTimezones) next[z] = { start: p.start, end: p.end };
+                                return next;
+                              })
+                            }
+                            aria-label={`Copy ${city} working hours to all cities`}
+                            className="px-3 py-2 rounded-lg bg-sky-700 text-white hover:bg-sky-600 text-xs transition-transform active:scale-95 motion-reduce:transform-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                          >
+                            Copy to all
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        )}
 
         {/* Inline scheduling (inside TimeComparison) - only show if showCalendar is true */}
         {showCalendar && (
