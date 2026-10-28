@@ -1,4 +1,4 @@
-// Generates the static About (/about) page. "/" is the Command Center (React app).
+// Generates the static About (/about), Privacy (/privacy) and Terms (/terms) pages. "/" is the Command Center (React app).
 //
 //   node scripts/generate-site-pages.mjs
 //
@@ -74,4 +74,90 @@ const about = shell({
 });
 write("about/index.html", about);
 
-console.log("Generated about page.");
+// ---------- Privacy ----------
+const UPDATED = "28 October 2026";
+const crumbs = (name, path) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+    { "@type": "ListItem", position: 2, name, item: `${SITE}${path}` },
+  ],
+});
+
+write("privacy/index.html", shell({
+  title: "Privacy Policy | GeoSyncX",
+  description: "How GeoSyncX handles your data: what stays in your browser, how Google AdSense uses cookies, and the choices you have.",
+  path: "/privacy",
+  schema: [crumbs("Privacy Policy", "/privacy")],
+  body: `    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Privacy Policy</nav>
+    <h1>Privacy <span>Policy</span></h1>
+    <p class="lead">Last updated: ${UPDATED}</p>
+
+    <p>GeoSyncX (${SITE.replace("https://", "")}) is a free set of timezone and productivity tools. This page explains what information is handled when you use the site.</p>
+
+    <h2>What stays in your browser</h2>
+    <p>The tools run in your browser. The cities you compare, your primary timezone, your theme, your to-do items and your meeting preferences are saved in your browser's local storage so they are there next time. This data is not sent to us. Text you paste into the JSON / XML Formatter is processed on your device and is not uploaded.</p>
+    <p>You can remove this data at any time by clearing the site data for geosyncx.com in your browser settings.</p>
+
+    <h2>Information we collect</h2>
+    <p>We do not ask you to create an account and we do not collect names, email addresses or payment details through the site. If you email us at <a href="mailto:hello@geosyncx.com">hello@geosyncx.com</a>, we receive your email address and message and use them only to reply.</p>
+    <p>Like any website, our hosting provider may keep standard server logs (such as IP address, browser type and requested page) for security and reliability.</p>
+
+    <h2>Advertising and cookies</h2>
+    <p>We use Google AdSense to show ads. Google and its partners, as third-party vendors, use cookies and similar technologies to serve ads based on your visits to this and other websites.</p>
+    <ul>
+      <li>Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to GeoSyncX and other sites on the internet.</li>
+      <li>You can opt out of personalised advertising by visiting <a href="https://adssettings.google.com" rel="noopener" target="_blank">Google Ads Settings</a>, or opt out of some third-party vendors' use of cookies at <a href="https://www.aboutads.info" rel="noopener" target="_blank">aboutads.info</a>.</li>
+      <li>To learn how Google uses data from sites that use its services, see <a href="https://policies.google.com/technologies/partner-sites" rel="noopener" target="_blank">How Google uses information from sites or apps that use our services</a>.</li>
+    </ul>
+    <p>If you are in the European Economic Area, the United Kingdom or Switzerland, you will be asked for your consent to cookies for advertising through a consent message. You can change your choice at any time using the privacy options link that message provides, or by clearing your cookies.</p>
+
+    <h2>Your rights</h2>
+    <p>Depending on where you live (for example under the GDPR, UK GDPR or CCPA), you may have the right to access, correct or delete personal data held about you, and to object to certain processing. Since we hold very little personal data, the quickest route is to email us and we will respond.</p>
+
+    <h2>Children</h2>
+    <p>GeoSyncX is not directed at children under 13 and we do not knowingly collect personal information from them.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes, we will update the date at the top of this page.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about privacy? Email <a href="mailto:hello@geosyncx.com">hello@geosyncx.com</a>.</p>`,
+}));
+
+// ---------- Terms ----------
+write("terms/index.html", shell({
+  title: "Terms of Use | GeoSyncX",
+  description: "The terms for using GeoSyncX's free timezone converters, meeting finder and productivity tools.",
+  path: "/terms",
+  schema: [crumbs("Terms of Use", "/terms")],
+  body: `    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Terms of Use</nav>
+    <h1>Terms of <span>Use</span></h1>
+    <p class="lead">Last updated: ${UPDATED}</p>
+
+    <p>By using GeoSyncX you agree to these terms. If you do not agree, please do not use the site.</p>
+
+    <h2>Use of the tools</h2>
+    <p>GeoSyncX is free for personal and business use. Please do not misuse the site, attempt to disrupt it, or scrape it in a way that affects other visitors.</p>
+
+    <h2>Accuracy</h2>
+    <p>Time conversions use the IANA timezone database and your device's clock, and phone-code information is provided as a guide. Timezone rules change, and some countries have several timezones, so please double-check anything important, such as a legal deadline or a flight, with an official source. The tools are provided "as is" without warranties of any kind.</p>
+
+    <h2>Limitation of liability</h2>
+    <p>To the extent permitted by law, GeoSyncX is not liable for any loss or damage arising from your use of, or inability to use, the site or from reliance on its results, such as a missed meeting.</p>
+
+    <h2>Advertising and third-party links</h2>
+    <p>The site shows ads provided by Google AdSense and may link to other websites. We do not control those sites or the ads shown and are not responsible for their content. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+
+    <h2>Content</h2>
+    <p>The text, design and code of GeoSyncX belong to its owner. You may link to any page. Please do not republish our articles without permission.</p>
+
+    <h2>Changes</h2>
+    <p>We may update these terms from time to time. The date at the top shows the latest version. Continued use of the site means you accept the updated terms.</p>
+
+    <h2>Contact</h2>
+    <p>Questions? Email <a href="mailto:hello@geosyncx.com">hello@geosyncx.com</a>.</p>`,
+}));
+
+console.log("Generated about, privacy and terms pages.");

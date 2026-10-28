@@ -142,6 +142,16 @@ export default function Footer({ darkMode }) {
                   Contact Us
                 </a>
               </li>
+              <li>
+                <a href="/privacy" className={`text-sm transition-colors ${linkClass}`}>
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className={`text-sm transition-colors ${linkClass}`}>
+                  Terms of Use
+                </a>
+              </li>
             </ul>
           </div>
         </div>

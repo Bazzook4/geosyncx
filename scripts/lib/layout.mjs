@@ -73,6 +73,8 @@ export const siteFooter = (year) => `
           <a href="/">Home</a>
           <a href="/about">About / Our Story</a>
           <a href="mailto:hello@geosyncx.com">Contact Us</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Use</a>
         </div>
       </div>
       <div class="footer-bottom">© ${year} GeoSyncX. Free timezone tools for global teams. Conversions use the IANA timezone database.</div>

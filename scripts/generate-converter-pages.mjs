@@ -82,6 +82,7 @@ ${seo.schema.map((s) => `  <script type="application/ld+json" data-rh="true">\n$
 ${seo.top}
 ${seo.rest}
   </div>
+  <p class="pre-legal"><a href="/about">About</a> · <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Use</a> · <a href="mailto:hello@geosyncx.com">Contact</a></p>
 </div></div>
 <noscript>The live converter needs JavaScript. The time difference, conversion chart and FAQ above work without it.</noscript>
 </body>

@@ -5,6 +5,7 @@ import { DEFAULT_SEO } from "./seo-config";
 import TimeComparison from "./TimeComparison.jsx";
 import BestMeetingFinder from "./BestMeetingFinder.jsx";
 import InAppGuide from "./InAppGuide.jsx";
+import AdUnit from "./AdUnit.jsx";
 import { normalizeTimezoneName } from "./timezones.js";
 
 const isValidZone = (tz) => {
@@ -120,6 +121,8 @@ export default function App({ darkMode, converter }) {
             darkMode={darkMode}
           />
         </div>
+
+        <AdUnit slot={import.meta.env.VITE_ADSENSE_SLOT_TOOL} />
 
         {/* In-App Help Guide */}
         <InAppGuide darkMode={darkMode} activeTab="timezones" />

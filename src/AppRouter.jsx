@@ -17,6 +17,7 @@ import AboutPage from "./pages/AboutPage.jsx";
 import PhoneCodeLookupPage from "./pages/PhoneCodeLookupPage.jsx";
 import FormatterPage from "./pages/FormatterPage.jsx";
 import LiveBoardPage from "./pages/LiveBoardPage.jsx";
+import TimelinePage from "./pages/TimelinePage.jsx";
 
 // Components
 import Footer from "./Footer.jsx";
@@ -69,6 +70,7 @@ export default function AppRouter() {
   const NAV_LINKS = [
     { to: "/tools/phone-code-lookup", label: "Phone Lookup" },
     { to: "/tools/formatter", label: "Formatter" },
+    { to: "/tools/timeline", label: "Timeline" },
     { to: "/tools/live-board", label: "Live Board" },
     { to: "/blog", label: "Blog" },
     { to: "/about", label: "About" },
@@ -194,6 +196,7 @@ export default function AppRouter() {
           <Route path="/tools/meeting-scheduler" element={<Navigate to="/command-center" replace />} />
           <Route path="/tools/best-meeting-time" element={<Navigate to="/command-center" replace />} />
           <Route path="/tools/formatter" element={<FormatterPage darkMode={darkMode} />} />
+          <Route path="/tools/timeline" element={<TimelinePage darkMode={darkMode} />} />
           <Route path="/tools/live-board" element={<LiveBoardPage darkMode={darkMode} />} />
 
           {/* Blog */}
