@@ -72,7 +72,7 @@ function ClockRow({ tz, label, isPrimary, darkMode, now, onRemove, isAnchor, onS
       <div
         className="w-1 h-10 rounded-full flex-shrink-0"
         style={{
-          background: isPrimary ? "#38bdf8" : isAnchor ? "#818cf8" : "rgba(255,255,255,0.08)",
+          background: isPrimary ? "#2dd4bf" : isAnchor ? "#5eead4" : "rgba(255,255,255,0.08)",
         }}
       />
 

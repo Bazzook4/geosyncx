@@ -1,5 +1,5 @@
 // /src/TimeComparison.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Fragment } from "react";
 import { DateTime } from "luxon";
 import { timezoneData } from "./timezones.js";
 import { TrashIcon, PhoneIcon } from "@heroicons/react/24/outline";
@@ -35,6 +35,44 @@ function getPhoneCode(entry) {
 
 function encode(s = "") {
   return encodeURIComponent(s).replace(/%20/g, "+");
+}
+
+// Thin 24-hour strip for one city: night/day shading, with the chosen hour highlighted.
+// Every strip starts at midnight of the primary date, so columns line up across rows.
+function DayStrip({ zone, primaryZone, selectedDate, selectedHour, onPick, darkMode }) {
+  if (!primaryZone || !selectedDate) return null;
+  const start = DateTime.fromISO(selectedDate, { zone: primaryZone }).startOf("day");
+  if (!start.isValid) return null;
+
+  return (
+    <div className="flex gap-px rounded-md overflow-hidden" role="group" aria-label="Pick an hour">
+      {Array.from({ length: 24 }, (_, h) => {
+        const local = start.plus({ hours: h }).setZone(zone);
+        const night = local.hour < 6 || local.hour >= 21;
+        const shoulder = !night && (local.hour < 8 || local.hour >= 19);
+        const tone = night
+          ? darkMode ? "bg-sky-950 text-sky-300" : "bg-slate-600 text-white"
+          : shoulder
+          ? darkMode ? "bg-sky-900/50 text-sky-200" : "bg-sky-200 text-sky-900"
+          : darkMode ? "bg-white/15 text-white" : "bg-sky-50 text-slate-700";
+        return (
+          <button
+            type="button"
+            key={h}
+            onClick={() => onPick(h)}
+            title={local.toFormat("ccc d LLL, h:mm a")}
+            aria-label={local.toFormat("ccc d LLL, h:mm a")}
+            aria-pressed={h === selectedHour}
+            className={`flex-1 h-6 text-[9px] leading-6 text-center tabular-nums ${tone} ${
+              h === selectedHour ? "ring-2 ring-inset ring-amber-400" : "hover:brightness-110"
+            }`}
+          >
+            <span className="hidden md:inline">{local.hour}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function TimeComparison({
@@ -432,9 +470,9 @@ export default function TimeComparison({
                 const converted = convertTime(tz);
 
                 return (
+                  <Fragment key={tz}>
                   <tr
-                    key={tz}
-                    className={`border-b border-white/10 ${rowHoverClass} transition`}
+                    className={`${rowHoverClass} transition`}
                   >
                     <td className="p-2 flex items-center gap-2 md:w-1/2 w-[40%]">
                       <div className="flex flex-col gap-1">
@@ -543,6 +581,21 @@ export default function TimeComparison({
                       </div>
                     </td>
                   </tr>
+                  <tr className="border-b border-white/10">
+                    <td colSpan={3} className="px-2 pb-3">
+                      <DayStrip
+                        zone={tz}
+                        primaryZone={primaryZone}
+                        selectedDate={selectedDate}
+                        selectedHour={Number((selectedTime || "").split(":")[0])}
+                        onPick={(h) =>
+                          setSelectedTime(`${String(h).padStart(2, "0")}:${(selectedTime || "00:00").split(":")[1] || "00"}`)
+                        }
+                        darkMode={darkMode}
+                      />
+                    </td>
+                  </tr>
+                  </Fragment>
                 );
               })}
               {sortedTimezones.length === 0 && (

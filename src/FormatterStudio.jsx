@@ -375,7 +375,7 @@ function CodeViewer({ highlighted, output, format, darkMode }) {
               <span style={{ minWidth: `${lineNumWidth}ch`, textAlign: "right", fontSize: "0.75rem" }}>
                 {i + 1}
               </span>
-              <span style={{ width: "14px", textAlign: "center", fontSize: "0.65rem", color: darkMode ? "#38bdf8" : "#0284c7" }}>
+              <span style={{ width: "14px", textAlign: "center", fontSize: "0.65rem", color: darkMode ? "#2dd4bf" : "#0f766e" }}>
                 {isFoldable ? (isCollapsed ? "▶" : "▼") : ""}
               </span>
             </div>
@@ -403,7 +403,7 @@ function CodeViewer({ highlighted, output, format, darkMode }) {
                       borderRadius: "4px",
                       fontSize: "0.7rem",
                       background: darkMode ? "rgba(56,189,248,0.15)" : "rgba(2,132,199,0.1)",
-                      color: darkMode ? "#38bdf8" : "#0284c7",
+                      color: darkMode ? "#2dd4bf" : "#0f766e",
                       border: `1px solid ${darkMode ? "rgba(56,189,248,0.3)" : "rgba(2,132,199,0.2)"}`,
                     }}
                   >

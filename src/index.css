@@ -1,6 +1,33 @@
 /* /src/index.css */
 @import "tailwindcss";
 
+/* Accent palette: sky and indigo both resolve to teal so the whole app shares one accent.
+   500 maps to teal-600 (not 500) so white text on buttons stays readable. */
+@theme {
+  --color-sky-50: oklch(98.4% 0.014 180.72);
+  --color-sky-100: oklch(95.3% 0.051 180.801);
+  --color-sky-200: oklch(91% 0.096 180.426);
+  --color-sky-300: oklch(85.5% 0.138 181.071);
+  --color-sky-400: oklch(77.7% 0.152 181.912);
+  --color-sky-500: oklch(60% 0.118 184.704);
+  --color-sky-600: oklch(51.1% 0.096 186.391);
+  --color-sky-700: oklch(43.7% 0.078 188.216);
+  --color-sky-800: oklch(38.6% 0.063 188.416);
+  --color-sky-900: oklch(38.6% 0.063 188.416);
+  --color-sky-950: oklch(27.7% 0.046 192.524);
+  --color-indigo-50: oklch(98.4% 0.014 180.72);
+  --color-indigo-100: oklch(95.3% 0.051 180.801);
+  --color-indigo-200: oklch(91% 0.096 180.426);
+  --color-indigo-300: oklch(85.5% 0.138 181.071);
+  --color-indigo-400: oklch(77.7% 0.152 181.912);
+  --color-indigo-500: oklch(60% 0.118 184.704);
+  --color-indigo-600: oklch(51.1% 0.096 186.391);
+  --color-indigo-700: oklch(43.7% 0.078 188.216);
+  --color-indigo-800: oklch(38.6% 0.063 188.416);
+  --color-indigo-900: oklch(38.6% 0.063 188.416);
+  --color-indigo-950: oklch(27.7% 0.046 192.524);
+}
+
 /* Optional: smoother font rendering + dark mode base */
 :root {
   color-scheme: light dark;
@@ -20,7 +47,7 @@ html, body, #root {
   color: #60a5fa;
 }
 .formatter-output .token-boolean {
-  color: #38bdf8;
+  color: #2dd4bf;
   font-weight: 600;
 }
 .formatter-output .token-null {
@@ -28,7 +55,7 @@ html, body, #root {
   font-style: italic;
 }
 .formatter-output .token-tag {
-  color: #38bdf8;
+  color: #2dd4bf;
 }
 .formatter-output .token-attr-name {
   color: #f97316;
