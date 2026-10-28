@@ -815,8 +815,8 @@ export default function TimeComparison({
                           <TrashIcon className="w-5 h-5" aria-hidden="true" />
                         </button>
                       </div>
-                      <div className="flex flex-wrap md:flex-nowrap xl:flex-wrap items-center gap-x-2 gap-y-1 min-w-0 whitespace-nowrap xl:whitespace-normal">
-                        <p className="font-medium">
+                      <div className="flex flex-nowrap items-center gap-x-2 min-w-0 whitespace-nowrap">
+                        <p className="font-medium shrink-0" title={timezone?.gmt || undefined}>
                           {timezone?.city || tz}
                           {tz === primaryZone && (
                             <span className={`ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 inline-block ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
@@ -825,15 +825,11 @@ export default function TimeComparison({
                           )}
                         </p>
                         <p
-                          className={`text-sm ${mutedClass}`}
+                          className={`text-sm truncate ${mutedClass}`}
+                          title={timezone?.country || undefined}
                         >
                           {timezone?.country || ""}
                         </p>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full shrink-0 ${chipClass}`}
-                        >
-                          {timezone?.gmt || ""}
-                        </span>
                         {getPhoneCode(timezone) && (
                           <span
                             className={`text-xs font-mono px-2 py-1 rounded-full shrink-0 ${chipClass}`}
